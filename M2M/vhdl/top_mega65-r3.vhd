@@ -78,7 +78,7 @@ port (
    joy_2_left_n   : in  std_logic;
    joy_2_right_n  : in  std_logic;
    joy_2_fire_n   : in  std_logic;
-   
+
    paddle         : in std_logic_vector(3 downto 0);
    paddle_drain   : out std_logic;
 
@@ -109,7 +109,7 @@ port (
    iec_data_en    : out std_logic;
    iec_data_i     : in std_logic;
    iec_data_o     : out std_logic;
-   iec_srq_en     : out std_logic;   
+   iec_srq_en     : out std_logic;
    iec_srq_i      : in std_logic;
    iec_srq_o      : out std_logic;
 
@@ -117,7 +117,7 @@ port (
    -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
    cart_ctrl_en   : out std_logic;
    cart_ctrl_dir  : out std_logic;
-   cart_addr_en   : out std_logic;     
+   cart_addr_en   : out std_logic;
    cart_haddr_dir : out std_logic;
    cart_laddr_dir : out std_logic;
    cart_data_en   : out std_logic;
@@ -127,11 +127,11 @@ port (
    cart_reset     : out std_logic;                 -- R3 board bug. Should be inout.
    cart_phi2      : out std_logic;
    cart_dotclock  : out std_logic;
-   
+
    cart_nmi       : in std_logic;                  -- R3 board bug. Should be inout.
    cart_irq       : in std_logic;                  -- R3 board bug. Should be inout.
    cart_dma       : in std_logic;
-   cart_exrom     : in std_logic;   
+   cart_exrom     : in std_logic;
    cart_game      : in std_logic;
 
    cart_ba        : inout std_logic;
@@ -504,7 +504,7 @@ begin
          main_kb_key_num_i       => main_key_num,
          main_kb_key_pressed_n_i => main_key_pressed_n,
          main_power_led_o        => main_power_led,
-         main_power_led_col_o    => main_power_led_col,         
+         main_power_led_col_o    => main_power_led_col,
          main_drive_led_o        => main_drive_led,
          main_drive_led_col_o    => main_drive_led_col,
 
@@ -543,11 +543,11 @@ begin
          hr_core_waitrequest_i   => hr_core_waitrequest,
          hr_high_i               => hr_high,
          hr_low_i                => hr_low,
-         
+
          --------------------------------------------------------------------
          -- C64 specific ports that are not supported by the M2M framework
          --------------------------------------------------------------------
-        
+
          -- CBM-488/IEC serial port
          iec_reset_n_o     => iec_reset,
          iec_atn_n_o       => iec_atn,
@@ -557,10 +557,10 @@ begin
          iec_data_en_o     => iec_data_en,
          iec_data_n_i      => iec_data_i,
          iec_data_n_o      => iec_data_o,
-         iec_srq_en_o      => iec_srq_en,   
+         iec_srq_en_o      => iec_srq_en,
          iec_srq_n_i       => iec_srq_i,
          iec_srq_n_o       => iec_srq_o,
-            
+
          -- C64 Expansion Port (aka Cartridge Port) control lines
          -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
          cart_ctrl_en_o    => cart_ctrl_en,
@@ -570,27 +570,28 @@ begin
          cart_laddr_dir_o  => cart_laddr_dir,
          cart_data_en_o    => cart_data_en,
          cart_data_dir_o   => cart_data_dir,
-             
+
          -- C64 Expansion Port (aka Cartridge Port)
          cart_reset_o      => cart_reset,
          cart_phi2_o       => cart_phi2,
          cart_dotclock_o   => cart_dotclock,
-         
+
          cart_nmi_i        => cart_nmi,
          cart_irq_i        => cart_irq,
          cart_dma_i        => cart_dma,
-         cart_exrom_i      => cart_exrom,     
+         cart_exrom_i      => cart_exrom,
          cart_game_i       => cart_game,
-         
+
          cart_ba_io        => cart_ba,
          cart_rw_io        => cart_rw,
          cart_roml_io      => cart_roml,
          cart_romh_io      => cart_romh,
          cart_io1_io       => cart_io1,
          cart_io2_io       => cart_io2,
-     
+
          cart_d_io         => cart_d,
-         cart_a_io         => cart_a        
+         cart_a_io         => cart_a
       ); -- CORE
-      
+
 end architecture synthesis;
+
