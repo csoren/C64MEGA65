@@ -82,8 +82,8 @@ port (
    paddle_drain_o     : out   std_logic;
 
    -- Built-in HyperRAM
-   hr_d_io            : inout   std_logic_vector(7 downto 0);    -- Data/Address
-   hr_rwds_io         : inout   std_logic;               -- RW Data strobe
+   hr_d_io            : inout std_logic_vector(7 downto 0);    -- Data/Address
+   hr_rwds_io         : inout std_logic;                 -- RW Data strobe
    hr_reset_o         : out   std_logic;                 -- Active low RESET line to HyperRAM
    hr_clk_p_o         : out   std_logic;
    hr_cs0_o           : out   std_logic;
@@ -123,7 +123,7 @@ port (
    cart_data_dir_o    : out   std_logic;
 
    -- C64 Expansion Port (aka Cartridge Port)
-   cart_reset_o       : out   std_logic;                 -- R3 board bug. Should be inout.
+   cart_reset_o       : out   std_logic;                  -- R3 board bug. Should be inout.
    cart_phi2_o        : out   std_logic;
    cart_dotclock_o    : out   std_logic;
 
@@ -274,56 +274,56 @@ begin
    i_framework : entity work.framework
    port map (
       -- Connect to I/O ports
-      CLK                     => clk_i,
-      max10_tx                => max10_tx_i,
-      max10_rx                => max10_rx_o,
-      max10_clkandsync        => max10_clkandsync_o,
-      UART_RXD                => uart_rxd_i,
-      UART_TXD                => uart_txd_o,
-      VGA_RED                 => vga_red_o,
-      VGA_GREEN               => vga_green_o,
-      VGA_BLUE                => vga_blue_o,
-      VGA_HS                  => vga_hs_o,
-      VGA_VS                  => vga_vs_o,
-      vdac_clk                => vdac_clk_o,
-      vdac_sync_n             => vdac_sync_n_o,
-      vdac_blank_n            => vdac_blank_n_o,
-      tmds_data_p             => tmds_data_p_o,
-      tmds_data_n             => tmds_data_n_o,
-      tmds_clk_p              => tmds_clk_p_o,
-      tmds_clk_n              => tmds_clk_n_o,
-      kb_io0                  => kb_io0_o,
-      kb_io1                  => kb_io1_o,
-      kb_io2                  => kb_io2_i,
-      SD_RESET                => sd_reset_o,
-      SD_CLK                  => sd_clk_o,
-      SD_MOSI                 => sd_mosi_o,
-      SD_MISO                 => sd_miso_i,
-      SD_CD                   => sd_cd_i,
-      SD2_RESET               => sd2_reset_o,
-      SD2_CLK                 => sd2_clk_o,
-      SD2_MOSI                => sd2_mosi_o,
-      SD2_MISO                => sd2_miso_i,
-      SD2_CD                  => sd2_cd_i,
-      pwm_l                   => pwm_l_o,
-      pwm_r                   => pwm_r_o,
-      joy_1_up_n              => joy_1_up_n_i,
-      joy_1_down_n            => joy_1_down_n_i,
-      joy_1_left_n            => joy_1_left_n_i,
-      joy_1_right_n           => joy_1_right_n_i,
-      joy_1_fire_n            => joy_1_fire_n_i,
-      joy_2_up_n              => joy_2_up_n_i,
-      joy_2_down_n            => joy_2_down_n_i,
-      joy_2_left_n            => joy_2_left_n_i,
-      joy_2_right_n           => joy_2_right_n_i,
-      joy_2_fire_n            => joy_2_fire_n_i,
-      paddle                  => paddle_i,
-      paddle_drain            => paddle_drain_o,
-      hr_d                    => hr_d_io,
-      hr_rwds                 => hr_rwds_io,
-      hr_reset                => hr_reset_o,
-      hr_clk_p                => hr_clk_p_o,
-      hr_cs0                  => hr_cs0_o,
+      clk_i                   => clk_i,
+      max10_tx_i              => max10_tx_i,
+      max10_rx_o              => max10_rx_o,
+      max10_clkandsync_o      => max10_clkandsync_o,
+      uart_rxd_i              => uart_rxd_i,
+      uart_txd_o              => uart_txd_o,
+      vga_red_o               => vga_red_o,
+      vga_green_o             => vga_green_o,
+      vga_blue_o              => vga_blue_o,
+      vga_hs_o                => vga_hs_o,
+      vga_vs_o                => vga_vs_o,
+      vdac_clk_o              => vdac_clk_o,
+      vdac_sync_n_o           => vdac_sync_n_o,
+      vdac_blank_n_o          => vdac_blank_n_o,
+      tmds_data_p_o           => tmds_data_p_o,
+      tmds_data_n_o           => tmds_data_n_o,
+      tmds_clk_p_o            => tmds_clk_p_o,
+      tmds_clk_n_o            => tmds_clk_n_o,
+      kb_io0_o                => kb_io0_o,
+      kb_io1_o                => kb_io1_o,
+      kb_io2_i                => kb_io2_i,
+      sd_reset_o              => sd_reset_o,
+      sd_clk_o                => sd_clk_o,
+      sd_mosi_o               => sd_mosi_o,
+      sd_miso_i               => sd_miso_i,
+      sd_cd_i                 => sd_cd_i,
+      sd2_reset_o             => sd2_reset_o,
+      sd2_clk_o               => sd2_clk_o,
+      sd2_mosi_o              => sd2_mosi_o,
+      sd2_miso_i              => sd2_miso_i,
+      sd2_cd_i                => sd2_cd_i,
+      pwm_l_o                 => pwm_l_o,
+      pwm_r_o                 => pwm_r_o,
+      joy_1_up_n_i            => joy_1_up_n_i,
+      joy_1_down_n_i          => joy_1_down_n_i,
+      joy_1_left_n_i          => joy_1_left_n_i,
+      joy_1_right_n_i         => joy_1_right_n_i,
+      joy_1_fire_n_i          => joy_1_fire_n_i,
+      joy_2_up_n_i            => joy_2_up_n_i,
+      joy_2_down_n_i          => joy_2_down_n_i,
+      joy_2_left_n_i          => joy_2_left_n_i,
+      joy_2_right_n_i         => joy_2_right_n_i,
+      joy_2_fire_n_i          => joy_2_fire_n_i,
+      paddle_i                => paddle_i,
+      paddle_drain_o          => paddle_drain_o,
+      hr_d_io                 => hr_d_io,
+      hr_rwds_io              => hr_rwds_io,
+      hr_reset_o              => hr_reset_o,
+      hr_clk_p_o              => hr_clk_p_o,
+      hr_cs0_o                => hr_cs0_o,
 
       -- Connect to CORE
       qnice_clk_o             => qnice_clk,
