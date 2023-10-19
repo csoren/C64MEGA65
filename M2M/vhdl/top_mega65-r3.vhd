@@ -271,7 +271,7 @@ architecture synthesis of CORE_R3 is
 
 begin
 
-   i_framework : entity work.framework
+   i_hal_r3 : entity work.hal_r3
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,
@@ -409,7 +409,7 @@ begin
       qnice_ramrom_ce_o       => qnice_ramrom_ce,
       qnice_ramrom_we_o       => qnice_ramrom_we,
       qnice_ramrom_wait_i     => qnice_ramrom_wait
-   ); -- i_framework
+   ); -- i_hal_r3
 
 
    ---------------------------------------------------------------------------------------------------------------
