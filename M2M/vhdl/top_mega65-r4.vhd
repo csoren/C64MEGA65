@@ -17,7 +17,7 @@ port (
    clk_i                   : in    std_logic;
 
    -- Reset button on the side of the machine
-   reset_button_i          : in    std_logic;
+   reset_button_i          : in    std_logic;      -- Active high
 
    -- USB-RS232 Interface
    uart_rxd_i              : in    std_logic;
@@ -679,6 +679,69 @@ begin
          cart_d_io         => cart_d_io,
          cart_a_io         => cart_a_io
       ); -- CORE
+
+   -- Safe default values
+   vga_scl_io            <= 'Z';
+   vga_sda_io            <= 'Z';
+   vdac_psave_n_o        <= '1';
+   hdmi_hiz_o            <= '0';
+   hdmi_enable_n_o       <= '0';
+   hdmi_hpd_a_io         <= 'Z';
+   hdmi_scl_io           <= 'Z';
+   hdmi_sda_io           <= 'Z';
+   audio_acks_o          <= '0';
+   audio_bick_o          <= '0';
+   audio_cdti_o          <= '0';
+   audio_lrclk_o         <= '0';
+   audio_mclk_o          <= '0';
+   audio_powerdown_n_o   <= '0';
+   audio_sdata_o         <= '0';
+   audio_smute_o         <= '0';
+   dbg_io                <= (others => 'Z');
+   eth_clock_o           <= '0';
+   eth_led2_o            <= '0';
+   eth_mdc_o             <= '0';
+   eth_mdio_io           <= 'Z';
+   eth_reset_o           <= '1';
+   eth_txd_o             <= (others => '0');
+   eth_txen_o            <= '0';
+   f_density_o           <= '0';
+   f_motora_o            <= '0';
+   f_motorb_o            <= '0';
+   f_selecta_o           <= '0';
+   f_selectb_o           <= '0';
+   f_side1_o             <= '0';
+   f_stepdir_o           <= '0';
+   f_step_o              <= '0';
+   f_wdata_o             <= '0';
+   f_wgate_o             <= '0';
+   fpga_sda_io           <= 'Z';
+   fpga_scl_io           <= 'Z';
+   grove_sda_io          <= 'Z';
+   grove_scl_io          <= 'Z';
+   joystick_5v_disable_o <= '0';
+   led_g_n_o             <= '0';
+   led_r_n_o             <= '0';
+   led_o                 <= '1';
+   p1lo_io               <= (others => 'Z');
+   p1hi_io               <= (others => 'Z');
+   p2lo_io               <= (others => 'Z');
+   p2hi_io               <= (others => 'Z');
+   pmod1_en_o            <= '0';
+   pmod2_en_o            <= '0';
+   qspidb_io             <= (others => 'Z');
+   qspicsn_o             <= '1';
+   sdram_clk_o           <= '0';
+   sdram_cke_o           <= '0';
+   sdram_ras_n_o         <= '1';
+   sdram_cas_n_o         <= '1';
+   sdram_we_n_o          <= '1';
+   sdram_cs_n_o          <= '1';
+   sdram_ba_o            <= (others => '0');
+   sdram_a_o             <= (others => '0');
+   sdram_dqml_o          <= '0';
+   sdram_dqmh_o          <= '0';
+   sdram_dq_io           <= (others => 'Z');
 
 end architecture synthesis;
 

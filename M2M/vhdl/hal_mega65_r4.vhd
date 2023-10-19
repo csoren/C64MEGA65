@@ -177,7 +177,7 @@ begin
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,
-      reset_n_i               => reset_button_i,
+      reset_n_i               => not reset_button_i,
       uart_rxd_i              => uart_rxd_i,
       uart_txd_o              => uart_txd_o,
       vga_red_o               => vga_red_o,
