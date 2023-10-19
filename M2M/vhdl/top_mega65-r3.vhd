@@ -13,15 +13,15 @@ use ieee.numeric_std.all;
 
 entity CORE_R3 is
 port (
-   clk_i              : in    std_logic;                 -- 100 mhz clock
+   -- Onboard crystal oscillator = 100 MHz
+   clk_i              : in    std_logic;
 
    -- MAX10 FPGA (delivers reset)
    max10_tx_i         : in    std_logic;
    max10_rx_o         : out   std_logic;
    max10_clkandsync_o : out   std_logic;
 
-   -- serial communication (rxd, txd only; rts/cts are not available)
-   -- 115.200 baud, 8-N-1
+   -- USB-RS232 Interface
    uart_rxd_i         : in    std_logic;                 -- receive data
    uart_txd_o         : out   std_logic;                 -- send data
 
