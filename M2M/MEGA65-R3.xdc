@@ -231,10 +231,6 @@ create_generated_clock -name tmds_576p_clk [get_pins i_hal_r3/i_framework/i_clk_
 create_generated_clock -name hdmi_576p_clk [get_pins i_hal_r3/i_framework/i_clk_m2m/i_clk_hdmi_576p/CLKOUT1]
 create_generated_clock -name main_clk      [get_pins CORE/clk_gen/i_clk_c64_orig/CLKOUT0]
 
-## Assume the core is running at the original (slightly faster) clock.
-## This halves the number of set_false_path needed.
-set_case_analysis 0 [get_pins CORE/core_speed_reg[0]/Q]
-
 ## Clock divider sdcard_clk that creates the 25 MHz used by sd_spi.vhd
 create_generated_clock -name sdcard_clk -source [get_pins i_hal_r3/i_framework/i_clk_m2m/i_clk_qnice/CLKOUT0] -divide_by 2 [get_pins i_hal_r3/i_framework/QNICE_SOC/sd_card/Slow_Clock_25MHz_reg/Q]
 
@@ -261,19 +257,6 @@ set_false_path -from [get_clocks qnice_clk]       -to [get_clocks tmds_720p_clk]
 ## Assume the HDMI output is 720p, which is the fastest clock.
 ## No need to do timing analysis on the slower HDMI clocks as well.
 set_case_analysis 0 [get_nets i_hal_r3/i_framework/i_clk_m2m/hdmi_clk_sel_i]
-
-## CDC in IEC drives, handled manually in the source code
-set_false_path -from [get_pins -hier id1_reg[*]/C]
-set_false_path -from [get_pins -hier id2_reg[*]/C]
-set_false_path -from [get_pins -hier busy_reg/C]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/reset_sync/s1_reg[*]/D]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/change_sync/s1_reg[*]/D]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/save_sync/s1_reg[*]/D]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/track_sync/s1_reg[*]/D]
-
-## Disk type register that moves very slow (on each (re-)mount) and that is initialized with very stable signals 
-set_false_path -from [get_pins CORE/i_main/i_iec_drive/dtype_reg[*][*]/C]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/dtype_reg[*][*]/D]
 
 ## The high level reset signals are slow enough so that we can afford a false path
 set_false_path -from [get_pins i_hal_r3/i_framework/i_reset_manager/reset_m2m_n_o_reg/C]
