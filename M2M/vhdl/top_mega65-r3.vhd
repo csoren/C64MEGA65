@@ -100,17 +100,17 @@ port (
    --------------------------------------------------------------------
 
    -- CBM-488/IEC serial port
-   iec_reset_o        : out   std_logic;
-   iec_atn_o          : out   std_logic;
+   iec_reset_n_o      : out   std_logic;
+   iec_atn_n_o        : out   std_logic;
    iec_clk_en_o       : out   std_logic;
-   iec_clk_i          : in    std_logic;
-   iec_clk_o          : out   std_logic;
+   iec_clk_n_i        : in    std_logic;
+   iec_clk_n_o        : out   std_logic;
    iec_data_en_o      : out   std_logic;
-   iec_data_i         : in    std_logic;
-   iec_data_o         : out   std_logic;
+   iec_data_n_i       : in    std_logic;
+   iec_data_n_o       : out   std_logic;
    iec_srq_en_o       : out   std_logic;
-   iec_srq_i          : in    std_logic;
-   iec_srq_o          : out   std_logic;
+   iec_srq_n_i        : in    std_logic;
+   iec_srq_n_o        : out   std_logic;
 
    -- C64 Expansion Port (aka Cartridge Port) control lines
    -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
@@ -548,17 +548,17 @@ begin
          --------------------------------------------------------------------
 
          -- CBM-488/IEC serial port
-         iec_reset_n_o     => iec_reset_o,
-         iec_atn_n_o       => iec_atn_o,
+         iec_reset_n_o     => iec_reset_n_o,
+         iec_atn_n_o       => iec_atn_n_o,
          iec_clk_en_o      => iec_clk_en_o,
-         iec_clk_n_i       => iec_clk_i,
-         iec_clk_n_o       => iec_clk_o,
+         iec_clk_n_i       => iec_clk_n_i,
+         iec_clk_n_o       => iec_clk_n_o,
          iec_data_en_o     => iec_data_en_o,
-         iec_data_n_i      => iec_data_i,
-         iec_data_n_o      => iec_data_o,
+         iec_data_n_i      => iec_data_n_i,
+         iec_data_n_o      => iec_data_n_o,
          iec_srq_en_o      => iec_srq_en_o,
-         iec_srq_n_i       => iec_srq_i,
-         iec_srq_n_o       => iec_srq_o,
+         iec_srq_n_i       => iec_srq_n_i,
+         iec_srq_n_o       => iec_srq_n_o,
 
          -- C64 Expansion Port (aka Cartridge Port) control lines
          -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
