@@ -179,15 +179,56 @@ end entity hal_r3;
 
 architecture synthesis of hal_r3 is
 
+  signal reset_n : std_logic;
+
 begin
+
+   -----------------------------------------------------------------------------------------
+   -- MAX10 FPGA handling: extract reset signal
+   -----------------------------------------------------------------------------------------
+
+   MAX10 : entity work.max10
+      port map (
+         pixelclock        => clk_i,
+         cpuclock          => clk_i,
+         led               => open,
+
+         max10_rx          => max10_rx_o,
+         max10_tx          => max10_tx_i,
+         max10_clkandsync  => max10_clkandsync_o,
+
+         max10_fpga_commit => open,
+         max10_fpga_date   => open,
+         reset_button      => reset_n,
+         dipsw             => open,
+         j21in             => open,
+         j21ddr            => (others => '0'),
+         j21out            => (others => '0')
+      );
+
+   ---------------------------------------------------------------------------------------------
+   -- Audio output (3.5 mm jack)
+   ---------------------------------------------------------------------------------------------
+
+   -- Convert the C64's PCM output to pulse density modulation
+   i_pcm2pdm : entity work.pcm_to_pdm
+      port map
+      (
+         cpuclock         => main_clk_i,
+         pcm_left         => main_audio_l_i,
+         pcm_right        => main_audio_r_i,
+         -- Pulse Density Modulation (PDM is supposed to sound better than PWM on MEGA65)
+         pdm_left         => pwm_l_o,
+         pdm_right        => pwm_r_o,
+         audio_mode       => '0'         -- 0=PDM, 1=PWM
+      ); -- i_pcm2pdm
+
 
    i_framework : entity work.framework
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,
-      max10_tx_i              => max10_tx_i,
-      max10_rx_o              => max10_rx_o,
-      max10_clkandsync_o      => max10_clkandsync_o,
+      reset_n_i               => reset_n,
       uart_rxd_i              => uart_rxd_i,
       uart_txd_o              => uart_txd_o,
       vga_red_o               => vga_red_o,
@@ -215,8 +256,6 @@ begin
       sd2_mosi_o              => sd2_mosi_o,
       sd2_miso_i              => sd2_miso_i,
       sd2_cd_i                => sd2_cd_i,
-      pwm_l_o                 => pwm_l_o,
-      pwm_r_o                 => pwm_r_o,
       joy_1_up_n_i            => joy_1_up_n_i,
       joy_1_down_n_i          => joy_1_down_n_i,
       joy_1_left_n_i          => joy_1_left_n_i,

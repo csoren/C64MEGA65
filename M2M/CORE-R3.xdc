@@ -81,7 +81,7 @@ resize_pblock pblock_i_hyperram -add {SLICE_X0Y200:SLICE_X7Y224}
 
 # Place MAX10 close to I/O pins
 create_pblock pblock_MAX10
-add_cells_to_pblock pblock_MAX10 [get_cells [list i_hal_r3/i_framework/MAX10]]
+add_cells_to_pblock pblock_MAX10 [get_cells [list i_hal_r3/MAX10]]
 resize_pblock pblock_MAX10 -add {SLICE_X0Y150:SLICE_X7Y174}
 
 # Place Keyboard close to I/O pins

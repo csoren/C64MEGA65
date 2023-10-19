@@ -22,11 +22,7 @@ use xpm.vcomponents.all;
 entity framework is
 port (
    clk_i                   : in    std_logic;                  -- 100 MHz clock
-
-   -- MAX10 FPGA (delivers reset)
-   max10_tx_i              : in    std_logic;
-   max10_rx_o              : out   std_logic;
-   max10_clkandsync_o      : out   std_logic;
+   reset_n_i               : in    std_logic;
 
    -- Serial communication (rxd, txd only; rts/cts are not available)
    -- 115.200 baud, 8-N-1
@@ -69,10 +65,6 @@ port (
    sd2_mosi_o              : out   std_logic;
    sd2_miso_i              : in    std_logic;
    sd2_cd_i                : in    std_logic;
-
-   -- 3.5mm analog audio jack
-   pwm_l_o                 : out   std_logic;
-   pwm_r_o                 : out   std_logic;
 
    -- Joysticks and Paddles
    joy_1_up_n_i            : in    std_logic;
@@ -232,7 +224,6 @@ signal hdmi_rst               : std_logic;
 -- Reset Control
 ---------------------------------------------------------------------------------------------
 
-signal reset_n                : std_logic;
 signal reset_n_dbnce          : std_logic;
 signal reset_core_n           : std_logic;
 
@@ -383,33 +374,10 @@ begin
    qnice_clk_o <= qnice_clk;
    qnice_rst_o <= qnice_rst;
 
-   -----------------------------------------------------------------------------------------
-   -- MAX10 FPGA handling: extract reset signal
-   -----------------------------------------------------------------------------------------
-
-   MAX10 : entity work.max10
-      port map (
-         pixelclock        => clk_i,
-         cpuclock          => clk_i,
-         led               => open,
-
-         max10_rx          => max10_rx_o,
-         max10_tx          => max10_tx_i,
-         max10_clkandsync  => max10_clkandsync_o,
-
-         max10_fpga_commit => open,
-         max10_fpga_date   => open,
-         reset_button      => reset_n,
-         dipsw             => open,
-         j21in             => open,
-         j21ddr            => (others => '0'),
-         j21out            => (others => '0')
-      );
-
    -- 20 ms stable time for the reset button
    i_reset_debouncer : entity work.debounce
       generic map(initial => '1', clk_freq => BOARD_CLK_SPEED, stable_time => 20)
-      port map (clk => clk_i, reset_n => '1', button => reset_n, result => reset_n_dbnce);
+      port map (clk => clk_i, reset_n => '1', button => reset_n_i, result => reset_n_dbnce);
 
    ---------------------------------------------------------------------------------------------------------------
    -- Generate clocks and reset signals
@@ -1033,8 +1001,6 @@ begin
          vdac_clk                => vdac_clk_o,
          vdac_sync_n             => vdac_sync_n_o,
          vdac_blank_n            => vdac_blank_n_o,
-         pwm_l                   => pwm_l_o,
-         pwm_r                   => pwm_r_o,
          hdmi_clk_i              => hdmi_clk,
          hdmi_rst_i              => hdmi_rst,
          tmds_clk_i              => tmds_clk,
