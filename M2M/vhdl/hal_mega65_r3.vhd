@@ -10,7 +10,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity hal_r3 is
+entity hal_mega65_r3 is
 port (
    clk_i                   : in    std_logic;                  -- 100 MHz clock
 
@@ -175,9 +175,9 @@ port (
    qnice_ramrom_we_o       : out   std_logic;
    qnice_ramrom_wait_i     : in    std_logic
 );
-end entity hal_r3;
+end entity hal_mega65_r3;
 
-architecture synthesis of hal_r3 is
+architecture synthesis of hal_mega65_r3 is
 
   signal reset_n : std_logic;
 

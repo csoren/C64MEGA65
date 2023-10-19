@@ -11,7 +11,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity CORE_R3 is
+entity mega65_r3 is
 port (
    -- Onboard crystal oscillator = 100 MHz
    clk_i              : in    std_logic;
@@ -22,8 +22,8 @@ port (
    max10_clkandsync_o : out   std_logic;
 
    -- USB-RS232 Interface
-   uart_rxd_i         : in    std_logic;                 -- receive data
-   uart_txd_o         : out   std_logic;                 -- send data
+   uart_rxd_i         : in    std_logic;
+   uart_txd_o         : out   std_logic;
 
    -- VGA and VDAC
    vga_red_o          : out   std_logic_vector(7 downto 0);
@@ -66,34 +66,28 @@ port (
    pwm_r_o            : out   std_logic;
 
    -- Joysticks and Paddles
-   joy_1_up_n_i       : in    std_logic;
-   joy_1_down_n_i     : in    std_logic;
-   joy_1_left_n_i     : in    std_logic;
-   joy_1_right_n_i    : in    std_logic;
-   joy_1_fire_n_i     : in    std_logic;
+   fa_up_n_i          : in    std_logic;
+   fa_down_n_i        : in    std_logic;
+   fa_left_n_i        : in    std_logic;
+   fa_right_n_i       : in    std_logic;
+   fa_fire_n_i        : in    std_logic;
 
-   joy_2_up_n_i       : in    std_logic;
-   joy_2_down_n_i     : in    std_logic;
-   joy_2_left_n_i     : in    std_logic;
-   joy_2_right_n_i    : in    std_logic;
-   joy_2_fire_n_i     : in    std_logic;
+   fb_up_n_i          : in    std_logic;
+   fb_down_n_i        : in    std_logic;
+   fb_left_n_i        : in    std_logic;
+   fb_right_n_i       : in    std_logic;
+   fb_fire_n_i        : in    std_logic;
 
    paddle_i           : in    std_logic_vector(3 downto 0);
    paddle_drain_o     : out   std_logic;
 
    -- Built-in HyperRAM
-   hr_d_io            : inout std_logic_vector(7 downto 0);    -- Data/Address
-   hr_rwds_io         : inout std_logic;                 -- RW Data strobe
-   hr_reset_o         : out   std_logic;                 -- Active low RESET line to HyperRAM
+   hr_d_io            : inout std_logic_vector(7 downto 0);
+   hr_rwds_io         : inout std_logic;
+   hr_reset_o         : out   std_logic;
    hr_clk_p_o         : out   std_logic;
    hr_cs0_o           : out   std_logic;
 
-   -- Optional additional HyperRAM in trap-door slot
---   hr2_d            : inout unsigned(7 downto 0);    -- Data/Address
---   hr2_rwds         : inout   std_logic;               -- RW Data strobe
---   hr2_reset        : out   std_logic;                 -- Active low RESET line to HyperRAM
---   hr2_clk_p        : out   std_logic;
---   hr_cs1           : out   std_logic;
 
    --------------------------------------------------------------------
    -- C64 specific ports that are not supported by the M2M framework
@@ -143,9 +137,9 @@ port (
    cart_d_io          : inout unsigned(7 downto 0);
    cart_a_io          : inout unsigned(15 downto 0)
 );
-end entity CORE_R3;
+end entity mega65_r3;
 
-architecture synthesis of CORE_R3 is
+architecture synthesis of mega65_r3 is
 
    signal main_clk    : std_logic;
    signal main_rst    : std_logic;
@@ -271,7 +265,7 @@ architecture synthesis of CORE_R3 is
 
 begin
 
-   i_hal_r3 : entity work.hal_r3
+   i_hal_mega65_r3 : entity work.hal_mega65_r3
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,
@@ -307,16 +301,16 @@ begin
       sd2_cd_i                => sd2_cd_i,
       pwm_l_o                 => pwm_l_o,
       pwm_r_o                 => pwm_r_o,
-      joy_1_up_n_i            => joy_1_up_n_i,
-      joy_1_down_n_i          => joy_1_down_n_i,
-      joy_1_left_n_i          => joy_1_left_n_i,
-      joy_1_right_n_i         => joy_1_right_n_i,
-      joy_1_fire_n_i          => joy_1_fire_n_i,
-      joy_2_up_n_i            => joy_2_up_n_i,
-      joy_2_down_n_i          => joy_2_down_n_i,
-      joy_2_left_n_i          => joy_2_left_n_i,
-      joy_2_right_n_i         => joy_2_right_n_i,
-      joy_2_fire_n_i          => joy_2_fire_n_i,
+      joy_1_up_n_i            => fa_up_n_i,
+      joy_1_down_n_i          => fa_down_n_i,
+      joy_1_left_n_i          => fa_left_n_i,
+      joy_1_right_n_i         => fa_right_n_i,
+      joy_1_fire_n_i          => fa_fire_n_i,
+      joy_2_up_n_i            => fb_up_n_i,
+      joy_2_down_n_i          => fb_down_n_i,
+      joy_2_left_n_i          => fb_left_n_i,
+      joy_2_right_n_i         => fb_right_n_i,
+      joy_2_fire_n_i          => fb_fire_n_i,
       paddle_i                => paddle_i,
       paddle_drain_o          => paddle_drain_o,
       hr_d_io                 => hr_d_io,
@@ -409,7 +403,7 @@ begin
       qnice_ramrom_ce_o       => qnice_ramrom_ce,
       qnice_ramrom_we_o       => qnice_ramrom_we,
       qnice_ramrom_wait_i     => qnice_ramrom_wait
-   ); -- i_hal_r3
+   ); -- i_hal_mega65_r3
 
 
    ---------------------------------------------------------------------------------------------------------------
@@ -574,20 +568,17 @@ begin
          cart_reset_o      => cart_reset_o,
          cart_phi2_o       => cart_phi2_o,
          cart_dotclock_o   => cart_dotclock_o,
-
          cart_nmi_i        => cart_nmi_i,
          cart_irq_i        => cart_irq_i,
          cart_dma_i        => cart_dma_i,
          cart_exrom_i      => cart_exrom_i,
          cart_game_i       => cart_game_i,
-
          cart_ba_io        => cart_ba_io,
          cart_rw_io        => cart_rw_io,
          cart_roml_io      => cart_roml_io,
          cart_romh_io      => cart_romh_io,
          cart_io1_io       => cart_io1_io,
          cart_io2_io       => cart_io2_io,
-
          cart_d_io         => cart_d_io,
          cart_a_io         => cart_a_io
       ); -- CORE
