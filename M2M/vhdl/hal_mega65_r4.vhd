@@ -57,6 +57,16 @@ port (
    sd2_miso_i              : in    std_logic;
    sd2_cd_i                : in    std_logic;
 
+   -- Audio DAC. U37 = AK4432VT
+   audio_mclk_o            : out   std_logic;   -- Master Clock Input Pin,       12.288 MHz
+   audio_bick_o            : out   std_logic;   -- Audio Serial Data Clock Pin,   3.072 MHz
+   audio_sdti_o            : out   std_logic;   -- Audio Serial Data Input Pin,  16-bit LSB justified
+   audio_lrclk_o           : out   std_logic;   -- Input Channel Clock Pin,      48.0 kHz
+   audio_pdn_n_o           : out   std_logic;   -- Power-Down & Reset Pin
+   audio_i2cfil_o          : out   std_logic;   -- I2C Interface Mode Select Pin
+   audio_scl_o             : out   std_logic;   -- Control Data Clock Input Pin
+   audio_sda_io            : inout std_logic;   -- Control Data Input/Output Pin
+
    -- Joysticks and Paddles
    joy_1_up_n_i            : in    std_logic;
    joy_1_down_n_i          : in    std_logic;
@@ -171,7 +181,30 @@ end entity hal_mega65_r4;
 
 architecture synthesis of hal_mega65_r4 is
 
+   signal audio_clk     : std_logic;
+   signal audio_reset   : std_logic;
+   signal audio_left    : signed(15 downto 0);
+   signal audio_right   : signed(15 downto 0);
+
 begin
+
+   -- Driver for the audio DAC (AK4432VT).
+   i_audio : entity work.audio
+      port map (
+         audio_clk_i    => audio_clk,
+         audio_reset_i  => audio_reset,
+         audio_left_i   => audio_left,
+         audio_right_i  => audio_right,
+         audio_test_i   => '0',           -- Set to 1 to output a simple sine wave @ 477 Hz.
+         audio_mclk_o   => audio_mclk_o,
+         audio_bick_o   => audio_bick_o,
+         audio_sdti_o   => audio_sdti_o,
+         audio_lrclk_o  => audio_lrclk_o,
+         audio_pdn_n_o  => audio_pdn_n_o,
+         audio_i2cfil_o => audio_i2cfil_o,
+         audio_scl_o    => audio_scl_o,
+         audio_sda_io   => audio_sda_io
+      ); -- i_audio
 
    i_framework : entity work.framework
    port map (
@@ -283,6 +316,12 @@ begin
       hr_core_waitrequest_o   => hr_core_waitrequest_o,
       hr_high_o               => hr_high_o,
       hr_low_o                => hr_low_o,
+
+      -- Audio
+      audio_clk_o             => audio_clk,
+      audio_reset_o           => audio_reset,
+      audio_left_o            => audio_left,
+      audio_right_o           => audio_right,
 
       -- Connect to QNICE
       qnice_dvi_i             => qnice_dvi_i,

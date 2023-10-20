@@ -77,14 +77,14 @@ port (
    sd2_wp_i                : in    std_logic;
 
    -- Audio DAC. U37 = AK4432VT
-   audio_acks_o            : out   std_logic;
-   audio_bick_o            : out   std_logic;
-   audio_cdti_o            : out   std_logic;
-   audio_lrclk_o           : out   std_logic;
-   audio_mclk_o            : out   std_logic;
-   audio_powerdown_n_o     : out   std_logic;
-   audio_sdata_o           : out   std_logic;
-   audio_smute_o           : out   std_logic;
+   audio_mclk_o            : out   std_logic;   -- Master Clock Input Pin,       12.288 MHz
+   audio_bick_o            : out   std_logic;   -- Audio Serial Data Clock Pin,   3.072 MHz
+   audio_sdti_o            : out   std_logic;   -- Audio Serial Data Input Pin,  16-bit LSB justified
+   audio_lrclk_o           : out   std_logic;   -- Input Channel Clock Pin,      48.0 kHz
+   audio_pdn_n_o           : out   std_logic;   -- Power-Down & Reset Pin
+   audio_i2cfil_o          : out   std_logic;   -- I2C Interface Mode Select Pin
+   audio_scl_o             : out   std_logic;   -- Control Data Clock Input Pin
+   audio_sda_io            : inout std_logic;   -- Control Data Input/Output Pin
 
    -- Joysticks and Paddles
    fa_up_n_i               : in    std_logic;
@@ -398,6 +398,14 @@ begin
       sd2_mosi_o              => sd_mosi_o,
       sd2_miso_i              => sd_miso_i,
       sd2_cd_i                => sd_cd_i,
+      audio_mclk_o            => audio_mclk_o,
+      audio_bick_o            => audio_bick_o,
+      audio_sdti_o            => audio_sdti_o,
+      audio_lrclk_o           => audio_lrclk_o,
+      audio_pdn_n_o           => audio_pdn_n_o,
+      audio_i2cfil_o          => audio_i2cfil_o,
+      audio_scl_o             => audio_scl_o,
+      audio_sda_io            => audio_sda_io,
       joy_1_up_n_i            => fa_up_n_i,
       joy_1_down_n_i          => fa_down_n_i,
       joy_1_left_n_i          => fa_left_n_i,
@@ -689,14 +697,6 @@ begin
    hdmi_hpd_a_io         <= 'Z';
    hdmi_scl_io           <= 'Z';
    hdmi_sda_io           <= 'Z';
-   audio_acks_o          <= '0';
-   audio_bick_o          <= '0';
-   audio_cdti_o          <= '0';
-   audio_lrclk_o         <= '0';
-   audio_mclk_o          <= '0';
-   audio_powerdown_n_o   <= '0';
-   audio_sdata_o         <= '0';
-   audio_smute_o         <= '0';
    dbg_io                <= (others => 'Z');
    eth_clock_o           <= '0';
    eth_led2_o            <= '0';
@@ -720,9 +720,9 @@ begin
    grove_sda_io          <= 'Z';
    grove_scl_io          <= 'Z';
    joystick_5v_disable_o <= '0';
-   led_g_n_o             <= '0';
-   led_r_n_o             <= '0';
-   led_o                 <= '1';
+   led_g_n_o             <= '1'; -- Off
+   led_r_n_o             <= '1'; -- Off
+   led_o                 <= '0'; -- Off
    p1lo_io               <= (others => 'Z');
    p1hi_io               <= (others => 'Z');
    p2lo_io               <= (others => 'Z');

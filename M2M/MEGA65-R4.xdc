@@ -93,14 +93,14 @@ set_property -dict {PACKAGE_PIN C18  IOSTANDARD LVCMOS33} [get_ports {sd2_d1_i}]
 set_property -dict {PACKAGE_PIN C19  IOSTANDARD LVCMOS33} [get_ports {sd2_d2_i}];               # SD2_D2
 
 # Audio DAC. U37 = AK4432VT
-set_property -dict {PACKAGE_PIN L6   IOSTANDARD LVCMOS33} [get_ports {audio_acks_o}];           # AUDIO2            = U37.ACKS
-set_property -dict {PACKAGE_PIN E19  IOSTANDARD LVCMOS33} [get_ports {audio_bick_o}];           # AUDIO_BCLK        = U37.BICK
-set_property -dict {PACKAGE_PIN W9   IOSTANDARD LVCMOS33} [get_ports {audio_cdti_o}];           # AUDIO3            = U37.CDTI
-set_property -dict {PACKAGE_PIN F19  IOSTANDARD LVCMOS33} [get_ports {audio_lrclk_o}];          # AUDIO_LRCLK       = U37.LRCK
-set_property -dict {PACKAGE_PIN D16  IOSTANDARD LVCMOS33} [get_ports {audio_mclk_o}];           # AUDIO_MCLK        = U37.MCLK
-set_property -dict {PACKAGE_PIN F18  IOSTANDARD LVCMOS33} [get_ports {audio_powerdown_n_o}];    # nSD_AUDIO         = U37.PDN
-set_property -dict {PACKAGE_PIN E16  IOSTANDARD LVCMOS33} [get_ports {audio_sdata_o}];          # AUDIO_SDATA       = U37.SDTI
-set_property -dict {PACKAGE_PIN F4   IOSTANDARD LVCMOS33} [get_ports {audio_smute_o}];          # AUDIO1            = U37.SMUTE
+set_property -dict {PACKAGE_PIN D16  IOSTANDARD LVCMOS33} [get_ports {audio_mclk_o}];           # AUDIO_MCLK
+set_property -dict {PACKAGE_PIN E19  IOSTANDARD LVCMOS33} [get_ports {audio_bick_o}];           # AUDIO_BCLK
+set_property -dict {PACKAGE_PIN E16  IOSTANDARD LVCMOS33} [get_ports {audio_sdti_o}];           # AUDIO_SDATA
+set_property -dict {PACKAGE_PIN F19  IOSTANDARD LVCMOS33} [get_ports {audio_lrclk_o}];          # AUDIO_LRCLK
+set_property -dict {PACKAGE_PIN F18  IOSTANDARD LVCMOS33} [get_ports {audio_pdn_n_o}];          # nSD_AUDIO
+set_property -dict {PACKAGE_PIN F4   IOSTANDARD LVCMOS33} [get_ports {audio_i2cfil_o}];         # AUDIO1
+set_property -dict {PACKAGE_PIN L6   IOSTANDARD LVCMOS33} [get_ports {audio_scl_o}];            # AUDIO2
+set_property -dict {PACKAGE_PIN W9   IOSTANDARD LVCMOS33} [get_ports {audio_sda_io}];           # AUDIO3
 
 # Joystick
 set_property -dict {PACKAGE_PIN F16  IOSTANDARD LVCMOS33} [get_ports {fa_down_n_i}];            # FA_DOWN

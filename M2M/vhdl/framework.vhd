@@ -135,6 +135,12 @@ port (
    main_pot2_x_o           : out   std_logic_vector(7 downto 0);
    main_pot2_y_o           : out   std_logic_vector(7 downto 0);
 
+   -- Audio
+   audio_clk_o             : out   std_logic;
+   audio_reset_o           : out   std_logic;
+   audio_left_o            : out   signed(15 downto 0);
+   audio_right_o           : out   signed(15 downto 0);
+
    -- Provide HyperRAM to core (in HyperRAM clock domain)
    hr_clk_o                : out   std_logic;
    hr_rst_o                : out   std_logic;
@@ -1119,6 +1125,11 @@ begin
    hr_d_io    <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
    hr_rwds_in <= hr_rwds_io;
    hr_dq_in   <= hr_d_io;
+
+   audio_clk_o   <= audio_clk;
+   audio_reset_o <= audio_rst;
+   audio_left_o  <= signed(audio_left);
+   audio_right_o <= signed(audio_right);
 
 end architecture synthesis;
 
