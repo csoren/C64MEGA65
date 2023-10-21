@@ -1,9 +1,18 @@
-### Version 5 Work-in-Progress: List of inofficial builds
+# Work-in-Progress: List of inofficial builds
 
 The purpose of this list is to track down regressions introduced in newer
 builds that were not there in older builds. By finding the last known-to-work
 build, we have a better chance to hunt down problems. The name of the build
 can be checked in the "About & Help" menu of the core.
+
+## Version 5.1
+
+| Name        | Date     | Commit  | Comment
+|-------------|----------|---------|--------------------------------------
+| WIP-V5.1-A1 | 10/20/23 | f1bf2f5 | First version that is able to generate an R3 and R4 bitstream using the refactored M2M framework
+| WIP-V5.1-A2 | 10/21/23 | 5975fe7 | Dedicated test build for AmokPhaze101 for doing M2M regression tests to find refactoring-induced bugs
+
+## Version 5
 
 | Name        | Date     | Commit  | Comment
 |-------------|----------|---------|--------------------------------------
@@ -34,3 +43,4 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5-B2   | 06/04/23 | 6b299b4 | Visualize long reset by turning the MEGA65's drive led blue
 | WIP-V5-B3   | 06/06/23 | 197d9de | Add supoprt for OSM fractional scaling
 | WIP-V5-B4   | 06/10/23 | ff71e71 | Release candidate for Version 5
+
