@@ -323,7 +323,6 @@ create_generated_clock -name tmds_720p_clk [get_pins i_hal_mega65_r3/i_framework
 create_generated_clock -name hdmi_720p_clk [get_pins i_hal_mega65_r3/i_framework/i_clk_m2m/i_clk_hdmi_720p/CLKOUT1]
 create_generated_clock -name tmds_576p_clk [get_pins i_hal_mega65_r3/i_framework/i_clk_m2m/i_clk_hdmi_576p/CLKOUT0]
 create_generated_clock -name hdmi_576p_clk [get_pins i_hal_mega65_r3/i_framework/i_clk_m2m/i_clk_hdmi_576p/CLKOUT1]
-create_generated_clock -name main_clk      [get_pins CORE/clk_gen/i_clk_c64_orig/CLKOUT0]
 
 ## Clock divider sdcard_clk that creates the 25 MHz used by sd_spi.vhd
 create_generated_clock -name sdcard_clk -source [get_pins i_hal_mega65_r3/i_framework/i_clk_m2m/i_clk_qnice/CLKOUT0] -divide_by 2 [get_pins i_hal_mega65_r3/i_framework/QNICE_SOC/sd_card/Slow_Clock_25MHz_reg/Q]
@@ -341,10 +340,10 @@ set_multicycle_path -from [get_cells -include_replicated {{i_hal_mega65_r3/i_fra
 # Timing between the two system clocks, ascal.vhd, audio, HDMI and HyperRAM is asynchronous.
 set_false_path -from [get_clocks hr_clk_x1]       -to [get_clocks hdmi_720p_clk]
 set_false_path   -to [get_clocks hr_clk_x1]     -from [get_clocks hdmi_720p_clk]
-set_false_path -from [get_clocks hr_clk_x1]       -to [get_clocks main_clk]
-set_false_path   -to [get_clocks hr_clk_x1]     -from [get_clocks main_clk]
-set_false_path -from [get_clocks hdmi_720p_clk]   -to [get_clocks main_clk]
-set_false_path   -to [get_clocks hdmi_720p_clk] -from [get_clocks main_clk]
+set_false_path   -through [get_pins i_hal_mega65_r3/i_framework/i_av_pipeline/i_digital_pipeline/i_ascal/reset_na]
+set_false_path -from [get_pins -hierarchical -regexp ".*/i_ascal/i_.*_reg.*/C"] -to [get_pins -hierarchical -regexp ".*/i_ascal/avl_.*_reg.*/D"]
+set_false_path -from [get_pins -hierarchical -regexp ".*/i_ascal/i_.*_reg.*/C"] -to [get_pins -hierarchical -regexp ".*/i_ascal/o_.*_reg.*/D"]
+set_false_path -from [get_pins -hierarchical -regexp ".*/i_ascal/o_.*_reg.*/C"] -to [get_pins -hierarchical -regexp ".*/i_ascal/i_.*_reg.*/D"]
 set_false_path -from [get_clocks qnice_clk]       -to [get_clocks hdmi_720p_clk]
 set_false_path -from [get_clocks qnice_clk]       -to [get_clocks tmds_720p_clk]
 
