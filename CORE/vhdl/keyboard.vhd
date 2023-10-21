@@ -38,18 +38,30 @@ entity keyboard is
       key_pressed_n_i      : in std_logic;               -- low active: debounced feedback: is kb_key_num_i pressed right now?
       
       -- Interface to the MEGA65 joysticks
-      joy_1_up_n           : in std_logic;
-      joy_1_down_n         : in std_logic;
-      joy_1_left_n         : in std_logic;
-      joy_1_right_n        : in std_logic;
-      joy_1_fire_n         : in std_logic;
+      joy_1_up_n_i         : in std_logic;
+      joy_1_down_n_i       : in std_logic;
+      joy_1_left_n_i       : in std_logic;
+      joy_1_right_n_i      : in std_logic;
+      joy_1_fire_n_i       : in std_logic;
 
-      joy_2_up_n           : in std_logic;
-      joy_2_down_n         : in std_logic;
-      joy_2_left_n         : in std_logic;
-      joy_2_right_n        : in std_logic;
-      joy_2_fire_n         : in std_logic;      
+      joy_1_up_n_o         : out std_logic;
+      joy_1_down_n_o       : out std_logic;
+      joy_1_left_n_o       : out std_logic;
+      joy_1_right_n_o      : out std_logic;
+      joy_1_fire_n_o       : out std_logic;
+
+      joy_2_up_n_i         : in std_logic;
+      joy_2_down_n_i       : in std_logic;
+      joy_2_left_n_i       : in std_logic;
+      joy_2_right_n_i      : in std_logic;
+      joy_2_fire_n_i       : in std_logic;      
       
+      joy_2_up_n_o         : out std_logic;
+      joy_2_down_n_o       : out std_logic;
+      joy_2_left_n_o       : out std_logic;
+      joy_2_right_n_o      : out std_logic;
+      joy_2_fire_n_o       : out std_logic;
+
       -- Interface to the C64's CIA1         
       cia1_pai_o           : out std_logic_vector(7 downto 0);
       cia1_pao_i           : in std_logic_vector(7 downto 0);
@@ -157,6 +169,20 @@ signal autokey_key   : natural range 0 to 79;
 signal autokey_delay : natural range 0 to C_AK_DELAY;
 
 begin
+
+   -- TBD: These output signals should be connected to the CIA.
+   -- For now, the safe value is 1.
+   joy_1_up_n_o    <= '1';
+   joy_1_down_n_o  <= '1';
+   joy_1_left_n_o  <= '1';
+   joy_1_right_n_o <= '1';
+   joy_1_fire_n_o  <= '1';
+   joy_2_up_n_o    <= '1';
+   joy_2_down_n_o  <= '1';
+   joy_2_left_n_o  <= '1';
+   joy_2_right_n_o <= '1';
+   joy_2_fire_n_o  <= '1';
+
    restore_n   <= key_pressed_n(m65_restore);
    
    keyboard_state : process(clk_main_i)
@@ -243,7 +269,7 @@ begin
                      -- down cursor is "natural" for the C64, up cursor is emulated with RIGHT SHIFT + VERT CRSR
                      (cia1_pbo_i(7) or (key_pressed_n(m65_vert_crsr)    
                                     and key_pressed_n(m65_up_crsr)))    and
-                     joy_2_up_n;
+                     joy_2_up_n_i;
 
    cia1_pai_o(1) <=  cia1_pao_i(1)                                      and
                      (cia1_pbo_i(0) or key_pressed_n(m65_3))            and
@@ -254,7 +280,7 @@ begin
                      (cia1_pbo_i(5) or key_pressed_n(m65_s))            and
                      (cia1_pbo_i(6) or key_pressed_n(m65_e))            and                  
                      (cia1_pbo_i(7) or key_pressed_n(m65_left_shift))   and
-                     joy_2_down_n;
+                     joy_2_down_n_i;
 
    cia1_pai_o(2) <=  cia1_pao_i(2)                                      and
                      (cia1_pbo_i(0) or key_pressed_n(m65_5))            and
@@ -265,7 +291,7 @@ begin
                      (cia1_pbo_i(5) or key_pressed_n(m65_f))            and
                      (cia1_pbo_i(6) or key_pressed_n(m65_t))            and
                      (cia1_pbo_i(7) or key_pressed_n(m65_x))            and
-                     joy_2_left_n;
+                     joy_2_left_n_i;
                      
    cia1_pai_o(3) <=  cia1_pao_i(3)                                      and
                      (cia1_pbo_i(0) or key_pressed_n(m65_7))            and
@@ -276,7 +302,7 @@ begin
                      (cia1_pbo_i(5) or key_pressed_n(m65_h))            and
                      (cia1_pbo_i(6) or key_pressed_n(m65_u))            and
                      (cia1_pbo_i(7) or key_pressed_n(m65_v))            and
-                     joy_2_right_n;
+                     joy_2_right_n_i;
                      
    cia1_pai_o(4) <=  cia1_pao_i(4)                                      and
                      (cia1_pbo_i(0) or key_pressed_n(m65_9))            and
@@ -287,7 +313,7 @@ begin
                      (cia1_pbo_i(5) or key_pressed_n(m65_k))            and
                      (cia1_pbo_i(6) or key_pressed_n(m65_o))            and
                      (cia1_pbo_i(7) or key_pressed_n(m65_n))            and
-                     joy_2_fire_n;
+                     joy_2_fire_n_i;
                      
    cia1_pai_o(5) <=  cia1_pao_i(5)                                      and
                      (cia1_pbo_i(0) or key_pressed_n(m65_plus))         and
@@ -337,7 +363,7 @@ begin
                      (cia1_pao_i(5) or key_pressed_n(m65_plus))         and
                      (cia1_pao_i(6) or key_pressed_n(m65_gbp))          and
                      (cia1_pao_i(7) or key_pressed_n(m65_1))            and
-                     joy_1_up_n;
+                     joy_1_up_n_i;
 
    cia1_pbi_o(1) <=  cia1_pbo_i(1)                                      and
                      (cia1_pao_i(0) or key_pressed_n(m65_return))       and
@@ -348,7 +374,7 @@ begin
                      (cia1_pao_i(5) or key_pressed_n(m65_p))            and
                      (cia1_pao_i(6) or key_pressed_n(m65_asterisk))     and
                      (cia1_pao_i(7) or key_pressed_n(m65_arrow_left))   and
-                     joy_1_down_n;
+                     joy_1_down_n_i;
                                           
                      -- right cursor is "natural" for the C64, left cursor is emulated with RIGHT SHIFT + HORZ CRSR
    cia1_pbi_o(2) <=  cia1_pbo_i(2)                                      and
@@ -362,7 +388,7 @@ begin
                      (cia1_pao_i(5) or key_pressed_n(m65_l))            and
                      (cia1_pao_i(6) or key_pressed_n(m65_semicolon))    and
                      (cia1_pao_i(7) or key_pressed_n(m65_ctrl))         and
-                     joy_1_left_n;
+                     joy_1_left_n_i;
                      
    cia1_pbi_o(3) <=  cia1_pbo_i(3)                                      and
                      (cia1_pao_i(0) or key_pressed_n(m65_f7))           and
@@ -373,7 +399,7 @@ begin
                      (cia1_pao_i(5) or key_pressed_n(m65_minus))        and
                      (cia1_pao_i(6) or key_pressed_n(m65_clr_home))     and
                      (cia1_pao_i(7) or key_pressed_n(m65_2))            and
-                     joy_1_right_n;
+                     joy_1_right_n_i;
                      
    cia1_pbi_o(4) <=  cia1_pbo_i(4)                                      and
                      (cia1_pao_i(0) or key_pressed_n(m65_f1))           and
@@ -389,7 +415,7 @@ begin
                                     and key_pressed_n(m65_left_crsr)))  and
                                           
                      (cia1_pao_i(7) or key_pressed_n(m65_space))        and
-                     joy_1_fire_n;
+                     joy_1_fire_n_i;
                      
    cia1_pbi_o(5) <=  cia1_pbo_i(5)                                      and
                      (cia1_pao_i(0) or key_pressed_n(m65_f3))           and

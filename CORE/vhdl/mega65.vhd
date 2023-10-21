@@ -120,11 +120,21 @@ port (
    main_joy_1_left_n_i      : in  std_logic;
    main_joy_1_right_n_i     : in  std_logic;
    main_joy_1_fire_n_i      : in  std_logic;
+   main_joy_1_up_n_o        : out std_logic;
+   main_joy_1_down_n_o      : out std_logic;
+   main_joy_1_left_n_o      : out std_logic;
+   main_joy_1_right_n_o     : out std_logic;
+   main_joy_1_fire_n_o      : out std_logic;
    main_joy_2_up_n_i        : in  std_logic;
    main_joy_2_down_n_i      : in  std_logic;
    main_joy_2_left_n_i      : in  std_logic;
    main_joy_2_right_n_i     : in  std_logic;
    main_joy_2_fire_n_i      : in  std_logic;
+   main_joy_2_up_n_o        : out std_logic;
+   main_joy_2_down_n_o      : out std_logic;
+   main_joy_2_left_n_o      : out std_logic;
+   main_joy_2_right_n_o     : out std_logic;
+   main_joy_2_fire_n_o      : out std_logic;
    main_pot1_x_i            : in  std_logic_vector(7 downto 0);
    main_pot1_y_i            : in  std_logic_vector(7 downto 0);
    main_pot2_x_i            : in  std_logic_vector(7 downto 0);
@@ -533,11 +543,21 @@ begin
          joy_1_left_n_i         => main_joy_1_left_n_i,
          joy_1_right_n_i        => main_joy_1_right_n_i,
          joy_1_fire_n_i         => main_joy_1_fire_n_i,
+         joy_1_up_n_o           => main_joy_1_up_n_o ,
+         joy_1_down_n_o         => main_joy_1_down_n_o,
+         joy_1_left_n_o         => main_joy_1_left_n_o,
+         joy_1_right_n_o        => main_joy_1_right_n_o,
+         joy_1_fire_n_o         => main_joy_1_fire_n_o,
          joy_2_up_n_i           => main_joy_2_up_n_i,
          joy_2_down_n_i         => main_joy_2_down_n_i,
          joy_2_left_n_i         => main_joy_2_left_n_i,
          joy_2_right_n_i        => main_joy_2_right_n_i,
          joy_2_fire_n_i         => main_joy_2_fire_n_i,
+         joy_2_up_n_o           => main_joy_2_up_n_o ,
+         joy_2_down_n_o         => main_joy_2_down_n_o,
+         joy_2_left_n_o         => main_joy_2_left_n_o,
+         joy_2_right_n_o        => main_joy_2_right_n_o,
+         joy_2_fire_n_o         => main_joy_2_fire_n_o,
          pot1_x_i               => main_pot1_x_i,
          pot1_y_i               => main_pot1_y_i,
          pot2_x_i               => main_pot2_x_i,

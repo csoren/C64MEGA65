@@ -68,11 +68,21 @@ entity main is
       joy_1_left_n_i         : in  std_logic;
       joy_1_right_n_i        : in  std_logic;
       joy_1_fire_n_i         : in  std_logic;
+      joy_1_up_n_o           : out std_logic;
+      joy_1_down_n_o         : out std_logic;
+      joy_1_left_n_o         : out std_logic;
+      joy_1_right_n_o        : out std_logic;
+      joy_1_fire_n_o         : out std_logic;
       joy_2_up_n_i           : in  std_logic;
       joy_2_down_n_i         : in  std_logic;
       joy_2_left_n_i         : in  std_logic;
       joy_2_right_n_i        : in  std_logic;
       joy_2_fire_n_i         : in  std_logic;
+      joy_2_up_n_o           : out std_logic;
+      joy_2_down_n_o         : out std_logic;
+      joy_2_left_n_o         : out std_logic;
+      joy_2_right_n_o        : out std_logic;
+      joy_2_fire_n_o         : out std_logic;
       pot1_x_i               : in  std_logic_vector(7 downto 0);
       pot1_y_i               : in  std_logic_vector(7 downto 0);
       pot2_x_i               : in  std_logic_vector(7 downto 0);
@@ -944,17 +954,29 @@ begin
          key_pressed_n_i      => kb_key_pressed_n_i,
 
          -- Interface to the MEGA65 joysticks
-         joy_1_up_n           => joy_1_up_n_i,
-         joy_1_down_n         => joy_1_down_n_i,
-         joy_1_left_n         => joy_1_left_n_i,
-         joy_1_right_n        => joy_1_right_n_i,
-         joy_1_fire_n         => joy_1_fire_n_i,
+         joy_1_up_n_i         => joy_1_up_n_i,
+         joy_1_down_n_i       => joy_1_down_n_i,
+         joy_1_left_n_i       => joy_1_left_n_i,
+         joy_1_right_n_i      => joy_1_right_n_i,
+         joy_1_fire_n_i       => joy_1_fire_n_i,
 
-         joy_2_up_n           => joy_2_up_n_i,
-         joy_2_down_n         => joy_2_down_n_i,
-         joy_2_left_n         => joy_2_left_n_i,
-         joy_2_right_n        => joy_2_right_n_i,
-         joy_2_fire_n         => joy_2_fire_n_i,
+         joy_1_up_n_o         => joy_1_up_n_o,
+         joy_1_down_n_o       => joy_1_down_n_o,
+         joy_1_left_n_o       => joy_1_left_n_o,
+         joy_1_right_n_o      => joy_1_right_n_o,
+         joy_1_fire_n_o       => joy_1_fire_n_o,
+
+         joy_2_up_n_i         => joy_2_up_n_i,
+         joy_2_down_n_i       => joy_2_down_n_i,
+         joy_2_left_n_i       => joy_2_left_n_i,
+         joy_2_right_n_i      => joy_2_right_n_i,
+         joy_2_fire_n_i       => joy_2_fire_n_i,
+
+         joy_2_up_n_o         => joy_2_up_n_o,
+         joy_2_down_n_o       => joy_2_down_n_o,
+         joy_2_left_n_o       => joy_2_left_n_o,
+         joy_2_right_n_o      => joy_2_right_n_o,
+         joy_2_fire_n_o       => joy_2_fire_n_o,
 
          -- Interface to the MiSTer C64 core that directly connects to the C64's CIA1 instead of
          -- going the detour of converting the MEGA65 keystrokes into PS/2 keystrokes first.

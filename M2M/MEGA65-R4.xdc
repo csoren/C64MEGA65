@@ -212,18 +212,18 @@ set_property -dict {PACKAGE_PIN T16  IOSTANDARD LVCMOS33} [get_ports {cpld_cfg_i
 set_property -dict {PACKAGE_PIN U16  IOSTANDARD LVCMOS33} [get_ports {cpld_cfg_i[3]}];          # CPLD_CFG3
 
 # Debug. Also used to control output to joystick ??
-set_property -dict {PACKAGE_PIN J17  IOSTANDARD LVCMOS33} [get_ports {dbg_io[0]}];              # DBG0 = FA_FIRE_O
-set_property -dict {PACKAGE_PIN H14  IOSTANDARD LVCMOS33} [get_ports {dbg_io[10]}];             # DBG10
-set_property -dict {PACKAGE_PIN G13  IOSTANDARD LVCMOS33} [get_ports {dbg_io[11]}];             # DBG11
-set_property -dict {PACKAGE_PIN G16  IOSTANDARD LVCMOS33} [get_ports {dbg_io[1]}];              # DBG1 = FA_UP_O
-set_property -dict {PACKAGE_PIN K13  IOSTANDARD LVCMOS33} [get_ports {dbg_io[2]}];              # DBG2 = FA_LEFT_O
-set_property -dict {PACKAGE_PIN K14  IOSTANDARD LVCMOS33} [get_ports {dbg_io[3]}];              # DBG3 = FA_DOWN_O
-set_property -dict {PACKAGE_PIN N20  IOSTANDARD LVCMOS33} [get_ports {dbg_io[4]}];              # DBG4 = FB_UP_O
-set_property -dict {PACKAGE_PIN L16  IOSTANDARD LVCMOS33} [get_ports {dbg_io[5]}];              # DBG5 = FA_RIGHT_O
-set_property -dict {PACKAGE_PIN M18  IOSTANDARD LVCMOS33} [get_ports {dbg_io[6]}];              # DBG6 = FB_DOWN_O
-set_property -dict {PACKAGE_PIN N19  IOSTANDARD LVCMOS33} [get_ports {dbg_io[7]}];              # DBG7 = FB_FIRE_O
-set_property -dict {PACKAGE_PIN E18  IOSTANDARD LVCMOS33} [get_ports {dbg_io[8]}];              # DBG8 = FB_RIGHT_O
-set_property -dict {PACKAGE_PIN M17  IOSTANDARD LVCMOS33} [get_ports {dbg_io[9]}];              # DBG9 = FB_LEFT_O
+set_property -dict {PACKAGE_PIN J17  IOSTANDARD LVCMOS33} [get_ports {fa_fire_n_o}];            # DBG0 = FA_FIRE_O
+set_property -dict {PACKAGE_PIN G16  IOSTANDARD LVCMOS33} [get_ports {fa_up_n_o}];              # DBG1 = FA_UP_O
+set_property -dict {PACKAGE_PIN K13  IOSTANDARD LVCMOS33} [get_ports {fa_left_n_o}];            # DBG2 = FA_LEFT_O
+set_property -dict {PACKAGE_PIN K14  IOSTANDARD LVCMOS33} [get_ports {fa_down_n_o}];            # DBG3 = FA_DOWN_O
+set_property -dict {PACKAGE_PIN N20  IOSTANDARD LVCMOS33} [get_ports {fb_up_n_o}];              # DBG4 = FB_UP_O
+set_property -dict {PACKAGE_PIN L16  IOSTANDARD LVCMOS33} [get_ports {fa_right_n_o}];           # DBG5 = FA_RIGHT_O
+set_property -dict {PACKAGE_PIN M18  IOSTANDARD LVCMOS33} [get_ports {fb_down_n_o}];            # DBG6 = FB_DOWN_O
+set_property -dict {PACKAGE_PIN N19  IOSTANDARD LVCMOS33} [get_ports {fb_fire_n_o}];            # DBG7 = FB_FIRE_O
+set_property -dict {PACKAGE_PIN E18  IOSTANDARD LVCMOS33} [get_ports {fb_right_n_o}];           # DBG8 = FB_RIGHT_O
+set_property -dict {PACKAGE_PIN M17  IOSTANDARD LVCMOS33} [get_ports {fb_left_n_o}];            # DBG9 = FB_LEFT_O
+set_property -dict {PACKAGE_PIN H14  IOSTANDARD LVCMOS33} [get_ports {dbg_io_10}];              # DBG10
+set_property -dict {PACKAGE_PIN G13  IOSTANDARD LVCMOS33} [get_ports {dbg_io_11}];              # DBG11
 
 # SMSC Ethernet PHY. U4 = KSZ8081RNDCA
 set_property -dict {PACKAGE_PIN L4   IOSTANDARD LVCMOS33} [get_ports {eth_clock_o}];            # ETH_CLK
