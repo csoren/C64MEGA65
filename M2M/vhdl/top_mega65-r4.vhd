@@ -158,8 +158,8 @@ port (
    cart_nmi_i              : in    std_logic;                  -- R4 board bug. Should be inout.
    cart_irq_i              : in    std_logic;                  -- R4 board bug. Should be inout.
    cart_dma_i              : in    std_logic;
-   cart_exrom_io           : inout std_logic;
-   cart_game_io            : inout std_logic;
+   cart_exrom_i            : in    std_logic;
+   cart_game_i             : in    std_logic;
    cart_ba_io              : inout std_logic;
    cart_rw_io              : inout std_logic;
    cart_roml_io            : inout std_logic;
@@ -732,8 +732,8 @@ begin
          cart_nmi_i        => cart_nmi_i,
          cart_irq_i        => cart_irq_i,
          cart_dma_i        => cart_dma_i,
-         cart_exrom_i      => cart_exrom_io,
-         cart_game_i       => cart_game_io,
+         cart_exrom_i      => cart_exrom_i,
+         cart_game_i       => cart_game_i,
          cart_ba_io        => cart_ba_io,
          cart_rw_io        => cart_rw_io,
          cart_roml_io      => cart_roml_io,

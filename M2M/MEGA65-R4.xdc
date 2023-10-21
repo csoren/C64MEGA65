@@ -190,8 +190,8 @@ set_property -dict {PACKAGE_PIN W20  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[
 set_property -dict {PACKAGE_PIN W21  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[7]}];           # F_C64_D7
 set_property -dict {PACKAGE_PIN P15  IOSTANDARD LVCMOS33} [get_ports {cart_dma_i}];             # F_C64_DMA
 set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports {cart_dotclock_o}];        # F_C64_CLOCK
-set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_io}];          # F_C64_EXROM
-set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_io}];           #_F_C64_GAME
+set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_i}];           # F_C64_EXROM
+set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_i}];            #_F_C64_GAME
 set_property -dict {PACKAGE_PIN L18  IOSTANDARD LVCMOS33} [get_ports {cart_haddr_dir_o}];       # F_HADDR_DIR
 set_property -dict {PACKAGE_PIN N15  IOSTANDARD LVCMOS33} [get_ports {cart_io1_io}];            # F_C64_IO1
 set_property -dict {PACKAGE_PIN AA20 IOSTANDARD LVCMOS33} [get_ports {cart_io2_io}];            # F_C64_IO2
