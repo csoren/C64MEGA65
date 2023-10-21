@@ -36,16 +36,16 @@ port (
    vdac_blank_n_o          : out   std_logic;
    vdac_psave_n_o          : out   std_logic;
 
-   -- Digital Video (HDMI)
+   -- HDMI. U10 = PTN3363BSMP
    tmds_data_p_o           : out   std_logic_vector(2 downto 0);
    tmds_data_n_o           : out   std_logic_vector(2 downto 0);
    tmds_clk_p_o            : out   std_logic;
    tmds_clk_n_o            : out   std_logic;
-   hdmi_hiz_o              : out   std_logic;
-   hdmi_enable_n_o         : out   std_logic;
-   hdmi_hpd_a_io           : inout std_logic;
-   hdmi_scl_io             : inout std_logic;
-   hdmi_sda_io             : inout std_logic;
+   hdmi_hiz_en_o           : out   std_logic;   -- Connect to U10.HIZ_EN
+   hdmi_ls_oe_n_o          : out   std_logic;   -- Connect to U10.OE#
+   hdmi_hpd_i              : in    std_logic;   -- Connect to U10.HPD_SOURCE
+   hdmi_scl_io             : inout std_logic;   -- Connect to U10.SCL_SOURCE
+   hdmi_sda_io             : inout std_logic;   -- Connect to U10.SDA_SOURCE
 
    -- MEGA65 smart keyboard controller
    kb_io0_o                : out   std_logic;                 -- clock to keyboard
@@ -696,9 +696,8 @@ begin
    vga_scl_io            <= 'Z';
    vga_sda_io            <= 'Z';
    vdac_psave_n_o        <= '1';
-   hdmi_hiz_o            <= '0';
-   hdmi_enable_n_o       <= '0';
-   hdmi_hpd_a_io         <= 'Z';
+   hdmi_hiz_en_o         <= '0'; -- HDMI is 50 ohm terminated.
+   hdmi_ls_oe_n_o        <= '0'; -- Enable HDMI output
    hdmi_scl_io           <= 'Z';
    hdmi_sda_io           <= 'Z';
    dbg_io                <= (others => 'Z');
