@@ -65,17 +65,19 @@ set_property -dict {PACKAGE_PIN A14  IOSTANDARD LVCMOS33} [get_ports {kb_io0_o}]
 set_property -dict {PACKAGE_PIN A13  IOSTANDARD LVCMOS33} [get_ports {kb_io1_o}];               # KB_IO2
 set_property -dict {PACKAGE_PIN C13  IOSTANDARD LVCMOS33} [get_ports {kb_io2_i}];               # KB_IO3
 
-# SD cards
-set_property -dict {PACKAGE_PIN K1   IOSTANDARD LVCMOS33} [get_ports {sd2_cd_i}];               # SD_CD
-set_property -dict {PACKAGE_PIN G2   IOSTANDARD LVCMOS33} [get_ports {sd2_clk_o}];              # SD_CLK
-set_property -dict {PACKAGE_PIN H2   IOSTANDARD LVCMOS33} [get_ports {sd2_miso_i}];             # SD_D0
-set_property -dict {PACKAGE_PIN J2   IOSTANDARD LVCMOS33} [get_ports {sd2_mosi_o}];             # SD_CMD
-set_property -dict {PACKAGE_PIN K2   IOSTANDARD LVCMOS33} [get_ports {sd2_reset_o}];            # SD_D3
-set_property -dict {PACKAGE_PIN D17  IOSTANDARD LVCMOS33} [get_ports {sd_cd_i}];                # SD2_CD
-set_property -dict {PACKAGE_PIN B17  IOSTANDARD LVCMOS33} [get_ports {sd_clk_o}];               # SD2_CLK
-set_property -dict {PACKAGE_PIN B18  IOSTANDARD LVCMOS33} [get_ports {sd_miso_i}];              # SD2_D0
-set_property -dict {PACKAGE_PIN B16  IOSTANDARD LVCMOS33} [get_ports {sd_mosi_o}];              # SD2_CMD
-set_property -dict {PACKAGE_PIN B15  IOSTANDARD LVCMOS33} [get_ports {sd_reset_o}];             # SD2_D3
+# Micro SD Connector (external slot at back of the cover)
+set_property -dict {PACKAGE_PIN K1   IOSTANDARD LVCMOS33} [get_ports {sd_cd_i}];                # SD_CD
+set_property -dict {PACKAGE_PIN G2   IOSTANDARD LVCMOS33} [get_ports {sd_clk_o}];               # SD_CLK
+set_property -dict {PACKAGE_PIN H2   IOSTANDARD LVCMOS33} [get_ports {sd_miso_i}];              # SD_D0
+set_property -dict {PACKAGE_PIN J2   IOSTANDARD LVCMOS33} [get_ports {sd_mosi_o}];              # SD_CMD
+set_property -dict {PACKAGE_PIN K2   IOSTANDARD LVCMOS33} [get_ports {sd_reset_o}];             # SD_D3
+
+# SD Connector (this is the slot at the bottom side of the case under the cover
+set_property -dict {PACKAGE_PIN D17  IOSTANDARD LVCMOS33} [get_ports {sd2_cd_i}];               # SD2_CD
+set_property -dict {PACKAGE_PIN B17  IOSTANDARD LVCMOS33} [get_ports {sd2_clk_o}];              # SD2_CLK
+set_property -dict {PACKAGE_PIN B18  IOSTANDARD LVCMOS33} [get_ports {sd2_miso_i}];             # SD2_D0
+set_property -dict {PACKAGE_PIN B16  IOSTANDARD LVCMOS33} [get_ports {sd2_mosi_o}];             # SD2_CMD
+set_property -dict {PACKAGE_PIN B15  IOSTANDARD LVCMOS33} [get_ports {sd2_reset_o}];            # SD2_D3
 
 # PWM audio
 set_property -dict {PACKAGE_PIN L6   IOSTANDARD LVCMOS33} [get_ports {pwm_l_o}];                # PWM_L
@@ -267,11 +269,11 @@ set_false_path -from [get_pins i_hal_mega65_r3/i_framework/i_reset_manager/reset
 ## CONFIGURATION AND BITSTREAM PROPERTIES
 ################################
 
-set_property CONFIG_VOLTAGE 3.3 [current_design]
-set_property CFGBVS VCCO [current_design]
-set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
-set_property BITSTREAM.CONFIG.CONFIGRATE 66 [current_design]
-set_property CONFIG_MODE SPIx4 [current_design]
-set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR YES [current_design]
-set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
+set_property CONFIG_VOLTAGE                  3.3   [current_design]
+set_property CFGBVS                          VCCO  [current_design]
+set_property BITSTREAM.GENERAL.COMPRESS      TRUE  [current_design]
+set_property BITSTREAM.CONFIG.CONFIGRATE     66    [current_design]
+set_property CONFIG_MODE                     SPIx4 [current_design]
+set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR YES   [current_design]
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH   4     [current_design]
 

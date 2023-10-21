@@ -43,14 +43,14 @@ port (
    kb_io1_o                : out   std_logic;                 -- data output to keyboard
    kb_io2_i                : in    std_logic;                 -- data input from keyboard
 
-   -- SD Card (internal on bottom)
+   -- Micro SD Connector (external slot at back of the cover)
    sd_reset_o              : out   std_logic;
    sd_clk_o                : out   std_logic;
    sd_mosi_o               : out   std_logic;
    sd_miso_i               : in    std_logic;
    sd_cd_i                 : in    std_logic;
 
-   -- SD Card (external on back)
+   -- SD Connector (this is the slot at the bottom side of the case under the cover)
    sd2_reset_o             : out   std_logic;
    sd2_clk_o               : out   std_logic;
    sd2_mosi_o              : out   std_logic;

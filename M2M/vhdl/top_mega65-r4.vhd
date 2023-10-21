@@ -57,7 +57,7 @@ port (
    kb_tdo_i                : in    std_logic;
    kb_tms_i                : in    std_logic;
 
-   -- SD card (external on back)
+   -- Micro SD Connector (external slot at back of the cover)
    sd_reset_o              : out   std_logic;
    sd_clk_o                : out   std_logic;
    sd_mosi_o               : out   std_logic;
@@ -66,7 +66,7 @@ port (
    sd_d1_i                 : in    std_logic;
    sd_d2_i                 : in    std_logic;
 
-   -- SD card (internal on bottom)
+   -- SD Connector (this is the slot at the bottom side of the case under the cover)
    sd2_reset_o             : out   std_logic;
    sd2_clk_o               : out   std_logic;
    sd2_mosi_o              : out   std_logic;
@@ -136,11 +136,14 @@ port (
    cart_laddr_dir_o        : out   std_logic;
    cart_data_en_o          : out   std_logic;
    cart_data_dir_o         : out   std_logic;
-   cart_reset_o            : out   std_logic;
+
+   -- C64 Expansion Port (aka Cartridge Port)
+   cart_reset_o            : out   std_logic;                  -- R4 board bug. Should be inout.
    cart_phi2_o             : out   std_logic;
    cart_dotclock_o         : out   std_logic;
-   cart_nmi_i              : in    std_logic;
-   cart_irq_i              : in    std_logic;
+
+   cart_nmi_i              : in    std_logic;                  -- R4 board bug. Should be inout.
+   cart_irq_i              : in    std_logic;                  -- R4 board bug. Should be inout.
    cart_dma_i              : in    std_logic;
    cart_exrom_io           : inout std_logic;
    cart_game_io            : inout std_logic;
@@ -150,6 +153,7 @@ port (
    cart_romh_io            : inout std_logic;
    cart_io1_io             : inout std_logic;
    cart_io2_io             : inout std_logic;
+
    cart_d_io               : inout unsigned(7 downto 0);
    cart_a_io               : inout unsigned(15 downto 0);
 
@@ -388,16 +392,16 @@ begin
       kb_io0_o                => kb_io0_o,
       kb_io1_o                => kb_io1_o,
       kb_io2_i                => kb_io2_i,
-      sd_reset_o              => sd2_reset_o,
-      sd_clk_o                => sd2_clk_o,
-      sd_mosi_o               => sd2_mosi_o,
-      sd_miso_i               => sd2_miso_i,
-      sd_cd_i                 => sd2_cd_i,
-      sd2_reset_o             => sd_reset_o,
-      sd2_clk_o               => sd_clk_o,
-      sd2_mosi_o              => sd_mosi_o,
-      sd2_miso_i              => sd_miso_i,
-      sd2_cd_i                => sd_cd_i,
+      sd_reset_o              => sd_reset_o,
+      sd_clk_o                => sd_clk_o,
+      sd_mosi_o               => sd_mosi_o,
+      sd_miso_i               => sd_miso_i,
+      sd_cd_i                 => sd_cd_i,
+      sd2_reset_o             => sd2_reset_o,
+      sd2_clk_o               => sd2_clk_o,
+      sd2_mosi_o              => sd2_mosi_o,
+      sd2_miso_i              => sd2_miso_i,
+      sd2_cd_i                => sd2_cd_i,
       audio_mclk_o            => audio_mclk_o,
       audio_bick_o            => audio_bick_o,
       audio_sdti_o            => audio_sdti_o,

@@ -25,7 +25,7 @@ port (
    uart_rxd_i         : in    std_logic;
    uart_txd_o         : out   std_logic;
 
-   -- VGA and VDAC
+   -- VGA via VDAC. U3 = ADV7125BCPZ170
    vga_red_o          : out   std_logic_vector(7 downto 0);
    vga_green_o        : out   std_logic_vector(7 downto 0);
    vga_blue_o         : out   std_logic_vector(7 downto 0);
@@ -47,14 +47,14 @@ port (
    kb_io1_o           : out   std_logic;                 -- data output to keyboard
    kb_io2_i           : in    std_logic;                 -- data input from keyboard
 
-   -- SD Card (internal on bottom)
+   -- Micro SD Connector (external slot at back of the cover)
    sd_reset_o         : out   std_logic;
    sd_clk_o           : out   std_logic;
    sd_mosi_o          : out   std_logic;
    sd_miso_i          : in    std_logic;
    sd_cd_i            : in    std_logic;
 
-   -- SD Card (external on back)
+   -- SD Connector (this is the slot at the bottom side of the case under the cover)
    sd2_reset_o        : out   std_logic;
    sd2_clk_o          : out   std_logic;
    sd2_mosi_o         : out   std_logic;
