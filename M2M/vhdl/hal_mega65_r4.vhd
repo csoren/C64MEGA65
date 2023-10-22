@@ -217,7 +217,6 @@ begin
          audio_reset_i  => audio_reset,
          audio_left_i   => audio_left,
          audio_right_i  => audio_right,
-         audio_test_i   => '0',           -- Set to 1 to output a simple sine wave @ 477 Hz.
          audio_mclk_o   => audio_mclk_o,
          audio_bick_o   => audio_bick_o,
          audio_sdti_o   => audio_sdti_o,
