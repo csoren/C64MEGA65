@@ -22,54 +22,54 @@ use xpm.vcomponents.all;
 
 entity MEGA65_Core is
 port (
-   CLK                      : in  std_logic;                 -- 100 MHz clock
-   RESET_M2M_N              : in  std_logic;                 -- Debounced system reset in system clock domain
+   CLK                     : in  std_logic;                 -- 100 MHz clock
+   RESET_M2M_N             : in  std_logic;                 -- Debounced system reset in system clock domain
 
    -- Share clock and reset with the framework
-   main_clk_o               : out std_logic;                 -- CORE's clock
-   main_rst_o               : out std_logic;                 -- CORE's reset, synchronized
+   main_clk_o              : out std_logic;                 -- CORE's clock
+   main_rst_o              : out std_logic;                 -- CORE's reset, synchronized
 
    --------------------------------------------------------------------------------------------------------
    -- QNICE Clock Domain
    --------------------------------------------------------------------------------------------------------
 
    -- Get QNICE clock from the framework: for the vdrives as well as for RAMs and ROMs
-   qnice_clk_i              : in  std_logic;
-   qnice_rst_i              : in  std_logic;
+   qnice_clk_i             : in  std_logic;
+   qnice_rst_i             : in  std_logic;
 
    -- Video and audio mode control
-   qnice_dvi_o              : out std_logic;                 -- 0=HDMI (with sound), 1=DVI (no sound)
-   qnice_video_mode_o       : out natural range 0 to 3;      -- HDMI 1280x720 @ 50 Hz resolution = mode 0,
+   qnice_dvi_o             : out std_logic;                 -- 0=HDMI (with sound), 1=DVI (no sound)
+   qnice_video_mode_o      : out natural range 0 to 3;      -- HDMI 1280x720 @ 50 Hz resolution = mode 0,
                                                              -- HDMI 1280x720 @ 60 Hz resolution = mode 1,
                                                              -- PAL 576p in 4:3 and 5:4 are modes 2 and 3
-   qnice_osm_cfg_scaling_o  : out std_logic_vector(8 downto 0);
-   qnice_scandoubler_o      : out std_logic;                 -- 0 = no scandoubler, 1 = scandoubler
-   qnice_audio_mute_o       : out std_logic;
-   qnice_audio_filter_o     : out std_logic;
-   qnice_zoom_crop_o        : out std_logic;
-   qnice_ascal_mode_o       : out std_logic_vector(1 downto 0);
-   qnice_ascal_polyphase_o  : out std_logic;
-   qnice_ascal_triplebuf_o  : out std_logic;
-   qnice_retro15kHz_o       : out std_logic;
-   qnice_csync_o            : out std_logic;                 -- 0 = normal HS/VS, 1 = Composite Sync 
+   qnice_osm_cfg_scaling_o : out std_logic_vector(8 downto 0);
+   qnice_scandoubler_o     : out std_logic;                 -- 0 = no scandoubler, 1 = scandoubler
+   qnice_audio_mute_o      : out std_logic;
+   qnice_audio_filter_o    : out std_logic;
+   qnice_zoom_crop_o       : out std_logic;
+   qnice_ascal_mode_o      : out std_logic_vector(1 downto 0);
+   qnice_ascal_polyphase_o : out std_logic;
+   qnice_ascal_triplebuf_o : out std_logic;
+   qnice_retro15kHz_o      : out std_logic;
+   qnice_csync_o           : out std_logic;                 -- 0 = normal HS/VS, 1 = Composite Sync 
 
    -- Flip joystick ports
-   qnice_flip_joyports_o    : out std_logic;
+   qnice_flip_joyports_o   : out std_logic;
 
    -- On-Screen-Menu selections
-   qnice_osm_control_i      : in  std_logic_vector(255 downto 0);
+   qnice_osm_control_i     : in  std_logic_vector(255 downto 0);
 
    -- QNICE general purpose register
-   qnice_gp_reg_i           : in  std_logic_vector(255 downto 0);
+   qnice_gp_reg_i          : in  std_logic_vector(255 downto 0);
 
    -- Core-specific devices
-   qnice_dev_id_i           : in  std_logic_vector(15 downto 0);
-   qnice_dev_addr_i         : in  std_logic_vector(27 downto 0);
-   qnice_dev_data_i         : in  std_logic_vector(15 downto 0);
-   qnice_dev_data_o         : out std_logic_vector(15 downto 0);
-   qnice_dev_ce_i           : in  std_logic;
-   qnice_dev_we_i           : in  std_logic;
-   qnice_dev_wait_o         : out std_logic;
+   qnice_dev_id_i          : in  std_logic_vector(15 downto 0);
+   qnice_dev_addr_i        : in  std_logic_vector(27 downto 0);
+   qnice_dev_data_i        : in  std_logic_vector(15 downto 0);
+   qnice_dev_data_o        : out std_logic_vector(15 downto 0);
+   qnice_dev_ce_i          : in  std_logic;
+   qnice_dev_we_i          : in  std_logic;
+   qnice_dev_wait_o        : out std_logic;
 
    --------------------------------------------------------------------------------------------------------
    -- Core Clock Domain
@@ -78,134 +78,134 @@ port (
    -- M2M's reset manager provides 2 signals:
    --    m2m:   Reset the whole machine: Core and Framework
    --    core:  Only reset the core
-   main_reset_m2m_i         : in  std_logic;
-   main_reset_core_i        : in  std_logic;
+   main_reset_m2m_i        : in  std_logic;
+   main_reset_core_i       : in  std_logic;
 
-   main_pause_core_i        : in  std_logic;
+   main_pause_core_i       : in  std_logic;
 
    -- On-Screen-Menu selections
-   main_osm_control_i       : in  std_logic_vector(255 downto 0);
+   main_osm_control_i      : in  std_logic_vector(255 downto 0);
 
    -- QNICE general purpose register converted to main clock domain
-   main_qnice_gp_reg_i      : in  std_logic_vector(255 downto 0);
+   main_qnice_gp_reg_i     : in  std_logic_vector(255 downto 0);
 
    -- Video output
-   video_clk_o              : out std_logic;
-   video_rst_o              : out std_logic;
-   video_ce_o               : out std_logic;
-   video_ce_ovl_o           : out std_logic;
-   video_red_o              : out std_logic_vector(7 downto 0);
-   video_green_o            : out std_logic_vector(7 downto 0);
-   video_blue_o             : out std_logic_vector(7 downto 0);
-   video_vs_o               : out std_logic;
-   video_hs_o               : out std_logic;
-   video_hblank_o           : out std_logic;
-   video_vblank_o           : out std_logic;
+   video_clk_o             : out std_logic;
+   video_rst_o             : out std_logic;
+   video_ce_o              : out std_logic;
+   video_ce_ovl_o          : out std_logic;
+   video_red_o             : out std_logic_vector(7 downto 0);
+   video_green_o           : out std_logic_vector(7 downto 0);
+   video_blue_o            : out std_logic_vector(7 downto 0);
+   video_vs_o              : out std_logic;
+   video_hs_o              : out std_logic;
+   video_hblank_o          : out std_logic;
+   video_vblank_o          : out std_logic;
 
    -- Audio output (Signed PCM)
-   main_audio_left_o        : out signed(15 downto 0);
-   main_audio_right_o       : out signed(15 downto 0);
+   main_audio_left_o       : out signed(15 downto 0);
+   main_audio_right_o      : out signed(15 downto 0);
 
    -- M2M Keyboard interface (incl. power led and drive led)
-   main_kb_key_num_i        : in  integer range 0 to 79;     -- cycles through all MEGA65 keys
-   main_kb_key_pressed_n_i  : in  std_logic;                 -- low active: debounced feedback: is kb_key_num_i pressed right now?
-   main_power_led_o         : out std_logic;
-   main_power_led_col_o     : out std_logic_vector(23 downto 0);
-   main_drive_led_o         : out std_logic;
-   main_drive_led_col_o     : out std_logic_vector(23 downto 0);
+   main_kb_key_num_i       : in  integer range 0 to 79;     -- cycles through all MEGA65 keys
+   main_kb_key_pressed_n_i : in  std_logic;                 -- low active: debounced feedback: is kb_key_num_i pressed right now?
+   main_power_led_o        : out std_logic;
+   main_power_led_col_o    : out std_logic_vector(23 downto 0);
+   main_drive_led_o        : out std_logic;
+   main_drive_led_col_o    : out std_logic_vector(23 downto 0);
 
    -- Joysticks and paddles input
-   main_joy_1_up_n_i        : in  std_logic;
-   main_joy_1_down_n_i      : in  std_logic;
-   main_joy_1_left_n_i      : in  std_logic;
-   main_joy_1_right_n_i     : in  std_logic;
-   main_joy_1_fire_n_i      : in  std_logic;
-   main_joy_1_up_n_o        : out std_logic;
-   main_joy_1_down_n_o      : out std_logic;
-   main_joy_1_left_n_o      : out std_logic;
-   main_joy_1_right_n_o     : out std_logic;
-   main_joy_1_fire_n_o      : out std_logic;
-   main_joy_2_up_n_i        : in  std_logic;
-   main_joy_2_down_n_i      : in  std_logic;
-   main_joy_2_left_n_i      : in  std_logic;
-   main_joy_2_right_n_i     : in  std_logic;
-   main_joy_2_fire_n_i      : in  std_logic;
-   main_joy_2_up_n_o        : out std_logic;
-   main_joy_2_down_n_o      : out std_logic;
-   main_joy_2_left_n_o      : out std_logic;
-   main_joy_2_right_n_o     : out std_logic;
-   main_joy_2_fire_n_o      : out std_logic;
-   main_pot1_x_i            : in  std_logic_vector(7 downto 0);
-   main_pot1_y_i            : in  std_logic_vector(7 downto 0);
-   main_pot2_x_i            : in  std_logic_vector(7 downto 0);
-   main_pot2_y_i            : in  std_logic_vector(7 downto 0);
+   main_joy_1_up_n_i       : in  std_logic;
+   main_joy_1_down_n_i     : in  std_logic;
+   main_joy_1_left_n_i     : in  std_logic;
+   main_joy_1_right_n_i    : in  std_logic;
+   main_joy_1_fire_n_i     : in  std_logic;
+   main_joy_1_up_n_o       : out std_logic;
+   main_joy_1_down_n_o     : out std_logic;
+   main_joy_1_left_n_o     : out std_logic;
+   main_joy_1_right_n_o    : out std_logic;
+   main_joy_1_fire_n_o     : out std_logic;
+   main_joy_2_up_n_i       : in  std_logic;
+   main_joy_2_down_n_i     : in  std_logic;
+   main_joy_2_left_n_i     : in  std_logic;
+   main_joy_2_right_n_i    : in  std_logic;
+   main_joy_2_fire_n_i     : in  std_logic;
+   main_joy_2_up_n_o       : out std_logic;
+   main_joy_2_down_n_o     : out std_logic;
+   main_joy_2_left_n_o     : out std_logic;
+   main_joy_2_right_n_o    : out std_logic;
+   main_joy_2_fire_n_o     : out std_logic;
+   main_pot1_x_i           : in  std_logic_vector(7 downto 0);
+   main_pot1_y_i           : in  std_logic_vector(7 downto 0);
+   main_pot2_x_i           : in  std_logic_vector(7 downto 0);
+   main_pot2_y_i           : in  std_logic_vector(7 downto 0);
 
    --------------------------------------------------------------------------------------------------------
    -- Provide support for external memory (Avalon Memory Map)
    -- These signals run in the HyperRAM clock domain (i.e. 100 MHz)
    --------------------------------------------------------------------------------------------------------
 
-   hr_clk_i                 : in  std_logic;
-   hr_rst_i                 : in  std_logic;
-   hr_core_write_o          : out std_logic;
-   hr_core_read_o           : out std_logic;
-   hr_core_address_o        : out std_logic_vector(31 downto 0);
-   hr_core_writedata_o      : out std_logic_vector(15 downto 0);
-   hr_core_byteenable_o     : out std_logic_vector( 1 downto 0);
-   hr_core_burstcount_o     : out std_logic_vector( 7 downto 0);
-   hr_core_readdata_i       : in  std_logic_vector(15 downto 0);
-   hr_core_readdatavalid_i  : in  std_logic;
-   hr_core_waitrequest_i    : in  std_logic;
-   hr_high_i                : in  std_logic; -- Core is too fast
-   hr_low_i                 : in  std_logic; -- Core is too slow
+   hr_clk_i                : in  std_logic;
+   hr_rst_i                : in  std_logic;
+   hr_core_write_o         : out std_logic;
+   hr_core_read_o          : out std_logic;
+   hr_core_address_o       : out std_logic_vector(31 downto 0);
+   hr_core_writedata_o     : out std_logic_vector(15 downto 0);
+   hr_core_byteenable_o    : out std_logic_vector( 1 downto 0);
+   hr_core_burstcount_o    : out std_logic_vector( 7 downto 0);
+   hr_core_readdata_i      : in  std_logic_vector(15 downto 0);
+   hr_core_readdatavalid_i : in  std_logic;
+   hr_core_waitrequest_i   : in  std_logic;
+   hr_high_i               : in  std_logic; -- Core is too fast
+   hr_low_i                : in  std_logic; -- Core is too slow
 
    --------------------------------------------------------------------
    -- C64 specific ports that are not supported by the M2M framework
    --------------------------------------------------------------------
 
    -- CBM-488/IEC serial port
-   iec_reset_n_o            : out std_logic;
-   iec_atn_n_o              : out std_logic;
-   iec_clk_en_o             : out std_logic;
-   iec_clk_n_i              : in  std_logic;
-   iec_clk_n_o              : out std_logic;
-   iec_data_en_o            : out std_logic;
-   iec_data_n_i             : in  std_logic;
-   iec_data_n_o             : out std_logic;
-   iec_srq_en_o             : out std_logic;
-   iec_srq_n_i              : in  std_logic;
-   iec_srq_n_o              : out std_logic;
+   iec_reset_n_o           : out std_logic;
+   iec_atn_n_o             : out std_logic;
+   iec_clk_en_o            : out std_logic;
+   iec_clk_n_i             : in  std_logic;
+   iec_clk_n_o             : out std_logic;
+   iec_data_en_o           : out std_logic;
+   iec_data_n_i            : in  std_logic;
+   iec_data_n_o            : out std_logic;
+   iec_srq_en_o            : out std_logic;
+   iec_srq_n_i             : in  std_logic;
+   iec_srq_n_o             : out std_logic;
 
    -- C64 Expansion Port (aka Cartridge Port) control lines
    -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
-   cart_ctrl_en_o           : out std_logic;
-   cart_ctrl_dir_o          : out std_logic;
-   cart_addr_en_o           : out std_logic;
-   cart_haddr_dir_o         : out std_logic;
-   cart_laddr_dir_o         : out std_logic;
-   cart_data_en_o           : out std_logic;
-   cart_data_dir_o          : out std_logic;
+   cart_ctrl_en_o          : out std_logic;
+   cart_ctrl_dir_o         : out std_logic;
+   cart_addr_en_o          : out std_logic;
+   cart_haddr_dir_o        : out std_logic;
+   cart_laddr_dir_o        : out std_logic;
+   cart_data_en_o          : out std_logic;
+   cart_data_dir_o         : out std_logic;
 
    -- C64 Expansion Port (aka Cartridge Port)
-   cart_reset_o             : out std_logic;
-   cart_phi2_o              : out std_logic;
-   cart_dotclock_o          : out std_logic;
+   cart_reset_o            : out std_logic;
+   cart_phi2_o             : out std_logic;
+   cart_dotclock_o         : out std_logic;
 
-   cart_nmi_i               : in  std_logic;
-   cart_irq_i               : in  std_logic;
-   cart_dma_i               : in  std_logic;
-   cart_exrom_i             : in  std_logic;
-   cart_game_i              : in  std_logic;
+   cart_nmi_i              : in  std_logic;
+   cart_irq_i              : in  std_logic;
+   cart_dma_i              : in  std_logic;
+   cart_exrom_i            : in  std_logic;
+   cart_game_i             : in  std_logic;
 
-   cart_ba_io               : inout std_logic;
-   cart_rw_io               : inout std_logic;
-   cart_roml_io             : inout std_logic;
-   cart_romh_io             : inout std_logic;
-   cart_io1_io              : inout std_logic;
-   cart_io2_io              : inout std_logic;
+   cart_ba_io              : inout std_logic;
+   cart_rw_io              : inout std_logic;
+   cart_roml_io            : inout std_logic;
+   cart_romh_io            : inout std_logic;
+   cart_io1_io             : inout std_logic;
+   cart_io2_io             : inout std_logic;
 
-   cart_d_io                : inout unsigned(7 downto 0);
-   cart_a_io                : inout unsigned(15 downto 0)
+   cart_d_io               : inout unsigned(7 downto 0);
+   cart_a_io               : inout unsigned(15 downto 0)
 );
 end entity MEGA65_Core;
 
