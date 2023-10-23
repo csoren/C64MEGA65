@@ -22,7 +22,7 @@ port (
    -- config data
    data_o      : out std_logic_vector(15 downto 0)
 );
-end config;
+end entity config;
 
 architecture beh of config is
 
