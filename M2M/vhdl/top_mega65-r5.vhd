@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------------
 -- Commodore 64 for MEGA65 (C64MEGA65)
 --
--- MEGA65 R4 main file that contains the whole machine
+-- MEGA65 R5 main file that contains the whole machine
 --
 -- based on C64_MiSTer by the MiSTer development team
 -- port done by MJoergen and sy2002 in 2023 and licensed under GPL v3
@@ -11,7 +11,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity mega65_r4 is
+entity mega65_r5 is
 port (
    -- Onboard crystal oscillator = 100 MHz
    clk_i                   : in    std_logic;
@@ -161,23 +161,34 @@ port (
    cart_rw_io              : inout std_logic;
    cart_io1_io             : inout std_logic;
    cart_io2_io             : inout std_logic;
-   cart_romh_io            : inout std_logic;
-   cart_roml_io            : inout std_logic;
-   cart_reset_o            : out   std_logic;                  -- R4 board bug. Should be inout.
+
+   cart_romh_oe_n_o        : out   std_logic;
+   cart_romh_i             : in    std_logic;
+   cart_roml_oe_n_o        : out   std_logic;
+   cart_roml_i             : in    std_logic;
+   cart_reset_oe_n_o       : out   std_logic;
+   cart_reset_i            : in    std_logic;
+   cart_game_oe_n_o        : out   std_logic;
    cart_game_i             : in    std_logic;
+   cart_exrom_oe_n_o       : out   std_logic;
    cart_exrom_i            : in    std_logic;
-   cart_nmi_i              : in    std_logic;                  -- R4 board bug. Should be inout.
-   cart_irq_i              : in    std_logic;                  -- R4 board bug. Should be inout.
+   cart_nmi_oe_n_o         : out   std_logic;
+   cart_nmi_i              : in    std_logic;
+   cart_irq_oe_n_o         : out   std_logic;
+   cart_irq_i              : in    std_logic;
+   cart_en_o               : out   std_logic;
 
    cart_d_io               : inout unsigned(7 downto 0);
    cart_a_io               : inout unsigned(15 downto 0);
 
-
-   -- DIP Switches
-   cpld_cfg_i              : in    std_logic_vector(3 downto 0);
+   -- I2C bus
+   -- U32 = PCA9655EMTTXG. Address 0x40. I/O expander.
+   -- U12 = MP8869SGL-Z.   Address 0x61. DC/DC Converter.
+   -- U14 = MP8869SGL-Z.   Address 0x67. DC/DC Converter.
+   i2c_scl_io              : inout std_logic;
+   i2c_sda_io              : inout std_logic;
 
    -- Debug.
-   dbg_io_10               : inout std_logic;
    dbg_io_11               : inout std_logic;
 
    -- SMSC Ethernet PHY. U4 = KSZ8081RNDCA
@@ -239,9 +250,6 @@ port (
    qspidb_io               : inout std_logic_vector(3 downto 0);
    qspicsn_o               : out   std_logic;
 
-   -- Board revision
-   rev_bit_i               : in    std_logic_vector(3 downto 0);
-
    -- SDRAM - 32M x 16 bit, 3.3V VCC. U44 = IS42S16320F-6BL
    sdram_clk_o             : out   std_logic;
    sdram_cke_o             : out   std_logic;
@@ -255,9 +263,9 @@ port (
    sdram_dqmh_o            : out   std_logic;
    sdram_dq_io             : inout std_logic_vector(15 downto 0)
 );
-end entity mega65_r4;
+end entity mega65_r5;
 
-architecture synthesis of mega65_r4 is
+architecture synthesis of mega65_r5 is
 
    signal main_clk    : std_logic;
    signal main_rst    : std_logic;
@@ -397,13 +405,16 @@ architecture synthesis of mega65_r4 is
    signal qnice_ramrom_we        : std_logic;
    signal qnice_ramrom_wait      : std_logic;
 
+   signal cart_roml              : std_logic;
+   signal cart_romh              : std_logic;
+
 begin
 
    ---------------------------------------------------------------------------------------------------------------
-   -- MiSTer2MEGA Hardware Abstraction Layer for the MEGA65 board revision R4
+   -- MiSTer2MEGA Hardware Abstraction Layer for the MEGA65 board revision R5
    ---------------------------------------------------------------------------------------------------------------
 
-   i_hal_mega65_r4 : entity work.hal_mega65_r4
+   i_hal_mega65_r5 : entity work.hal_mega65_r5
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,
@@ -565,7 +576,7 @@ begin
       qnice_ramrom_ce_o       => qnice_ramrom_ce,
       qnice_ramrom_we_o       => qnice_ramrom_we,
       qnice_ramrom_wait_i     => qnice_ramrom_wait
-   ); -- i_hal_mega65_r4
+   ); -- i_hal_mega65_r5
 
 
    ---------------------------------------------------------------------------------------------------------------
@@ -737,7 +748,6 @@ begin
          cart_data_dir_o   => cart_data_dir_o,
 
          -- C64 Expansion Port (aka Cartridge Port)
-         cart_reset_o      => cart_reset_o,
          cart_phi2_o       => cart_phi2_o,
          cart_dotclock_o   => cart_dotclock_o,
          cart_nmi_i        => cart_nmi_i,
@@ -747,13 +757,16 @@ begin
          cart_game_i       => cart_game_i,
          cart_ba_io        => cart_ba_io,
          cart_rw_io        => cart_rw_io,
-         cart_roml_io      => cart_roml_io,
-         cart_romh_io      => cart_romh_io,
+         cart_roml_io      => cart_roml,
+         cart_romh_io      => cart_romh,
          cart_io1_io       => cart_io1_io,
          cart_io2_io       => cart_io2_io,
          cart_d_io         => cart_d_io,
          cart_a_io         => cart_a_io
       ); -- CORE
+
+   cart_roml <= cart_roml_i;
+   cart_romh <= cart_romh_i;
 
    iec_clk_en_n_o  <= not iec_clk_en;
    iec_data_en_n_o <= not iec_data_en;
@@ -767,8 +780,16 @@ begin
    hdmi_ls_oe_n_o        <= '0'; -- Enable HDMI output
    hdmi_scl_io           <= 'Z';
    hdmi_sda_io           <= 'Z';
-   dbg_io_10             <= 'Z';
    dbg_io_11             <= 'Z';
+
+   cart_romh_oe_n_o      <= '1';
+   cart_roml_oe_n_o      <= '1';
+   cart_reset_oe_n_o     <= '1';
+   cart_game_oe_n_o      <= '1';
+   cart_exrom_oe_n_o     <= '1';
+   cart_nmi_oe_n_o       <= '1';
+   cart_irq_oe_n_o       <= '1';
+   cart_en_o             <= '0';
 
    eth_clock_o           <= '0';
    eth_led2_o            <= '0';
