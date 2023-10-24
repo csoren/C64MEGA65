@@ -163,19 +163,19 @@ port (
    cart_io2_io             : inout std_logic;
 
    cart_romh_oe_n_o        : out   std_logic;
-   cart_romh_i             : in    std_logic;
+   cart_romh_io            : inout std_logic;
    cart_roml_oe_n_o        : out   std_logic;
-   cart_roml_i             : in    std_logic;
+   cart_roml_io            : inout std_logic;
    cart_reset_oe_n_o       : out   std_logic;
-   cart_reset_i            : in    std_logic;
+   cart_reset_io           : inout std_logic;
    cart_game_oe_n_o        : out   std_logic;
-   cart_game_i             : in    std_logic;
+   cart_game_io            : inout std_logic;
    cart_exrom_oe_n_o       : out   std_logic;
-   cart_exrom_i            : in    std_logic;
+   cart_exrom_io           : inout std_logic;
    cart_nmi_oe_n_o         : out   std_logic;
-   cart_nmi_i              : in    std_logic;
+   cart_nmi_io             : inout std_logic;
    cart_irq_oe_n_o         : out   std_logic;
-   cart_irq_i              : in    std_logic;
+   cart_irq_io             : inout std_logic;
    cart_en_o               : out   std_logic;
 
    cart_d_io               : inout unsigned(7 downto 0);
@@ -404,9 +404,6 @@ architecture synthesis of mega65_r5 is
    signal qnice_ramrom_ce        : std_logic;
    signal qnice_ramrom_we        : std_logic;
    signal qnice_ramrom_wait      : std_logic;
-
-   signal cart_roml              : std_logic;
-   signal cart_romh              : std_logic;
 
 begin
 
@@ -750,23 +747,21 @@ begin
          -- C64 Expansion Port (aka Cartridge Port)
          cart_phi2_o       => cart_phi2_o,
          cart_dotclock_o   => cart_dotclock_o,
-         cart_nmi_i        => cart_nmi_i,
-         cart_irq_i        => cart_irq_i,
          cart_dma_i        => cart_dma_i,
-         cart_exrom_i      => cart_exrom_i,
-         cart_game_i       => cart_game_i,
          cart_ba_io        => cart_ba_io,
          cart_rw_io        => cart_rw_io,
-         cart_roml_io      => cart_roml,
-         cart_romh_io      => cart_romh,
+         cart_romh_io      => cart_romh_io,
+         cart_roml_io      => cart_roml_io,
+         cart_reset_o      => cart_reset_io,
+         cart_game_i       => cart_game_io,
+         cart_exrom_i      => cart_exrom_io,
+         cart_nmi_i        => cart_nmi_io,
+         cart_irq_i        => cart_irq_io,
          cart_io1_io       => cart_io1_io,
          cart_io2_io       => cart_io2_io,
          cart_d_io         => cart_d_io,
          cart_a_io         => cart_a_io
       ); -- CORE
-
-   cart_roml <= cart_roml_i;
-   cart_romh <= cart_romh_i;
 
    iec_clk_en_n_o  <= not iec_clk_en;
    iec_data_en_n_o <= not iec_data_en;
