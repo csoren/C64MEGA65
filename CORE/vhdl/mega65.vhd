@@ -21,6 +21,9 @@ library xpm;
 use xpm.vcomponents.all;
 
 entity MEGA65_Core is
+generic (
+   G_BOARD : string                                         -- Which platform are we running on.
+);
 port (
    CLK                     : in  std_logic;                 -- 100 MHz clock
    RESET_M2M_N             : in  std_logic;                 -- Debounced system reset in system clock domain
@@ -177,38 +180,47 @@ port (
    iec_srq_n_i             : in  std_logic;
    iec_srq_n_o             : out std_logic;
 
-   -- C64 Expansion Port (aka Cartridge Port) control lines
-   cart_en_o               : out std_logic;  -- Enable port, active high
-   -- 0 : tristate (i.e. input), 1 : output
-   cart_ctrl_oe_o          : out std_logic;
-   cart_addr_oe_o          : out std_logic;
-   cart_data_oe_o          : out std_logic;
-
    -- C64 Expansion Port (aka Cartridge Port)
-   cart_reset_o            : out std_logic;
+   cart_en_o               : out std_logic;  -- Enable port, active high
    cart_phi2_o             : out std_logic;
    cart_dotclock_o         : out std_logic;
-   cart_nmi_i              : in  std_logic;
-   cart_irq_i              : in  std_logic;
    cart_dma_i              : in  std_logic;
-   cart_exrom_i            : in  std_logic;
+   cart_reset_oe_o         : out std_logic;
+   cart_reset_i            : in  std_logic;
+   cart_reset_o            : out std_logic;
+   cart_game_oe_o          : out std_logic;
    cart_game_i             : in  std_logic;
+   cart_game_o             : out std_logic;
+   cart_exrom_oe_o         : out std_logic;
+   cart_exrom_i            : in  std_logic;
+   cart_exrom_o            : out std_logic;
+   cart_nmi_oe_o           : out std_logic;
+   cart_nmi_i              : in  std_logic;
+   cart_nmi_o              : out std_logic;
+   cart_irq_oe_o           : out std_logic;
+   cart_irq_i              : in  std_logic;
+   cart_irq_o              : out std_logic;
+   cart_roml_oe_o          : out std_logic;
+   cart_roml_i             : in  std_logic;
+   cart_roml_o             : out std_logic;
+   cart_romh_oe_o          : out std_logic;
+   cart_romh_i             : in  std_logic;
+   cart_romh_o             : out std_logic;
+   cart_ctrl_oe_o          : out std_logic; -- 0 : tristate (i.e. input), 1 : output
    cart_ba_i               : in  std_logic;
    cart_rw_i               : in  std_logic;
-   cart_roml_i             : in  std_logic;
-   cart_romh_i             : in  std_logic;
    cart_io1_i              : in  std_logic;
    cart_io2_i              : in  std_logic;
-   cart_d_i                : in  unsigned( 7 downto 0);
-   cart_a_i                : in  unsigned(15 downto 0);
    cart_ba_o               : out std_logic;
    cart_rw_o               : out std_logic;
-   cart_roml_o             : out std_logic;
-   cart_romh_o             : out std_logic;
    cart_io1_o              : out std_logic;
    cart_io2_o              : out std_logic;
-   cart_d_o                : out unsigned( 7 downto 0);
-   cart_a_o                : out unsigned(15 downto 0)
+   cart_addr_oe_o          : out std_logic; -- 0 : tristate (i.e. input), 1 : output
+   cart_a_i                : in  unsigned(15 downto 0);
+   cart_a_o                : out unsigned(15 downto 0);
+   cart_data_oe_o          : out std_logic; -- 0 : tristate (i.e. input), 1 : output
+   cart_d_i                : in  unsigned( 7 downto 0);
+   cart_d_o                : out unsigned( 7 downto 0)
 );
 end entity MEGA65_Core;
 
@@ -497,7 +509,8 @@ begin
    -- main.vhd contains the actual MiSTer core
    i_main : entity work.main
       generic map (
-         G_VDNUM                => C_VDNUM
+         G_BOARD => G_BOARD,    -- Which platform are we running on.
+         G_VDNUM => C_VDNUM
       )
       port map (
          clk_main_i             => main_clk_o,
@@ -614,39 +627,47 @@ begin
          iec_srq_n_i            => iec_srq_n_i,
          iec_srq_n_o            => iec_srq_n_o,
 
-         -- C64 Expansion Port (aka Cartridge Port) control lines
-         cart_en_o               => cart_en_o,     -- Enable port, active high
-         -- 0 : tristate (i.e. input), 1 : output
-         cart_ctrl_oe_o          => cart_ctrl_oe_o,
-         cart_addr_oe_o          => cart_addr_oe_o,
-         cart_data_oe_o          => cart_data_oe_o,
-
-
          -- C64 Expansion Port (aka Cartridge Port)
-         cart_reset_o            => cart_reset_o,
-         cart_phi2_o             => cart_phi2_o,
-         cart_dotclock_o         => cart_dotclock_o,
-         cart_nmi_i              => cart_nmi_i,
-         cart_irq_i              => cart_irq_i,
-         cart_dma_i              => cart_dma_i,
-         cart_exrom_i            => cart_exrom_i,
-         cart_game_i             => cart_game_i,
-         cart_ba_i               => cart_ba_i,
-         cart_rw_i               => cart_rw_i,
-         cart_roml_i             => cart_roml_i,
-         cart_romh_i             => cart_romh_i,
-         cart_io1_i              => cart_io1_i,
-         cart_io2_i              => cart_io2_i,
-         cart_d_i                => cart_d_i,
-         cart_a_i                => cart_a_i,
-         cart_ba_o               => cart_ba_o,
-         cart_rw_o               => cart_rw_o,
-         cart_roml_o             => cart_roml_o,
-         cart_romh_o             => cart_romh_o,
-         cart_io1_o              => cart_io1_o,
-         cart_io2_o              => cart_io2_o,
-         cart_d_o                => cart_d_o,
-         cart_a_o                => cart_a_o,
+         cart_en_o              => cart_en_o,
+         cart_phi2_o            => cart_phi2_o,
+         cart_dotclock_o        => cart_dotclock_o,
+         cart_dma_i             => cart_dma_i,
+         cart_reset_oe_o        => cart_reset_oe_o,
+         cart_reset_i           => cart_reset_i,
+         cart_reset_o           => cart_reset_o,
+         cart_game_oe_o         => cart_game_oe_o,
+         cart_game_i            => cart_game_i,
+         cart_game_o            => cart_game_o,
+         cart_exrom_oe_o        => cart_exrom_oe_o,
+         cart_exrom_i           => cart_exrom_i,
+         cart_exrom_o           => cart_exrom_o,
+         cart_nmi_oe_o          => cart_nmi_oe_o,
+         cart_nmi_i             => cart_nmi_i,
+         cart_nmi_o             => cart_nmi_o,
+         cart_irq_oe_o          => cart_irq_oe_o,
+         cart_irq_i             => cart_irq_i,
+         cart_irq_o             => cart_irq_o,
+         cart_roml_oe_o         => cart_roml_oe_o,
+         cart_roml_i            => cart_roml_i,
+         cart_roml_o            => cart_roml_o,
+         cart_romh_oe_o         => cart_romh_oe_o,
+         cart_romh_i            => cart_romh_i,
+         cart_romh_o            => cart_romh_o,
+         cart_ctrl_oe_o         => cart_ctrl_oe_o,
+         cart_ba_i              => cart_ba_i,
+         cart_rw_i              => cart_rw_i,
+         cart_io1_i             => cart_io1_i,
+         cart_io2_i             => cart_io2_i,
+         cart_ba_o              => cart_ba_o,
+         cart_rw_o              => cart_rw_o,
+         cart_io1_o             => cart_io1_o,
+         cart_io2_o             => cart_io2_o,
+         cart_addr_oe_o         => cart_addr_oe_o,
+         cart_a_i               => cart_a_i,
+         cart_a_o               => cart_a_o,
+         cart_data_oe_o         => cart_data_oe_o,
+         cart_d_i               => cart_d_i,
+         cart_d_o               => cart_d_o,
 
          -- RAM Expansion Unit (REU)
          ext_cycle_o            => main_ext_cycle,
