@@ -17,6 +17,7 @@ use work.vdrives_pkg.all;
 
 entity main is
    generic (
+      G_BOARD                : string := "MEGA65_R3";      -- Which platform are we running on.
       G_VDNUM                : natural                     -- amount of virtual drives
    );
    port (
@@ -133,35 +134,40 @@ entity main is
       iec_data_n_o           : out std_logic;
       iec_srq_en_o           : out std_logic;
       iec_srq_n_i            : in  std_logic;
-      iec_srq_n_o            : out std_logic;    
-   
+      iec_srq_n_o            : out std_logic;
+
       -- C64 Expansion Port (aka Cartridge Port) control lines
-      -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
-      cart_ctrl_en_o         : out std_logic;
-      cart_ctrl_dir_o        : out std_logic;
-      cart_addr_en_o         : out std_logic;
-      cart_haddr_dir_o       : out std_logic;
-      cart_laddr_dir_o       : out std_logic;
-      cart_data_en_o         : out std_logic;
-      cart_data_dir_o        : out std_logic;
+      cart_en_o              : out std_logic;  -- Enable port, active high
+      -- 0 : tristate (i.e. input), 1 : output
+      cart_ctrl_oe_o         : out std_logic;
+      cart_addr_oe_o         : out std_logic;
+      cart_data_oe_o         : out std_logic;
 
       -- C64 Expansion Port (aka Cartridge Port)
-      cart_reset_o           : out   std_logic;
-      cart_phi2_o            : out   std_logic;
-      cart_dotclock_o        : out   std_logic;
-      cart_nmi_i             : in    std_logic;
-      cart_irq_i             : in    std_logic;
-      cart_dma_i             : in    std_logic;
-      cart_exrom_i           : in    std_logic;
-      cart_game_i            : in    std_logic;
-      cart_ba_io             : inout std_logic;
-      cart_rw_io             : inout std_logic;
-      cart_roml_io           : inout std_logic;
-      cart_romh_io           : inout std_logic;
-      cart_io1_io            : inout std_logic;
-      cart_io2_io            : inout std_logic;
-      cart_d_io              : inout unsigned( 7 downto 0);
-      cart_a_io              : inout unsigned(15 downto 0);
+      cart_reset_o           : out std_logic;
+      cart_phi2_o            : out std_logic;
+      cart_dotclock_o        : out std_logic;
+      cart_nmi_i             : in  std_logic;
+      cart_irq_i             : in  std_logic;
+      cart_dma_i             : in  std_logic;
+      cart_exrom_i           : in  std_logic;
+      cart_game_i            : in  std_logic;
+      cart_ba_i              : in  std_logic;
+      cart_rw_i              : in  std_logic;
+      cart_roml_i            : in  std_logic;
+      cart_romh_i            : in  std_logic;
+      cart_io1_i             : in  std_logic;
+      cart_io2_i             : in  std_logic;
+      cart_d_i               : in  unsigned( 7 downto 0);
+      cart_a_i               : in  unsigned(15 downto 0);
+      cart_ba_o              : out std_logic;
+      cart_rw_o              : out std_logic;
+      cart_roml_o            : out std_logic;
+      cart_romh_o            : out std_logic;
+      cart_io1_o             : out std_logic;
+      cart_io2_o             : out std_logic;
+      cart_d_o               : out unsigned( 7 downto 0);
+      cart_a_o               : out unsigned(15 downto 0);
 
       -- RAM Expansion Unit
       ext_cycle_o            : out std_logic;
@@ -628,25 +634,13 @@ begin
       -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
 
       -- Tristate all expansion port drivers that we can directly control
-      cart_ctrl_en_o       <= '1';
-      cart_addr_en_o       <= '1';
-      cart_data_en_o       <= '1';
-
-      -- Fixed direction signals: from FPGA to HW port
       -- @TODO: As soon as we support modules that can act as busmaster, we need to become more flexible here
-      cart_ctrl_dir_o      <= '1';     -- control signals
-      cart_haddr_dir_o     <= '1';     -- CPU address bus: higher 8 bit
-      cart_laddr_dir_o     <= '1';     -- CPU address bus: lower 8 bit
+      cart_ctrl_oe_o       <= '0';
+      cart_addr_oe_o       <= '0';
+      cart_data_oe_o       <= '0';
+      cart_en_o            <= '0'; -- Disable port
 
       -- Default values for all signals
-      cart_a_io            <= (others => 'Z');
-      cart_d_io            <= (others => 'Z');
-      cart_roml_io         <= 'Z';
-      cart_romh_io         <= 'Z';
-      cart_io1_io          <= 'Z';
-      cart_io2_io          <= 'Z';
-      cart_ba_io           <= 'Z';
-      cart_rw_io           <= 'Z';
       cart_phi2_o          <= '0';
       cart_reset_o         <= '1';
       cart_dotclock_o      <= '0';
@@ -655,7 +649,6 @@ begin
       cart_dma_n           <= '1';
       cart_exrom_n         <= '1';
       cart_game_n          <= '1';
-      cart_data_dir_o      <= '0';     -- changes dynamically (see below)
       data_from_cart       <= x"00";
 
       -- memory access flags
@@ -667,19 +660,20 @@ begin
       -- Mode = Use hardware slot
       if c64_exp_port_mode_i = 0 then
 
+         cart_en_o       <= '1'; -- Enable port
          -- Expansion Port control signals
-         cart_ctrl_en_o    <= '0';
-         cart_roml_io      <= cart_roml_n;
-         cart_romh_io      <= cart_romh_n;
-         cart_io1_io       <= cart_io1_n;
-         cart_io2_io       <= cart_io2_n;
-         cart_rw_io        <= not c64_ram_we;
-         cart_phi2_o       <= core_phi2;
+         cart_ctrl_oe_o  <= '1';
+         cart_roml_o     <= cart_roml_n;
+         cart_romh_o     <= cart_romh_n;
+         cart_io1_o      <= cart_io1_n;
+         cart_io2_o      <= cart_io2_n;
+         cart_rw_o       <= not c64_ram_we;
+         cart_phi2_o     <= core_phi2;
          
          -- @TODO: When implementing this, we need to perform more research. It seems that just using
          -- the C64 cores's "cpuHasBus" signal leads to less compatibility than more. For example it
          -- seemed, that the Kung Fu Flash is not working at all any more.
-         cart_ba_io        <= '1';         
+         cart_ba_o         <= '1';
 
          cart_reset_o      <= reset_core_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
          cart_dotclock_o   <= core_dotclk;
@@ -692,28 +686,27 @@ begin
 
          -- @TODO: As soon as we want to support DMA-enabled cartridges,
          -- we need to treat the address bus as a bi-directional port
-         cart_addr_en_o    <= '0';
+         cart_addr_oe_o  <= '1';
          if core_umax_romh = '0' then
-            cart_a_io         <= c64_ram_addr_o;
+            cart_a_o     <= c64_ram_addr_o;
          -- Ultimax mode and VIC accesses the bus
          else
             -- According to "The PLA Dissected", the address lines A12 to A15 of the C64 address bus are pulled up by
             -- RP4 whenever the VIC-II has the bus, so they are %1111 usually.
-            cart_a_io         <= "11" & c64_ram_addr_o(13 downto 0);
+            cart_a_o     <= "11" & c64_ram_addr_o(13 downto 0);
          end if;
 
          -- Switch the data lines bi-directionally so that the CPU can also
          -- write to the cartridge, e.g. for bank switching
-         cart_data_en_o       <= '0';
          if c64_ram_we = '0' and (cart_roml_n = '0' or cart_romh_n = '0' or cart_io1_n = '0' or cart_io2_n = '0') then
-            cart_data_dir_o   <= '0';
-            data_from_cart    <= cart_d_io;
+            cart_data_oe_o  <= '0';  -- input
+            data_from_cart  <= cart_d_i;
          else
-            cart_data_dir_o   <= '1';
+            cart_data_oe_o  <= '1';  -- output
             if c64_ram_we = '0' then
-               cart_d_io         <= c64_ram_data_i;
+               cart_d_o     <= c64_ram_data_i;
             else
-               cart_d_io         <= c64_ram_data_o;
+               cart_d_o     <= c64_ram_data_o;
             end if;
          end if;
       end if;

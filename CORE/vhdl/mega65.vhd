@@ -178,35 +178,37 @@ port (
    iec_srq_n_o             : out std_logic;
 
    -- C64 Expansion Port (aka Cartridge Port) control lines
-   -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
-   cart_ctrl_en_o          : out std_logic;
-   cart_ctrl_dir_o         : out std_logic;
-   cart_addr_en_o          : out std_logic;
-   cart_haddr_dir_o        : out std_logic;
-   cart_laddr_dir_o        : out std_logic;
-   cart_data_en_o          : out std_logic;
-   cart_data_dir_o         : out std_logic;
+   cart_en_o               : out std_logic;  -- Enable port, active high
+   -- 0 : tristate (i.e. input), 1 : output
+   cart_ctrl_oe_o          : out std_logic;
+   cart_addr_oe_o          : out std_logic;
+   cart_data_oe_o          : out std_logic;
 
    -- C64 Expansion Port (aka Cartridge Port)
    cart_reset_o            : out std_logic;
    cart_phi2_o             : out std_logic;
    cart_dotclock_o         : out std_logic;
-
    cart_nmi_i              : in  std_logic;
    cart_irq_i              : in  std_logic;
    cart_dma_i              : in  std_logic;
    cart_exrom_i            : in  std_logic;
    cart_game_i             : in  std_logic;
-
-   cart_ba_io              : inout std_logic;
-   cart_rw_io              : inout std_logic;
-   cart_roml_io            : inout std_logic;
-   cart_romh_io            : inout std_logic;
-   cart_io1_io             : inout std_logic;
-   cart_io2_io             : inout std_logic;
-
-   cart_d_io               : inout unsigned(7 downto 0);
-   cart_a_io               : inout unsigned(15 downto 0)
+   cart_ba_i               : in  std_logic;
+   cart_rw_i               : in  std_logic;
+   cart_roml_i             : in  std_logic;
+   cart_romh_i             : in  std_logic;
+   cart_io1_i              : in  std_logic;
+   cart_io2_i              : in  std_logic;
+   cart_d_i                : in  unsigned( 7 downto 0);
+   cart_a_i                : in  unsigned(15 downto 0);
+   cart_ba_o               : out std_logic;
+   cart_rw_o               : out std_logic;
+   cart_roml_o             : out std_logic;
+   cart_romh_o             : out std_logic;
+   cart_io1_o              : out std_logic;
+   cart_io2_o              : out std_logic;
+   cart_d_o                : out unsigned( 7 downto 0);
+   cart_a_o                : out unsigned(15 downto 0)
 );
 end entity MEGA65_Core;
 
@@ -613,32 +615,38 @@ begin
          iec_srq_n_o            => iec_srq_n_o,
 
          -- C64 Expansion Port (aka Cartridge Port) control lines
-         -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
-         cart_ctrl_en_o         => cart_ctrl_en_o,
-         cart_ctrl_dir_o        => cart_ctrl_dir_o,
-         cart_addr_en_o         => cart_addr_en_o,
-         cart_haddr_dir_o       => cart_haddr_dir_o,
-         cart_laddr_dir_o       => cart_laddr_dir_o,
-         cart_data_en_o         => cart_data_en_o,
-         cart_data_dir_o        => cart_data_dir_o,
+         cart_en_o               => cart_en_o,     -- Enable port, active high
+         -- 0 : tristate (i.e. input), 1 : output
+         cart_ctrl_oe_o          => cart_ctrl_oe_o,
+         cart_addr_oe_o          => cart_addr_oe_o,
+         cart_data_oe_o          => cart_data_oe_o,
+
 
          -- C64 Expansion Port (aka Cartridge Port)
-         cart_reset_o           => cart_reset_o,
-         cart_phi2_o            => cart_phi2_o,
-         cart_dotclock_o        => cart_dotclock_o,
-         cart_nmi_i             => cart_nmi_i,
-         cart_irq_i             => cart_irq_i,
-         cart_dma_i             => cart_dma_i,
-         cart_exrom_i           => cart_exrom_i,
-         cart_game_i            => cart_game_i,
-         cart_ba_io             => cart_ba_io,
-         cart_rw_io             => cart_rw_io,
-         cart_roml_io           => cart_roml_io,
-         cart_romh_io           => cart_romh_io,
-         cart_io1_io            => cart_io1_io,
-         cart_io2_io            => cart_io2_io,
-         cart_d_io              => cart_d_io,
-         cart_a_io              => cart_a_io,
+         cart_reset_o            => cart_reset_o,
+         cart_phi2_o             => cart_phi2_o,
+         cart_dotclock_o         => cart_dotclock_o,
+         cart_nmi_i              => cart_nmi_i,
+         cart_irq_i              => cart_irq_i,
+         cart_dma_i              => cart_dma_i,
+         cart_exrom_i            => cart_exrom_i,
+         cart_game_i             => cart_game_i,
+         cart_ba_i               => cart_ba_i,
+         cart_rw_i               => cart_rw_i,
+         cart_roml_i             => cart_roml_i,
+         cart_romh_i             => cart_romh_i,
+         cart_io1_i              => cart_io1_i,
+         cart_io2_i              => cart_io2_i,
+         cart_d_i                => cart_d_i,
+         cart_a_i                => cart_a_i,
+         cart_ba_o               => cart_ba_o,
+         cart_rw_o               => cart_rw_o,
+         cart_roml_o             => cart_roml_o,
+         cart_romh_o             => cart_romh_o,
+         cart_io1_o              => cart_io1_o,
+         cart_io2_o              => cart_io2_o,
+         cart_d_o                => cart_d_o,
+         cart_a_o                => cart_a_o,
 
          -- RAM Expansion Unit (REU)
          ext_cycle_o            => main_ext_cycle,

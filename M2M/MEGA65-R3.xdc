@@ -193,19 +193,19 @@ set_property -dict {PACKAGE_PIN W20  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[
 set_property -dict {PACKAGE_PIN W21  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[7]}];           # F_C64_D7
 set_property -dict {PACKAGE_PIN P15  IOSTANDARD LVCMOS33} [get_ports {cart_dma_i}];             # F_C64_DMA
 set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports {cart_dotclock_o}];        # F_C64_CLOCK
-set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_i}];           # F_C64_EXROM
-set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_i}];            # F_C64_GAME
 set_property -dict {PACKAGE_PIN L18  IOSTANDARD LVCMOS33} [get_ports {cart_haddr_dir_o}];       # F_HADDR_DIR
 set_property -dict {PACKAGE_PIN N15  IOSTANDARD LVCMOS33} [get_ports {cart_io1_io}];            # F_C64_IO1
 set_property -dict {PACKAGE_PIN AA20 IOSTANDARD LVCMOS33} [get_ports {cart_io2_io}];            # F_C64_IO2
-set_property -dict {PACKAGE_PIN P14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_i}];             # F_C64_IRQ
 set_property -dict {PACKAGE_PIN L21  IOSTANDARD LVCMOS33} [get_ports {cart_laddr_dir_o}];       # F_LADDR_DIR
-set_property -dict {PACKAGE_PIN W17  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_i}];             # F_C64_NMI
 set_property -dict {PACKAGE_PIN V17  IOSTANDARD LVCMOS33} [get_ports {cart_phi2_o}];            # F_C64_O2
-set_property -dict {PACKAGE_PIN N14  IOSTANDARD LVCMOS33} [get_ports {cart_reset_o}];           # F_C64_RESET
+set_property -dict {PACKAGE_PIN R18  IOSTANDARD LVCMOS33} [get_ports {cart_rw_io}];             # F_C64_RW
 set_property -dict {PACKAGE_PIN T18  IOSTANDARD LVCMOS33} [get_ports {cart_romh_io}];           # F_C64_ROMH
 set_property -dict {PACKAGE_PIN AB18 IOSTANDARD LVCMOS33} [get_ports {cart_roml_io}];           # F_C64_ROML
-set_property -dict {PACKAGE_PIN R18  IOSTANDARD LVCMOS33} [get_ports {cart_rw_io}];             # F_C64_RW
+set_property -dict {PACKAGE_PIN N14  IOSTANDARD LVCMOS33} [get_ports {cart_reset_o}];           # F_C64_RESET
+set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_i}];            # F_C64_GAME
+set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_i}];           # F_C64_EXROM
+set_property -dict {PACKAGE_PIN W17  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_i}];             # F_C64_NMI
+set_property -dict {PACKAGE_PIN P14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_i}];             # F_C64_IRQ
 
 # SMSC Ethernet PHY. U4 = KSZ8081RNDCA
 set_property -dict {PACKAGE_PIN L4   IOSTANDARD LVCMOS33} [get_ports {eth_clock_o}];            # ETH_CLK
