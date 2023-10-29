@@ -1,3 +1,40 @@
+Version 5.1 - MONTH, DAY, YEAR
+==============================
+
+The main purpose of this release is to support the new <@TODO"2024 batches" or "post November 2023"? Release date?> of the
+MEGA65 (aka "R5") which sports enhanced hardware. Additionally the core now
+also supports the very early R2 prototype boards and the
+never-released-to-the-public R4 boards.
+
+## New Features: R4/R5 boards only
+
+* Better analog audio output via the 3.1mm audio jack thanks by utilizing
+  MEGA65's new audio DAC.
+
+WIP The hardware of the MEGA65's Expansion Port (aka cartridge port) is now 100%
+  compatible to the C64's hardware as it has bi-directional signals for RESET,
+  IRQ and NMI. This allowed us to make the core compatible with even more
+  cartridges. One example stands out is, that you do not need the "reset
+  workaround" for the Kung Fu Flash (KFF) any more.
+@TODO: Needs update of the cartridge documentation that for example the reset
+workaround is not needed for the KungFu Flash any more
+
+## New Features: All boards
+
+WIP You can now close the "About & Help" screens also by pressing Run/Stop.
+
+## Bugfixes
+
+WIP The long-reset" feature was broken in V5. (Fixed GitHub issue #79)
+
+WIP Fixed a crash in the file browser. (Fixed GitHub issue #95)
+
+* In V5 we introduced a new feature: You can go one menu-level up (from a sub-
+  menu to the main-menu) by pressing Run/Stop. Subsequently you can also close
+  then the main menu via Run/Stop (additionally to via Help). But if you did
+  so, the Run/Stop keypress that happens to close the OSM was propagated to
+  the C64. (Fixed GitHub issue #80)
+
 Version 5 - June 23, 2023
 =========================
 
