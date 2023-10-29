@@ -95,7 +95,7 @@ set_property -dict {PACKAGE_PIN Y2   IOSTANDARD LVCMOS33} [get_ports {hdmi_clk_o
 set_property -dict {PACKAGE_PIN AA1  IOSTANDARD LVCMOS33} [get_ports {hdmi_spdif_o}];           # HDMI_SPDIF
 set_property -dict {PACKAGE_PIN T3   IOSTANDARD LVCMOS33} [get_ports {hdmi_u6_scl_io}];         # HDMI_SCL
 set_property -dict {PACKAGE_PIN U7   IOSTANDARD LVCMOS33} [get_ports {hdmi_u6_sda_io}];         # HDMI_SDA
-set_property -dict {PACKAGE_PIN Y9   IOSTANDARD LVCMOS33} [get_ports {hdmi_int_io}];            # HDMI_INT
+set_property -dict {PACKAGE_PIN Y9   IOSTANDARD LVCMOS33} [get_ports {hdmi_int_i}];             # HDMI_INT
 set_property -dict {PACKAGE_PIN AA8  IOSTANDARD LVCMOS33} [get_ports {hdmi_spdifout_i}];        # HDMI_SPDIFOUT
 
 # HDMI output. U10 = TPD12S016PWR
@@ -111,11 +111,11 @@ set_property -dict {PACKAGE_PIN V19  IOSTANDARD LVCMOS33} [get_ports {hdmi_cec_c
 set_property -dict {PACKAGE_PIN A14  IOSTANDARD LVCMOS33} [get_ports {kb_io0_o}];               # KB_IO1
 set_property -dict {PACKAGE_PIN A13  IOSTANDARD LVCMOS33} [get_ports {kb_io1_o}];               # KB_IO2
 set_property -dict {PACKAGE_PIN C13  IOSTANDARD LVCMOS33} [get_ports {kb_io2_i}];               # KB_IO3
-set_property -dict {PACKAGE_PIN B13  IOSTANDARD LVCMOS33} [get_ports {kb_jtagen_i}];            # KB_JTAGEN
-set_property -dict {PACKAGE_PIN E13  IOSTANDARD LVCMOS33} [get_ports {kb_tck_i}];               # KB_TCK
-set_property -dict {PACKAGE_PIN D15  IOSTANDARD LVCMOS33} [get_ports {kb_tdi_i}];               # KB_TDI
+set_property -dict {PACKAGE_PIN E13  IOSTANDARD LVCMOS33} [get_ports {kb_tck_o}];               # KB_TCK
 set_property -dict {PACKAGE_PIN E14  IOSTANDARD LVCMOS33} [get_ports {kb_tdo_i}];               # KB_TDO
-set_property -dict {PACKAGE_PIN D14  IOSTANDARD LVCMOS33} [get_ports {kb_tms_i}];               # KB_TMS
+set_property -dict {PACKAGE_PIN D14  IOSTANDARD LVCMOS33} [get_ports {kb_tms_o}];               # KB_TMS
+set_property -dict {PACKAGE_PIN D15  IOSTANDARD LVCMOS33} [get_ports {kb_tdi_o}];               # KB_TDI
+set_property -dict {PACKAGE_PIN B13  IOSTANDARD LVCMOS33} [get_ports {kb_jtagen_o}];            # KB_JTAGEN
 
 # Micro SD Connector (external slot at back of the cover)
 set_property -dict {PACKAGE_PIN K1   IOSTANDARD LVCMOS33} [get_ports {sd_cd_i}];                # SD_CD
@@ -156,16 +156,6 @@ set_property -dict {PACKAGE_PIN F15  IOSTANDARD LVCMOS33} [get_ports {fb_fire_n_
 set_property -dict {PACKAGE_PIN F21  IOSTANDARD LVCMOS33} [get_ports {fb_left_n_i}];            # FB_LEFT
 set_property -dict {PACKAGE_PIN C15  IOSTANDARD LVCMOS33} [get_ports {fb_right_n_i}];           # FB_RIGHT
 set_property -dict {PACKAGE_PIN W19  IOSTANDARD LVCMOS33} [get_ports {fb_up_n_i}];              # FB_UP
-
-# Paddles
-set_property -dict {PACKAGE_PIN H13  IOSTANDARD LVCMOS33} [get_ports {ad0_p_i}];                # AD0_P
-set_property -dict {PACKAGE_PIN G13  IOSTANDARD LVCMOS33} [get_ports {ad0_n_i}];                # AD0_N
-set_property -dict {PACKAGE_PIN J14  IOSTANDARD LVCMOS33} [get_ports {ad1_p_i}];                # AD1_P
-set_property -dict {PACKAGE_PIN H14  IOSTANDARD LVCMOS33} [get_ports {ad1_n_i}];                # AD1_N
-set_property -dict {PACKAGE_PIN J22  IOSTANDARD LVCMOS33} [get_ports {ad2_p_i}];                # AD2_P
-set_property -dict {PACKAGE_PIN H22  IOSTANDARD LVCMOS33} [get_ports {ad2_n_i}];                # AD2_N
-set_property -dict {PACKAGE_PIN G15  IOSTANDARD LVCMOS33} [get_ports {ad8_p_i}];                # AD8_P
-set_property -dict {PACKAGE_PIN G16  IOSTANDARD LVCMOS33} [get_ports {ad8_n_i}];                # AD8_N
 
 # HyperRAM. U29 = IS66WVH8M8BLL-100B1LI
 set_property -dict {PACKAGE_PIN D22  IOSTANDARD LVCMOS33} [get_ports {hr_clk_p_o}];             # H_CLK

@@ -44,26 +44,29 @@ port (
    hdmi_de_o          : out   std_logic;
    hdmi_clk_o         : out   std_logic;
    hdmi_spdif_o       : out   std_logic;
-   hdmi_scl_io        : inout std_logic;
-   hdmi_sda_io        : inout std_logic;
-   hdmi_int_io        : inout std_logic;
+   hdmi_u6_scl_io     : inout std_logic;
+   hdmi_u6_sda_io     : inout std_logic;
+   hdmi_int_i         : in    std_logic;
    hdmi_spdifout_i    : in    std_logic;
 
    -- HDMI. U10 = TPD12S016PWR
    hdmi_ct_hpd_o      : out   std_logic := '1';          -- Needed for HDMI compliancy: Assert +5V according to section 4.2.7 of the specification version 1.4b
    hdmi_hpd_i         : in    std_logic;
+   hdmi_scl_io        : inout std_logic;
+   hdmi_sda_io        : inout std_logic;
    hdmi_ls_oe_o       : out   std_logic;
    hdmi_cec_io        : inout std_logic;
+   hdmi_cec_clk_o     : out   std_logic;
 
    -- MEGA65 smart keyboard controller
    kb_io0_o           : out   std_logic;                 -- clock to keyboard
    kb_io1_o           : out   std_logic;                 -- data output to keyboard
    kb_io2_i           : in    std_logic;                 -- data input from keyboard
-   kb_jtagen_i        : in    std_logic;                 -- These JTAG signals to the keyboard lattice FPGA are for now set as input only, because they are not used.
-   kb_tck_i           : in    std_logic;
-   kb_tdi_i           : in    std_logic;
+   kb_tck_o           : out   std_logic;
    kb_tdo_i           : in    std_logic;
-   kb_tms_i           : in    std_logic;
+   kb_tms_o           : out   std_logic;
+   kb_tdi_o           : out   std_logic;
+   kb_jtagen_o        : out   std_logic;
 
    -- Micro SD Connector (external slot at back of the cover)
    sd_reset_o         : out   std_logic;
@@ -84,16 +87,13 @@ port (
    sd2_d1_i           : in    std_logic;
    sd2_d2_i           : in    std_logic;
 
-   -- 3.5mm analog audio jack
+   -- 3.5mm analog stereo audio jack
    pwm_l_o            : out   std_logic;
    pwm_r_o            : out   std_logic;
 
-   -- Audio DAC. U37 = SSM2518CPZ-R7
-   audio_mclk_o       : out   std_logic;
-   audio_bick_o       : out   std_logic;
-   audio_sdti_o       : out   std_logic;
-   audio_lrclk_o      : out   std_logic;
-   audio_pdn_n_o      : out   std_logic;
+   -- Analog mono speaker
+   speaker_pwm_o      : out   std_logic;
+   speaker_mute_n_o   : out   std_logic;
 
    -- Joysticks and Paddles
    fa_up_n_i          : in    std_logic;
@@ -101,15 +101,11 @@ port (
    fa_left_n_i        : in    std_logic;
    fa_right_n_i       : in    std_logic;
    fa_fire_n_i        : in    std_logic;
-
    fb_up_n_i          : in    std_logic;
    fb_down_n_i        : in    std_logic;
    fb_left_n_i        : in    std_logic;
    fb_right_n_i       : in    std_logic;
    fb_fire_n_i        : in    std_logic;
-
-   paddle_i           : in    std_logic_vector(3 downto 0);
-   paddle_drain_o     : out   std_logic;
 
    -- HyperRAM. U29 = IS66WVH8M8BLL-100B1L
    hr_d_io            : inout std_logic_vector(7 downto 0);
@@ -189,7 +185,6 @@ port (
 
    -- I2C bus for on-board peripherals:
    -- U36. 24AA025E48T.   Address 0x50. 2K Serial EEPROM.
-   -- U37. SSM2518CPZ-R7. Address 0x34. Audio DAC
    -- U38. ISL12020MIRZ.  Address 0x57. Real-Time Clock Module.
    -- U38. ISL12020MIRZ.  Address 0x6F. SRAM.
    -- U39. 24LC128.       Address 0x54. 128K CMOS Serial EEPROM.
@@ -443,50 +438,61 @@ begin
    cart_haddr_dir_o <= cart_addr_oe;
    cart_laddr_dir_o <= cart_addr_oe;
 
+   -- HDMI output. U6 = ADV7511KSTZ
+   hdmi_d_o       <= vga_red_o & "0000" &
+                     vga_green_o & "0000" &
+                     vga_blue_o & "0000";
+   hdmi_hsync_o   <= vga_hs_o;
+   hdmi_vsync_o   <= not vga_vs_o;
+   hdmi_de_o      <= not vdac_blank_n_o;
+   hdmi_clk_o     <= vdac_clk_o;
+   hdmi_spdif_o   <= '0'; -- TODO. Perhaps copy the file mega65-core/src/vhdl/hdmi_spdif.vhdl
 
    ---------------------------------------------------------------------------------------------
    -- Safe default values for ports not supported by the M2M framework
    ---------------------------------------------------------------------------------------------
 
-   vga_scl_io    <= 'Z';
-   vga_sda_io    <= 'Z';
-   hdmi_scl_io   <= 'Z';
-   hdmi_sda_io   <= 'Z';
-   hdmi_ls_oe_o  <= '1';
-   hdmi_cec_io   <= 'Z';
-   audio_mclk_o  <= '0';
-   audio_bick_o  <= '0';
-   audio_sdti_o  <= '0';
-   audio_lrclk_o <= '0';
-   audio_pdn_n_o <= '0';
-   eth_clock_o   <= '0';
-   eth_led2_o    <= '0';
-   eth_mdc_o     <= '0';
-   eth_mdio_io   <= 'Z';
-   eth_reset_o   <= '1';
-   eth_txd_o     <= (others => '0');
-   eth_txen_o    <= '0';
-   f_density_o   <= '0';
-   f_motora_o    <= '0';
-   f_motorb_o    <= '0';
-   f_selecta_o   <= '0';
-   f_selectb_o   <= '0';
-   f_side1_o     <= '0';
-   f_stepdir_o   <= '0';
-   f_step_o      <= '0';
-   f_wdata_o     <= '0';
-   f_wgate_o     <= '0';
-   fpga_sda_io   <= 'Z';
-   fpga_scl_io   <= 'Z';
-   grove_sda_io  <= 'Z';
-   grove_scl_io  <= 'Z';
-   led_o         <= '0'; -- Off
-   p1lo_io       <= (others => 'Z');
-   p1hi_io       <= (others => 'Z');
-   p2lo_io       <= (others => 'Z');
-   p2hi_io       <= (others => 'Z');
-   qspidb_io     <= (others => 'Z');
-   qspicsn_o     <= '1';
+   kb_tck_o       <= '0';
+   kb_tms_o       <= '0';
+   kb_tdi_o       <= '0';
+   kb_jtagen_o    <= '0';
+   vga_scl_io     <= 'Z';
+   vga_sda_io     <= 'Z';
+   hdmi_u6_scl_io <= 'Z';
+   hdmi_u6_sda_io <= 'Z';
+   hdmi_scl_io    <= 'Z';
+   hdmi_sda_io    <= 'Z';
+   hdmi_ls_oe_o   <= '1';
+   hdmi_cec_io    <= 'Z';
+   hdmi_cec_clk_o <= '0';
+   eth_clock_o    <= '0';
+   eth_led2_o     <= '0';
+   eth_mdc_o      <= '0';
+   eth_mdio_io    <= 'Z';
+   eth_reset_o    <= '1';
+   eth_txd_o      <= (others => '0');
+   eth_txen_o     <= '0';
+   f_density_o    <= '0';
+   f_motora_o     <= '0';
+   f_motorb_o     <= '0';
+   f_selecta_o    <= '0';
+   f_selectb_o    <= '0';
+   f_side1_o      <= '0';
+   f_stepdir_o    <= '0';
+   f_step_o       <= '0';
+   f_wdata_o      <= '0';
+   f_wgate_o      <= '0';
+   fpga_sda_io    <= 'Z';
+   fpga_scl_io    <= 'Z';
+   grove_sda_io   <= 'Z';
+   grove_scl_io   <= 'Z';
+   led_o          <= '0'; -- Off
+   p1lo_io        <= (others => 'Z');
+   p1hi_io        <= (others => 'Z');
+   p2lo_io        <= (others => 'Z');
+   p2hi_io        <= (others => 'Z');
+   qspidb_io      <= (others => 'Z');
+   qspicsn_o      <= '1';
 
 
    -----------------------------------------------------------------------------------------
@@ -508,10 +514,10 @@ begin
       vdac_clk_o              => vdac_clk_o,
       vdac_sync_n_o           => vdac_sync_n_o,
       vdac_blank_n_o          => vdac_blank_n_o,
-      tmds_data_p_o           => tmds_data_p_o,
-      tmds_data_n_o           => tmds_data_n_o,
-      tmds_clk_p_o            => tmds_clk_p_o,
-      tmds_clk_n_o            => tmds_clk_n_o,
+      tmds_data_p_o           => open,
+      tmds_data_n_o           => open,
+      tmds_clk_p_o            => open,
+      tmds_clk_n_o            => open,
       kb_io0_o                => kb_io0_o,
       kb_io1_o                => kb_io1_o,
       kb_io2_i                => kb_io2_i,
@@ -535,8 +541,8 @@ begin
       joy_2_left_n_i          => fb_left_n_i,
       joy_2_right_n_i         => fb_right_n_i,
       joy_2_fire_n_i          => fb_fire_n_i,
-      paddle_i                => paddle_i,
-      paddle_drain_o          => paddle_drain_o,
+      paddle_i                => "1111",
+      paddle_drain_o          => open,
       hr_d_io                 => hr_d_io,
       hr_rwds_io              => hr_rwds_io,
       hr_reset_o              => hr_reset_o,
