@@ -28,7 +28,7 @@ on-screen-menu.
 Features
 --------
 
-With our [Release 5](VERSIONS.md), we are striving for a **retro C64 PAL
+With our [Release 5.1](VERSIONS.md), we are striving for a **retro C64 PAL
 experience**: The core turns your MEGA65 into a Commodore 64 with a C1541
 drive (you can mount `*.d64`) images. It supports the following hardware
 ports of the MEGA65:
@@ -113,9 +113,9 @@ Important: If you use VGA displays or analog retro monitors, please switch off
 
 ### Constraints and Roadmap
 
-Our Release 5 is a mature release. Thanks to all the folks who
+Our Release 5.1 is a mature release. Thanks to all the folks who
 [contributed](AUTHORS) to the core, it is incredibly compatible to an original
-Commodore 64. With our Release 5 you can play nearly all the available games
+Commodore 64. With our Release 5.1 you can play nearly all the available games
 and watch almost all demos ever written for the C64. You can plug nearly
 every hardware cartridge ever made for the C64 into the MEGA65's expansion
 port and enjoy working/playing with it and you can work with any IEC device
@@ -155,10 +155,22 @@ This repository does not contain any copyrighted material.
 Installation
 ------------
 
-Make sure that you have a MEGA65 R3, R3A or newer. At the moment, we are not
-supporting older R2 machines. If you are not sure what MEGA65 version you have
-then you very probably have an R3, R3A or newer: The Devkits are R3 and the
-machines from Trenz are R3A.
+### IMPORTANT: Choose the right core variant for your hardware
+
+We are supporting all available MEGA65 variants: R2, R3/R3A, R4 and R5. Use
+the following table to ensure that you select and flash the correct `.cor`
+from the [ZIP file](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
+
+| MEGA65 Variant |   Years   | File name             | Comment
+|:--------------:|:---------:|:---------------------:|-------------------------
+| R2             | @TODO     | C64MEGA65-V5.1-R2.cor | Early prototypes. Only 20 of them were built
+| R3/R3A         | @TODO     | C64MEGA65-V5.1-R3.cor | R3 is the "DevKit" (100 were built) and R3A are batches 1 and 2. If you bought your MEGA65 between @TODO then you are very likely to have an R3 or R3A machine.
+| R4             | @TODO     | C64MEGA65-V5.1-R4.cor | Development board on our way to the R5. Only @TODO of them were manufactured (board only, no complete machines)
+| R5             | @TODO     | C64MEGA65-V5.1-R5.cor | @TODO
+
+Only use `*.bit` files if you know what you are doing.
+
+### How to install the C64 for MEGA65 core
 
 1. [Download](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
    the ZIP file that contains the bitstream and the core file and unpack it.

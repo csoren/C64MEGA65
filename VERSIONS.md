@@ -8,8 +8,8 @@ never-released-to-the-public R4 boards.
 
 ## New Features: R4/R5 boards only
 
-* Better analog audio output via the 3.1mm audio jack thanks by utilizing
-  MEGA65's new audio DAC.
+* Heavily improved quality of the analog audio output via the 3.1mm audio jack
+  thanks by utilizing MEGA65's new audio DAC.
 
 WIP The hardware of the MEGA65's Expansion Port (aka cartridge port) is now 100%
   compatible to the C64's hardware as it has bi-directional signals for RESET,
@@ -21,9 +21,14 @@ workaround is not needed for the KungFu Flash any more
 
 ## New Features: All boards
 
-WIP You can now close the "About & Help" screens also by pressing Run/Stop.
+* You can now close the "About & Help" screens also by pressing Run/Stop.
 
-## Bugfixes
+## Bugfixes: R4/R5 boards only
+
+* HDMI backpower is no issue any more
+@TODO: Needs update of FAQ and other parts of the documentation
+
+## Bugfixes: All boards
 
 WIP The long-reset" feature was broken in V5. (Fixed GitHub issue #79)
 
