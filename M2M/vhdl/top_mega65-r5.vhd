@@ -124,6 +124,54 @@ port (
    hr_clk_p_o              : out   std_logic;
    hr_cs0_o                : out   std_logic;
 
+   -- CBM-488/IEC serial port
+   iec_reset_n_o           : out   std_logic;
+   iec_atn_n_o             : out   std_logic;
+   iec_clk_en_n_o          : out   std_logic;
+   iec_clk_n_i             : in    std_logic;
+   iec_clk_n_o             : out   std_logic;
+   iec_data_en_n_o         : out   std_logic;
+   iec_data_n_i            : in    std_logic;
+   iec_data_n_o            : out   std_logic;
+   iec_srq_en_n_o          : out   std_logic;
+   iec_srq_n_i             : in    std_logic;
+   iec_srq_n_o             : out   std_logic;
+
+   -- C64 Expansion Port (aka Cartridge Port)
+   cart_phi2_o             : out   std_logic;
+   cart_dotclock_o         : out   std_logic;
+   cart_dma_i              : in    std_logic;
+   cart_reset_oe_n_o       : out   std_logic;
+   cart_reset_io           : inout std_logic;
+   cart_game_oe_n_o        : out   std_logic;
+   cart_game_io            : inout std_logic;
+   cart_exrom_oe_n_o       : out   std_logic;
+   cart_exrom_io           : inout std_logic;
+   cart_nmi_oe_n_o         : out   std_logic;
+   cart_nmi_io             : inout std_logic;
+   cart_irq_oe_n_o         : out   std_logic;
+   cart_irq_io             : inout std_logic;
+   cart_ctrl_en_o          : out   std_logic;
+   cart_ctrl_dir_o         : out   std_logic;                  -- =1 means FPGA->Port, =0 means Port->FPGA
+   cart_ba_io              : inout std_logic;
+   cart_rw_io              : inout std_logic;
+   cart_io1_io             : inout std_logic;
+   cart_io2_io             : inout std_logic;
+   cart_romh_oe_n_o        : out   std_logic;
+   cart_romh_io            : inout std_logic;
+   cart_roml_oe_n_o        : out   std_logic;
+   cart_roml_io            : inout std_logic;
+   cart_en_o               : out   std_logic;
+   cart_addr_en_o          : out   std_logic;
+   cart_haddr_dir_o        : out   std_logic;                  -- =1 means FPGA->Port, =0 means Port->FPGA
+   cart_laddr_dir_o        : out   std_logic;                  -- =1 means FPGA->Port, =0 means Port->FPGA
+   cart_a_io               : inout unsigned(15 downto 0);
+   cart_data_en_o          : out   std_logic;
+   cart_data_dir_o         : out   std_logic;                  -- =1 means FPGA->Port, =0 means Port->FPGA
+   cart_d_io               : inout unsigned(7 downto 0);
+
+   -- The remaining ports are not supported
+
    -- SMSC Ethernet PHY. U4 = KSZ8081RNDCA
    eth_clock_o             : out   std_logic;
    eth_led2_o              : out   std_logic;
@@ -183,62 +231,6 @@ port (
    qspidb_io               : inout std_logic_vector(3 downto 0);
    qspicsn_o               : out   std_logic;
 
-
-   --------------------------------------------------------------------
-   -- C64 specific ports that are not supported by the M2M framework
-   --------------------------------------------------------------------
-
-   -- CBM-488/IEC serial port
-   iec_reset_n_o           : out   std_logic;
-   iec_atn_n_o             : out   std_logic;
-   iec_clk_en_n_o          : out   std_logic;
-   iec_clk_n_i             : in    std_logic;
-   iec_clk_n_o             : out   std_logic;
-   iec_data_en_n_o         : out   std_logic;
-   iec_data_n_i            : in    std_logic;
-   iec_data_n_o            : out   std_logic;
-   iec_srq_en_n_o          : out   std_logic;
-   iec_srq_n_i             : in    std_logic;
-   iec_srq_n_o             : out   std_logic;
-
-   -- C64 Expansion Port (aka Cartridge Port) control lines
-   -- *_dir=1 means FPGA->Port, =0 means Port->FPGA
-   cart_ctrl_en_o          : out   std_logic;
-   cart_ctrl_dir_o         : out   std_logic;
-   cart_addr_en_o          : out   std_logic;
-   cart_haddr_dir_o        : out   std_logic;
-   cart_laddr_dir_o        : out   std_logic;
-   cart_data_en_o          : out   std_logic;
-   cart_data_dir_o         : out   std_logic;
-
-   -- C64 Expansion Port (aka Cartridge Port)
-   cart_phi2_o             : out   std_logic;
-   cart_dotclock_o         : out   std_logic;
-   cart_dma_i              : in    std_logic;
-
-   cart_ba_io              : inout std_logic;
-   cart_rw_io              : inout std_logic;
-   cart_io1_io             : inout std_logic;
-   cart_io2_io             : inout std_logic;
-
-   cart_romh_oe_n_o        : out   std_logic;
-   cart_romh_io            : inout std_logic;
-   cart_roml_oe_n_o        : out   std_logic;
-   cart_roml_io            : inout std_logic;
-   cart_reset_oe_n_o       : out   std_logic;
-   cart_reset_io           : inout std_logic;
-   cart_game_oe_n_o        : out   std_logic;
-   cart_game_io            : inout std_logic;
-   cart_exrom_oe_n_o       : out   std_logic;
-   cart_exrom_io           : inout std_logic;
-   cart_nmi_oe_n_o         : out   std_logic;
-   cart_nmi_io             : inout std_logic;
-   cart_irq_oe_n_o         : out   std_logic;
-   cart_irq_io             : inout std_logic;
-   cart_en_o               : out   std_logic;
-
-   cart_d_io               : inout unsigned(7 downto 0);
-   cart_a_io               : inout unsigned(15 downto 0);
 
    -- I2C bus
    -- U32 = PCA9655EMTTXG. Address 0x40. I/O expander.
@@ -388,6 +380,11 @@ architecture synthesis of mega65_r5 is
    signal cart_d_in              : unsigned(7 downto 0);
    signal cart_d_out             : unsigned(7 downto 0);
 
+   signal audio_clk              : std_logic;
+   signal audio_reset            : std_logic;
+   signal audio_left             : signed(15 downto 0);
+   signal audio_right            : signed(15 downto 0);
+
    ---------------------------------------------------------------------------------------------
    -- HyperRAM clock domain
    ---------------------------------------------------------------------------------------------
@@ -437,23 +434,36 @@ architecture synthesis of mega65_r5 is
    -- ramrom_addr is 28-bit because we have a 16-bit window selector and a 4k window: 65536*4096 = 268.435.456 = 2^28
    signal qnice_ramrom_dev       : std_logic_vector(15 downto 0);
    signal qnice_ramrom_addr      : std_logic_vector(27 downto 0);
-   signal qnice_ramrom_data_o    : std_logic_vector(15 downto 0);
-   signal qnice_ramrom_data_i    : std_logic_vector(15 downto 0);
+   signal qnice_ramrom_data_out  : std_logic_vector(15 downto 0);
+   signal qnice_ramrom_data_in   : std_logic_vector(15 downto 0);
    signal qnice_ramrom_ce        : std_logic;
    signal qnice_ramrom_we        : std_logic;
    signal qnice_ramrom_wait      : std_logic;
 
 begin
 
-   ---------------------------------------------------------------------------------------------------------------
-   -- MiSTer2MEGA Hardware Abstraction Layer for the MEGA65 board revision R5
-   ---------------------------------------------------------------------------------------------------------------
+   -- Driver for the audio DAC (AK4432VT).
+   i_audio : entity work.audio
+      port map (
+         audio_clk_i    => audio_clk,
+         audio_reset_i  => audio_reset,
+         audio_left_i   => audio_left,
+         audio_right_i  => audio_right,
+         audio_mclk_o   => audio_mclk_o,
+         audio_bick_o   => audio_bick_o,
+         audio_sdti_o   => audio_sdti_o,
+         audio_lrclk_o  => audio_lrclk_o,
+         audio_pdn_n_o  => audio_pdn_n_o,
+         audio_i2cfil_o => audio_i2cfil_o,
+         audio_scl_o    => audio_scl_o,
+         audio_sda_io   => audio_sda_io
+      ); -- i_audio
 
-   i_hal_mega65_r5 : entity work.hal_mega65_r5
+   i_framework : entity work.framework
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,
-      reset_button_i          => reset_button_i,
+      reset_n_i               => not reset_button_i,
       uart_rxd_i              => uart_rxd_i,
       uart_txd_o              => uart_txd_o,
       vga_red_o               => vga_red_o,
@@ -481,29 +491,21 @@ begin
       sd2_mosi_o              => sd2_mosi_o,
       sd2_miso_i              => sd2_miso_i,
       sd2_cd_i                => sd2_cd_i,
-      audio_mclk_o            => audio_mclk_o,
-      audio_bick_o            => audio_bick_o,
-      audio_sdti_o            => audio_sdti_o,
-      audio_lrclk_o           => audio_lrclk_o,
-      audio_pdn_n_o           => audio_pdn_n_o,
-      audio_i2cfil_o          => audio_i2cfil_o,
-      audio_scl_o             => audio_scl_o,
-      audio_sda_io            => audio_sda_io,
       joy_1_up_n_i            => fa_up_n_i,
       joy_1_down_n_i          => fa_down_n_i,
       joy_1_left_n_i          => fa_left_n_i,
       joy_1_right_n_i         => fa_right_n_i,
       joy_1_fire_n_i          => fa_fire_n_i,
-      joy_2_up_n_i            => fb_up_n_i,
-      joy_2_down_n_i          => fb_down_n_i,
-      joy_2_left_n_i          => fb_left_n_i,
-      joy_2_right_n_i         => fb_right_n_i,
-      joy_2_fire_n_i          => fb_fire_n_i,
       joy_1_up_n_o            => fa_up_n_o,
       joy_1_down_n_o          => fa_down_n_o,
       joy_1_left_n_o          => fa_left_n_o,
       joy_1_right_n_o         => fa_right_n_o,
       joy_1_fire_n_o          => fa_fire_n_o,
+      joy_2_up_n_i            => fb_up_n_i,
+      joy_2_down_n_i          => fb_down_n_i,
+      joy_2_left_n_i          => fb_left_n_i,
+      joy_2_right_n_i         => fb_right_n_i,
+      joy_2_fire_n_i          => fb_fire_n_i,
       joy_2_up_n_o            => fb_up_n_o,
       joy_2_down_n_o          => fb_down_n_o,
       joy_2_left_n_o          => fb_left_n_o,
@@ -588,6 +590,12 @@ begin
       hr_high_o               => hr_high,
       hr_low_o                => hr_low,
 
+      -- Audio
+      audio_clk_o             => audio_clk,
+      audio_reset_o           => audio_reset,
+      audio_left_o            => audio_left,
+      audio_right_o           => audio_right,
+
       -- Connect to QNICE
       qnice_dvi_i             => qnice_dvi,
       qnice_video_mode_i      => qnice_video_mode,
@@ -606,12 +614,12 @@ begin
       qnice_gp_reg_o          => qnice_gp_reg,
       qnice_ramrom_dev_o      => qnice_ramrom_dev,
       qnice_ramrom_addr_o     => qnice_ramrom_addr,
-      qnice_ramrom_data_out_o => qnice_ramrom_data_o,
-      qnice_ramrom_data_in_i  => qnice_ramrom_data_i,
+      qnice_ramrom_data_out_o => qnice_ramrom_data_out,
+      qnice_ramrom_data_in_i  => qnice_ramrom_data_in,
       qnice_ramrom_ce_o       => qnice_ramrom_ce,
       qnice_ramrom_we_o       => qnice_ramrom_we,
       qnice_ramrom_wait_i     => qnice_ramrom_wait
-   ); -- i_hal_mega65_r5
+   ); -- i_framework
 
 
    ---------------------------------------------------------------------------------------------------------------
@@ -664,8 +672,8 @@ begin
          -- Core-specific devices
          qnice_dev_id_i          => qnice_ramrom_dev,
          qnice_dev_addr_i        => qnice_ramrom_addr,
-         qnice_dev_data_i        => qnice_ramrom_data_o,
-         qnice_dev_data_o        => qnice_ramrom_data_i,
+         qnice_dev_data_i        => qnice_ramrom_data_out,
+         qnice_dev_data_o        => qnice_ramrom_data_in,
          qnice_dev_ce_i          => qnice_ramrom_ce,
          qnice_dev_we_i          => qnice_ramrom_we,
          qnice_dev_wait_o        => qnice_ramrom_wait,

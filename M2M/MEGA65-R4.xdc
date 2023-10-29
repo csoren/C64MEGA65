@@ -160,7 +160,25 @@ set_property -dict {PULLUP TRUE}                          [get_ports {iec_clk_n_
 set_property -dict {PULLUP TRUE}                          [get_ports {iec_data_n_i}];
 
 # C64 Expansion Port (aka Cartridge Port)
+set_property -dict {PACKAGE_PIN V17  IOSTANDARD LVCMOS33} [get_ports {cart_phi2_o}];            # F_C64_O2
+set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports {cart_dotclock_o}];        # F_C64_CLOCK
+set_property -dict {PACKAGE_PIN P15  IOSTANDARD LVCMOS33} [get_ports {cart_dma_i}];             # F_C64_DMA
+set_property -dict {PACKAGE_PIN N14  IOSTANDARD LVCMOS33} [get_ports {cart_reset_o}];           # F_C64_RESET
+set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_i}];            # F_C64_GAME
+set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_i}];           # F_C64_EXROM
+set_property -dict {PACKAGE_PIN W17  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_i}];             # F_C64_NMI
+set_property -dict {PACKAGE_PIN P14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_i}];             # F_C64_IRQ
+set_property -dict {PACKAGE_PIN G18  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_en_o}];         # F_CTRL_EN
+set_property -dict {PACKAGE_PIN U17  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_dir_o}];        # F_CTRL_DIR
+set_property -dict {PACKAGE_PIN N13  IOSTANDARD LVCMOS33} [get_ports {cart_ba_io}];             # F_C64_BA
+set_property -dict {PACKAGE_PIN R18  IOSTANDARD LVCMOS33} [get_ports {cart_rw_io}];             # F_C64_RW
+set_property -dict {PACKAGE_PIN N15  IOSTANDARD LVCMOS33} [get_ports {cart_io1_io}];            # F_C64_IO1
+set_property -dict {PACKAGE_PIN AA20 IOSTANDARD LVCMOS33} [get_ports {cart_io2_io}];            # F_C64_IO2
+set_property -dict {PACKAGE_PIN T18  IOSTANDARD LVCMOS33} [get_ports {cart_romh_io}];           # F_C64_ROMH
+set_property -dict {PACKAGE_PIN AB18 IOSTANDARD LVCMOS33} [get_ports {cart_roml_io}];           # F_C64_ROML
 set_property -dict {PACKAGE_PIN L19  IOSTANDARD LVCMOS33} [get_ports {cart_addr_en_o}];         # F_ADDR_EN
+set_property -dict {PACKAGE_PIN L18  IOSTANDARD LVCMOS33} [get_ports {cart_haddr_dir_o}];       # F_HADDR_DIR
+set_property -dict {PACKAGE_PIN L21  IOSTANDARD LVCMOS33} [get_ports {cart_laddr_dir_o}];       # F_LADDR_DIR
 set_property -dict {PACKAGE_PIN K19  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[0]}];           # F_C64_A0
 set_property -dict {PACKAGE_PIN K18  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[1]}];           # F_C64_A1
 set_property -dict {PACKAGE_PIN K21  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[2]}];           # F_C64_A2
@@ -177,11 +195,8 @@ set_property -dict {PACKAGE_PIN H19  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[
 set_property -dict {PACKAGE_PIN M20  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[13]}];          # F_C64_A13
 set_property -dict {PACKAGE_PIN N22  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[14]}];          # F_C64_A14
 set_property -dict {PACKAGE_PIN H18  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[15]}];          # F_C64_A15
-set_property -dict {PACKAGE_PIN N13  IOSTANDARD LVCMOS33} [get_ports {cart_ba_io}];             # F_C64_BA
-set_property -dict {PACKAGE_PIN U17  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_dir_o}];        # F_CTRL_DIR
-set_property -dict {PACKAGE_PIN G18  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_en_o}];         # F_CTRL_EN
-set_property -dict {PACKAGE_PIN V22  IOSTANDARD LVCMOS33} [get_ports {cart_data_dir_o}];        # F_DATA_DIR
 set_property -dict {PACKAGE_PIN U21  IOSTANDARD LVCMOS33} [get_ports {cart_data_en_o}];         # F_DATA_EN
+set_property -dict {PACKAGE_PIN V22  IOSTANDARD LVCMOS33} [get_ports {cart_data_dir_o}];        # F_DATA_DIR
 set_property -dict {PACKAGE_PIN P16  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[0]}];           # F_C64_D0
 set_property -dict {PACKAGE_PIN R17  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[1]}];           # F_C64_D1
 set_property -dict {PACKAGE_PIN P20  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[2]}];           # F_C64_D2
@@ -190,21 +205,6 @@ set_property -dict {PACKAGE_PIN U18  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[
 set_property -dict {PACKAGE_PIN V18  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[5]}];           # F_C64_D5
 set_property -dict {PACKAGE_PIN W20  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[6]}];           # F_C64_D6
 set_property -dict {PACKAGE_PIN W21  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[7]}];           # F_C64_D7
-set_property -dict {PACKAGE_PIN P15  IOSTANDARD LVCMOS33} [get_ports {cart_dma_i}];             # F_C64_DMA
-set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports {cart_dotclock_o}];        # F_C64_CLOCK
-set_property -dict {PACKAGE_PIN L18  IOSTANDARD LVCMOS33} [get_ports {cart_haddr_dir_o}];       # F_HADDR_DIR
-set_property -dict {PACKAGE_PIN N15  IOSTANDARD LVCMOS33} [get_ports {cart_io1_io}];            # F_C64_IO1
-set_property -dict {PACKAGE_PIN AA20 IOSTANDARD LVCMOS33} [get_ports {cart_io2_io}];            # F_C64_IO2
-set_property -dict {PACKAGE_PIN L21  IOSTANDARD LVCMOS33} [get_ports {cart_laddr_dir_o}];       # F_LADDR_DIR
-set_property -dict {PACKAGE_PIN V17  IOSTANDARD LVCMOS33} [get_ports {cart_phi2_o}];            # F_C64_O2
-set_property -dict {PACKAGE_PIN R18  IOSTANDARD LVCMOS33} [get_ports {cart_rw_io}];             # F_C64_RW
-set_property -dict {PACKAGE_PIN T18  IOSTANDARD LVCMOS33} [get_ports {cart_romh_io}];           # F_C64_ROMH
-set_property -dict {PACKAGE_PIN AB18 IOSTANDARD LVCMOS33} [get_ports {cart_roml_io}];           # F_C64_ROML
-set_property -dict {PACKAGE_PIN N14  IOSTANDARD LVCMOS33} [get_ports {cart_reset_o}];           # F_C64_RESET
-set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_i}];            #_F_C64_GAME
-set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_i}];           # F_C64_EXROM
-set_property -dict {PACKAGE_PIN W17  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_i}];             # F_C64_NMI
-set_property -dict {PACKAGE_PIN P14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_i}];             # F_C64_IRQ
 
 
 # DIP Switches
@@ -366,21 +366,21 @@ set_property -dict {PULLUP FALSE  SLEW FAST  DRIVE 16}    [get_ports {sdram_*}];
 
 # Place HyperRAM close to I/O pins
 create_pblock pblock_i_hyperram
-add_cells_to_pblock pblock_i_hyperram [get_cells [list */i_framework/i_hyperram]]
+add_cells_to_pblock pblock_i_hyperram [get_cells [list i_framework/i_hyperram]]
 resize_pblock pblock_i_hyperram -add {SLICE_X0Y200:SLICE_X7Y224}
 
 # Place Keyboard close to I/O pins
 create_pblock pblock_m65driver
-add_cells_to_pblock pblock_m65driver [get_cells [list */i_framework/i_m2m_keyb/m65driver]]
+add_cells_to_pblock pblock_m65driver [get_cells [list i_framework/i_m2m_keyb/m65driver]]
 resize_pblock pblock_m65driver -add {SLICE_X0Y225:SLICE_X7Y243}
 
 # Place SD card controller in the middle between the left and right FPGA boundary because the output ports are at the opposide edges
 create_pblock pblock_sdcard
-add_cells_to_pblock pblock_sdcard [get_cells [list */i_framework/QNICE_SOC/sd_card]]
+add_cells_to_pblock pblock_sdcard [get_cells [list i_framework/QNICE_SOC/sd_card]]
 resize_pblock pblock_sdcard -add {SLICE_X66Y178:SLICE_X99Y193}
 
 # Place phase-shifted VGA output registers near the actual output buffers
 create_pblock pblock_vga
-add_cells_to_pblock pblock_vga [get_cells [list */i_framework/i_av_pipeline/i_analog_pipeline/VGA_OUT_PHASE_SHIFTED.*]]
+add_cells_to_pblock pblock_vga [get_cells [list i_framework/i_av_pipeline/i_analog_pipeline/VGA_OUT_PHASE_SHIFTED.*]]
 resize_pblock pblock_vga -add SLICE_X0Y75:SLICE_X5Y99
 
