@@ -302,12 +302,14 @@ architecture synthesis of main is
    -- clock enable to derive the C64's pixel clock from the core's main clock : divide by 4
    signal video_ce             : std_logic_vector(1 downto 0);
 
-   -- Hard reset handling
-   constant C_HARD_RST_DELAY   : natural := 100_000; -- roundabout 1/30 of a second
-   signal reset_core_n         : std_logic;
-   signal hard_reset_n         : std_logic;
-   signal hard_rst_counter     : natural := 0;
-   signal system_cold_start    : natural range 0 to 4 := 4;
+   -- Hard reset handling:
+   -- Do not use hard_reset_n anywhere in main.vhd other than in cpu_data_in. Use reset_core_n instead.         
+   constant C_HARD_RST_DELAY   : natural   := 100_000; -- roundabout 1/30 of a second
+   signal hard_rst_counter     : natural   := 0;
+   signal reset_core_n         : std_logic := '1';
+   signal hard_reset_n         : std_logic := '1';
+   signal hard_reset_n_d       : std_logic := '1';
+   signal cold_start_done      : std_logic := '0';
 
    -- Core's simulated expansion port
    signal core_roml            : std_logic;
@@ -343,7 +345,7 @@ architecture synthesis of main is
    
    -- Hardware Expansion Port: Handle specifics of certain cartridges
    constant C_EF3_RESET_LEN    : natural := 7;           -- measured in phi2 cycles
-   signal cart_reset_counter   : natural range 0 to C_EF3_RESET_LEN;
+   signal cart_reset_counter   : natural range 0 to C_EF3_RESET_LEN := 0;
    signal cart_res_flckr_ign   : natural range 0 to 2;   -- avoid a short cart_reset_o after cart_reset_counter reached zero
    signal cart_is_an_EF3       : std_logic;
 
@@ -402,6 +404,8 @@ architecture synthesis of main is
 
 begin
    -- prevent data corruption by not allowing a soft reset to happen while the cache is still dirty
+   -- since we can have more than one cache that might be dirty, we convert the std_logic_vector of length G_VDNUM
+   -- into an unsigned and check for zero
    prevent_reset <= '0' when unsigned(cache_dirty) = 0 else '1';
 
    -- the color of the drive led is green normally, but it turns yellow
@@ -419,15 +423,23 @@ begin
    hard_reset : process(clk_main_i)
    begin
       if rising_edge(clk_main_i) then
-         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then
-            hard_rst_counter  <= C_HARD_RST_DELAY;
+         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then     
+            -- Due to sw_cartridge_wrapper's logic, reset_soft_i stays high longer than reset_hard_i.
+            -- We need to make sure that this is not interfering with hard_reset_n
+            if reset_hard_i = '1' then
+               hard_rst_counter  <= C_HARD_RST_DELAY;
+               hard_reset_n      <= '0';
+            end if;
 
             -- reset_core_n is low-active, so prevent_reset = 0 means execute reset
             -- but a hard reset can override
             reset_core_n      <= prevent_reset and (not reset_hard_i);
-
-            hard_reset_n      <= not reset_hard_i;  -- "not" converts to low-active
          else
+            -- The idea of the hard reset is, that while reset_core_n is back at '1' and therefore the core is
+            -- running (not being reset any more), hard_reset_n stays low for C_HARD_RST_DELAY clock cycles.
+            -- Reason: We need to give the KERNAL time to execute the routine $FD02 where it checks for the
+            -- cartridge signature "CBM80" in $8003 onwards. In case reset_n = '0' during these tests (i.e. hard
+            -- reset active) we will return zero instead of "CBM80" and therefore perform a hard reset.  
             reset_core_n      <= '1';
             if hard_rst_counter = 0 then
                hard_reset_n   <= '1';
@@ -437,20 +449,19 @@ begin
          end if;
       end if;
    end process;
-
-   -- Ensure that the cpu_data_in process provides a potential cartridge's ROM to the CPU so that we can
-   -- start a cartridge directly upon power on (aka "cold start"). The complex reset mechanisms in the
-   -- system create two hard_reset_n signals directly after power on, so we need to compensate for that.
+   
+   -- To make sure that cartridges in the Expansion Port start properly, we must not do a hard reset and mask the $8000 memory area,
+   -- when the core is launched for the first time (cold start).
    handle_cold_start : process(clk_main_i)
    begin
       if rising_edge(clk_main_i) then
-         if hard_reset_n = '0' and hard_rst_counter = C_HARD_RST_DELAY and (system_cold_start = 4 or system_cold_start = 2) then
-            system_cold_start <= system_cold_start - 1;
-         elsif hard_reset_n = '1' and hard_rst_counter = 0 and (system_cold_start = 3  or system_cold_start = 1) then
-            system_cold_start <= system_cold_start - 1;
+         hard_reset_n_d <= hard_reset_n;
+         -- detect the rising edge of hard_reset_n_d
+         if hard_reset_n = '1' and hard_reset_n_d = '0' and cold_start_done = '0' then
+            cold_start_done <= '1';
          end if;
       end if;
-   end process;
+   end process;   
 
    --------------------------------------------------------------------------------------------------
    -- Access to C64's RAM and hardware/simulated cartridge ROM
@@ -464,7 +475,7 @@ begin
       -- and avoid that the KERNAL ever sees the CBM80 signature during hard reset reset.
       -- But we cannot do it like on real hardware using the exrom signal because the
       -- MiSTer core is not supporting this.
-      if hard_reset_n = '0' and c64_ram_addr_o(15 downto 12) = x"8" and system_cold_start = 0 then
+      if hard_reset_n = '0' and c64_ram_addr_o(15 downto 12) = x"8" and cold_start_done = '1' then
          c64_ram_data <= x"00";
 
       -- Access the hardware cartridge
@@ -897,7 +908,7 @@ begin
    i_cartridge : entity work.cartridge
       port map (
          clk_i          => clk_main_i,
-         rst_i          => not hard_reset_n,
+         rst_i          => not reset_core_n,
          cart_loading_i => cartridge_loading_i,
          cart_id_i      => cartridge_id_i,
          cart_exrom_i   => cartridge_exrom_i,
