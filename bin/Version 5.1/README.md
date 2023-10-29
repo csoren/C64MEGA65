@@ -57,7 +57,7 @@ If you want the core to remember the settings you made in the on-screen-menu,
 then make sure that you copy the following file (`c64mega65`) into a folder
 called `/c64`. This `c64` folder needs to be located in the root folder of the
 SD card that is active when you boot the core:
-https://raw.githubusercontent.com/MJoergen/C64MEGA65/develop/bin/Version%205/R3/c64mega65
+https://github.com/MJoergen/C64MEGA65/blob/master/bin/Version%205.1/c64mega65
 
 For using hardware cartridges, make sure that you have a MEGA65 core #0 which
 is from mid 2023. Follow this instructions to upgrade:
