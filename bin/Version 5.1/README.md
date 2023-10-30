@@ -37,13 +37,12 @@ flawlessly.
 
 ## IMPORTANT: Choose the right core variant for your hardware
 
-We are supporting all available MEGA65 variants: R2, R3/R3A, R4 and R5. Use
-the following table to ensure that you select and flash the correct `.cor`
-from this ZIP file. Only use `*.bit` files if you know what you are doing.
+We are supporting these MEGA65 variants: R3/R3A, R4 and R5. Use the following
+table to ensure that you select and flash the correct `.cor` from this ZIP
+file. Only use `*.bit` files if you know what you are doing.
 
 | MEGA65 Variant |   Years   | File name             | Comment
 |:--------------:|:---------:|:---------------------:|-------------------------
-| R2             | @TODO     | C64MEGA65-V5.1-R2.cor | Early prototypes. Only 20 of them were built
 | R3/R3A         | @TODO     | C64MEGA65-V5.1-R3.cor | R3 is the "DevKit" (100 were built) and R3A are batches 1 and 2. If you bought your MEGA65 between @TODO then you are very likely to have an R3 or R3A machine.
 | R4             | @TODO     | C64MEGA65-V5.1-R4.cor | Development board on our way to the R5. Only @TODO of them were manufactured (board only, no complete machines)
 | R5             | @TODO     | C64MEGA65-V5.1-R5.cor | @TODO

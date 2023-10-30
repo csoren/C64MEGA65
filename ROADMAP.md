@@ -68,7 +68,6 @@ particular order:
 * Add the Vice test suite to our repertoire of tests and use the
   above-mentioned mechanism to execute on it:
   https://sourceforge.net/p/vice-emu/code/HEAD/tree/testprogs/testbench/ 
-* Support for R2 version of MEGA65
 * Enhance QNICE's FAT32 stack so that it is able to create new files
 * Fix visible tearing in Bromance demo (vertical scroll effect), but only,
   when HDMI Zoom is ON: https://csdb.dk/release/?id=205526

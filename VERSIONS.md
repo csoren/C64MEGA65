@@ -2,8 +2,8 @@ Version 5.1 - MONTH, DAY, YEAR
 ==============================
 
 The main purpose of this release is to support the new <@TODO"2024 batches" or "post November 2023"? Release date?> of the
-MEGA65 (aka "R5") which sports enhanced hardware. Additionally the core now
-also supports the very early R2 prototype boards and the
+MEGA65 (aka "R5") which sports enhanced hardware and better compatibility for
+Commodore 64 cartridges. Additionally the core now also supports the
 never-released-to-the-public R4 boards.
 
 ## New Features: R4/R5 boards only
@@ -30,9 +30,9 @@ workaround is not needed for the KungFu Flash any more
 
 ## Bugfixes: All boards
 
-WIP The long-reset" feature was broken in V5. (Fixed GitHub issue #79)
+* The long-reset" feature was broken in V5. (Fixed GitHub issue #79)
 
-WIP Fixed a crash in the file browser. (Fixed GitHub issue #95)
+* Fixed a crash in the file browser. (Fixed GitHub issue #95)
 
 * In V5 we introduced a new feature: You can go one menu-level up (from a sub-
   menu to the main-menu) by pressing Run/Stop. Subsequently you can also close
