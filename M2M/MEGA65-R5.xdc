@@ -70,11 +70,11 @@ set_property -dict {PACKAGE_PIN AB8  IOSTANDARD LVCMOS33} [get_ports {hdmi_ls_oe
 set_property -dict {PACKAGE_PIN A14  IOSTANDARD LVCMOS33} [get_ports {kb_io0_o}];               # KB_IO1
 set_property -dict {PACKAGE_PIN A13  IOSTANDARD LVCMOS33} [get_ports {kb_io1_o}];               # KB_IO2
 set_property -dict {PACKAGE_PIN C13  IOSTANDARD LVCMOS33} [get_ports {kb_io2_i}];               # KB_IO3
-set_property -dict {PACKAGE_PIN B13  IOSTANDARD LVCMOS33} [get_ports {kb_jtagen_i}];            # KB_JTAGEN
-set_property -dict {PACKAGE_PIN E13  IOSTANDARD LVCMOS33} [get_ports {kb_tck_i}];               # KB_TCK
-set_property -dict {PACKAGE_PIN D15  IOSTANDARD LVCMOS33} [get_ports {kb_tdi_i}];               # KB_TDI
+set_property -dict {PACKAGE_PIN E13  IOSTANDARD LVCMOS33} [get_ports {kb_tck_o}];               # KB_TCK
 set_property -dict {PACKAGE_PIN E14  IOSTANDARD LVCMOS33} [get_ports {kb_tdo_i}];               # KB_TDO
-set_property -dict {PACKAGE_PIN D14  IOSTANDARD LVCMOS33} [get_ports {kb_tms_i}];               # KB_TMS
+set_property -dict {PACKAGE_PIN D14  IOSTANDARD LVCMOS33} [get_ports {kb_tms_o}];               # KB_TMS
+set_property -dict {PACKAGE_PIN D15  IOSTANDARD LVCMOS33} [get_ports {kb_tdi_o}];               # KB_TDI
+set_property -dict {PACKAGE_PIN B13  IOSTANDARD LVCMOS33} [get_ports {kb_jtagen_o}];            # KB_JTAGEN
 
 # Micro SD Connector (external slot at back of the cover)
 set_property -dict {PACKAGE_PIN K1   IOSTANDARD LVCMOS33} [get_ports {sd_cd_i}];                # SD_CD
@@ -160,7 +160,33 @@ set_property -dict {PULLUP TRUE}                          [get_ports {iec_clk_n_
 set_property -dict {PULLUP TRUE}                          [get_ports {iec_data_n_i}];
 
 # C64 Expansion Port (aka Cartridge Port)
+set_property -dict {PACKAGE_PIN V17  IOSTANDARD LVCMOS33} [get_ports {cart_phi2_o}];            # F_C64_O2
+set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports {cart_dotclock_o}];        # F_C64_CLOCK
+set_property -dict {PACKAGE_PIN P15  IOSTANDARD LVCMOS33} [get_ports {cart_dma_i}];             # F_C64_DMA
+set_property -dict {PACKAGE_PIN T20  IOSTANDARD LVCMOS33} [get_ports {cart_reset_oe_n_o}];      # F_C64_RESET_EN
+set_property -dict {PACKAGE_PIN N14  IOSTANDARD LVCMOS33} [get_ports {cart_reset_io}];          # F_C64_RESET
+set_property -dict {PACKAGE_PIN L15  IOSTANDARD LVCMOS33} [get_ports {cart_game_oe_n_o}];       # F_C64_GAME_EN
+set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_io}];           #_F_C64_GAME
+set_property -dict {PACKAGE_PIN M16  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_oe_n_o}];      # F_C64_EXROM_EN
+set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_io}];          # F_C64_EXROM
+set_property -dict {PACKAGE_PIN F20  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_oe_n_o}];        # F_C64_NMI_EN
+set_property -dict {PACKAGE_PIN W17  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_io}];            # F_C64_NMI
+set_property -dict {PACKAGE_PIN H14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_oe_n_o}];        # F_C64_IRQ_EN
+set_property -dict {PACKAGE_PIN P14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_io}];            # F_C64_IRQ
+set_property -dict {PACKAGE_PIN G18  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_en_o}];         # F_CTRL_EN
+set_property -dict {PACKAGE_PIN U17  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_dir_o}];        # F_CTRL_DIR
+set_property -dict {PACKAGE_PIN N13  IOSTANDARD LVCMOS33} [get_ports {cart_ba_io}];             # F_C64_BA
+set_property -dict {PACKAGE_PIN R18  IOSTANDARD LVCMOS33} [get_ports {cart_rw_io}];             # F_C64_RW
+set_property -dict {PACKAGE_PIN N15  IOSTANDARD LVCMOS33} [get_ports {cart_io1_io}];            # F_C64_IO1
+set_property -dict {PACKAGE_PIN AA20 IOSTANDARD LVCMOS33} [get_ports {cart_io2_io}];            # F_C64_IO2
+set_property -dict {PACKAGE_PIN T16  IOSTANDARD LVCMOS33} [get_ports {cart_romh_oe_n_o}];       # F_C64_ROMH_DIR
+set_property -dict {PACKAGE_PIN T18  IOSTANDARD LVCMOS33} [get_ports {cart_romh_io}];           # F_C64_ROMH
+set_property -dict {PACKAGE_PIN U16  IOSTANDARD LVCMOS33} [get_ports {cart_roml_oe_n_o}];       # F_C64_ROML_DIR
+set_property -dict {PACKAGE_PIN AB18 IOSTANDARD LVCMOS33} [get_ports {cart_roml_io}];           # F_C64_ROML
+set_property -dict {PACKAGE_PIN T21  IOSTANDARD LVCMOS33} [get_ports {cart_en_o}];              # EXP_SLOT_EN
 set_property -dict {PACKAGE_PIN L19  IOSTANDARD LVCMOS33} [get_ports {cart_addr_en_o}];         # F_ADDR_EN
+set_property -dict {PACKAGE_PIN L18  IOSTANDARD LVCMOS33} [get_ports {cart_haddr_dir_o}];       # F_HADDR_DIR
+set_property -dict {PACKAGE_PIN L21  IOSTANDARD LVCMOS33} [get_ports {cart_laddr_dir_o}];       # F_LADDR_DIR
 set_property -dict {PACKAGE_PIN K19  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[0]}];           # F_C64_A0
 set_property -dict {PACKAGE_PIN K18  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[1]}];           # F_C64_A1
 set_property -dict {PACKAGE_PIN K21  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[2]}];           # F_C64_A2
@@ -177,11 +203,8 @@ set_property -dict {PACKAGE_PIN H19  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[
 set_property -dict {PACKAGE_PIN M20  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[13]}];          # F_C64_A13
 set_property -dict {PACKAGE_PIN N22  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[14]}];          # F_C64_A14
 set_property -dict {PACKAGE_PIN H18  IOSTANDARD LVCMOS33} [get_ports {cart_a_io[15]}];          # F_C64_A15
-set_property -dict {PACKAGE_PIN N13  IOSTANDARD LVCMOS33} [get_ports {cart_ba_io}];             # F_C64_BA
-set_property -dict {PACKAGE_PIN U17  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_dir_o}];        # F_CTRL_DIR
-set_property -dict {PACKAGE_PIN G18  IOSTANDARD LVCMOS33} [get_ports {cart_ctrl_en_o}];         # F_CTRL_EN
-set_property -dict {PACKAGE_PIN V22  IOSTANDARD LVCMOS33} [get_ports {cart_data_dir_o}];        # F_DATA_DIR
 set_property -dict {PACKAGE_PIN U21  IOSTANDARD LVCMOS33} [get_ports {cart_data_en_o}];         # F_DATA_EN
+set_property -dict {PACKAGE_PIN V22  IOSTANDARD LVCMOS33} [get_ports {cart_data_dir_o}];        # F_DATA_DIR
 set_property -dict {PACKAGE_PIN P16  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[0]}];           # F_C64_D0
 set_property -dict {PACKAGE_PIN R17  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[1]}];           # F_C64_D1
 set_property -dict {PACKAGE_PIN P20  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[2]}];           # F_C64_D2
@@ -190,29 +213,6 @@ set_property -dict {PACKAGE_PIN U18  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[
 set_property -dict {PACKAGE_PIN V18  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[5]}];           # F_C64_D5
 set_property -dict {PACKAGE_PIN W20  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[6]}];           # F_C64_D6
 set_property -dict {PACKAGE_PIN W21  IOSTANDARD LVCMOS33} [get_ports {cart_d_io[7]}];           # F_C64_D7
-set_property -dict {PACKAGE_PIN P15  IOSTANDARD LVCMOS33} [get_ports {cart_dma_i}];             # F_C64_DMA
-set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports {cart_dotclock_o}];        # F_C64_CLOCK
-set_property -dict {PACKAGE_PIN L18  IOSTANDARD LVCMOS33} [get_ports {cart_haddr_dir_o}];       # F_HADDR_DIR
-set_property -dict {PACKAGE_PIN N15  IOSTANDARD LVCMOS33} [get_ports {cart_io1_io}];            # F_C64_IO1
-set_property -dict {PACKAGE_PIN AA20 IOSTANDARD LVCMOS33} [get_ports {cart_io2_io}];            # F_C64_IO2
-set_property -dict {PACKAGE_PIN L21  IOSTANDARD LVCMOS33} [get_ports {cart_laddr_dir_o}];       # F_LADDR_DIR
-set_property -dict {PACKAGE_PIN V17  IOSTANDARD LVCMOS33} [get_ports {cart_phi2_o}];            # F_C64_O2
-set_property -dict {PACKAGE_PIN R18  IOSTANDARD LVCMOS33} [get_ports {cart_rw_io}];             # F_C64_RW
-set_property -dict {PACKAGE_PIN T16  IOSTANDARD LVCMOS33} [get_ports {cart_romh_oe_n_o}];       # F_C64_ROMH_DIR
-set_property -dict {PACKAGE_PIN T18  IOSTANDARD LVCMOS33} [get_ports {cart_romh_io}];           # F_C64_ROMH
-set_property -dict {PACKAGE_PIN U16  IOSTANDARD LVCMOS33} [get_ports {cart_roml_oe_n_o}];       # F_C64_ROML_DIR
-set_property -dict {PACKAGE_PIN AB18 IOSTANDARD LVCMOS33} [get_ports {cart_roml_io}];           # F_C64_ROML
-set_property -dict {PACKAGE_PIN T20  IOSTANDARD LVCMOS33} [get_ports {cart_reset_oe_n_o}];      # F_C64_RESET_EN
-set_property -dict {PACKAGE_PIN N14  IOSTANDARD LVCMOS33} [get_ports {cart_reset_io}];          # F_C64_RESET
-set_property -dict {PACKAGE_PIN L15  IOSTANDARD LVCMOS33} [get_ports {cart_game_oe_n_o}];       # F_C64_GAME_EN
-set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports {cart_game_io}];           #_F_C64_GAME
-set_property -dict {PACKAGE_PIN M16  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_oe_n_o}];      # F_C64_EXROM_EN
-set_property -dict {PACKAGE_PIN R19  IOSTANDARD LVCMOS33} [get_ports {cart_exrom_io}];          # F_C64_EXROM
-set_property -dict {PACKAGE_PIN F20  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_oe_n_o}];        # F_C64_NMI_EN
-set_property -dict {PACKAGE_PIN W17  IOSTANDARD LVCMOS33} [get_ports {cart_nmi_io}];            # F_C64_NMI
-set_property -dict {PACKAGE_PIN H14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_oe_n_o}];        # F_C64_IRQ_EN
-set_property -dict {PACKAGE_PIN P14  IOSTANDARD LVCMOS33} [get_ports {cart_irq_io}];            # F_C64_IRQ
-set_property -dict {PACKAGE_PIN T21  IOSTANDARD LVCMOS33} [get_ports {cart_en_o}];              # EXP_SLOT_EN
 
 # I2C bus
 # U32 = PCA9655EMTTXG. Address 0x40. I/O expander.

@@ -53,11 +53,11 @@ port (
    kb_io0_o           : out   std_logic;                 -- clock to keyboard
    kb_io1_o           : out   std_logic;                 -- data output to keyboard
    kb_io2_i           : in    std_logic;                 -- data input from keyboard
-   kb_jtagen_i        : in    std_logic;                 -- These JTAG signals to the keyboard lattice FPGA are for now set as input only, because they are not used.
-   kb_tck_i           : in    std_logic;
-   kb_tdi_i           : in    std_logic;
+   kb_tck_o           : out   std_logic;
    kb_tdo_i           : in    std_logic;
-   kb_tms_i           : in    std_logic;
+   kb_tms_o           : out   std_logic;
+   kb_tdi_o           : out   std_logic;
+   kb_jtagen_o        : out   std_logic;
 
    -- Micro SD Connector (external slot at back of the cover)
    sd_reset_o         : out   std_logic;
@@ -414,7 +414,6 @@ begin
    cart_romh_io     <= cart_romh_out when cart_ctrl_oe = '1' and cart_romh_oe = '1' else 'Z';
    cart_roml_in     <= cart_roml_io;
    cart_romh_in     <= cart_romh_io;
-
    cart_ba_io       <= cart_ba_out   when cart_ctrl_oe = '1' else 'Z';
    cart_rw_io       <= cart_rw_out   when cart_ctrl_oe = '1' else 'Z';
    cart_io1_io      <= cart_io1_out  when cart_ctrl_oe = '1' else 'Z';
@@ -524,11 +523,21 @@ begin
       joy_1_left_n_i          => fa_left_n_i,
       joy_1_right_n_i         => fa_right_n_i,
       joy_1_fire_n_i          => fa_fire_n_i,
+      joy_1_up_n_o            => open,
+      joy_1_down_n_o          => open,
+      joy_1_left_n_o          => open,
+      joy_1_right_n_o         => open,
+      joy_1_fire_n_o          => open,
       joy_2_up_n_i            => fb_up_n_i,
       joy_2_down_n_i          => fb_down_n_i,
       joy_2_left_n_i          => fb_left_n_i,
       joy_2_right_n_i         => fb_right_n_i,
       joy_2_fire_n_i          => fb_fire_n_i,
+      joy_2_up_n_o            => open,
+      joy_2_down_n_o          => open,
+      joy_2_left_n_o          => open,
+      joy_2_right_n_o         => open,
+      joy_2_fire_n_o          => open,
       paddle_i                => paddle_i,
       paddle_drain_o          => paddle_drain_o,
       hr_d_io                 => hr_d_io,
@@ -845,11 +854,11 @@ begin
          cart_io1_o        => cart_io1_out,
          cart_io2_o        => cart_io2_out,
          --
-         cart_addr_oe_o    => cart_addr_oe, -- 0 : tristate (i.e. input), 1 : output
+         cart_data_oe_o    => cart_data_oe, -- 0 : tristate (i.e. input), 1 : output
          cart_d_i          => cart_d_in,
          cart_d_o          => cart_d_out,
          --
-         cart_data_oe_o    => cart_data_oe, -- 0 : tristate (i.e. input), 1 : output
+         cart_addr_oe_o    => cart_addr_oe, -- 0 : tristate (i.e. input), 1 : output
          cart_a_i          => cart_a_in,
          cart_a_o          => cart_a_out
       ); -- CORE

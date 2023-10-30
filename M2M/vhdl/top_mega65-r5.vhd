@@ -52,11 +52,11 @@ port (
    kb_io0_o                : out   std_logic;                 -- clock to keyboard
    kb_io1_o                : out   std_logic;                 -- data output to keyboard
    kb_io2_i                : in    std_logic;                 -- data input from keyboard
-   kb_jtagen_i             : in    std_logic;
-   kb_tck_i                : in    std_logic;
-   kb_tdi_i                : in    std_logic;
+   kb_tck_o                : out   std_logic;
    kb_tdo_i                : in    std_logic;
-   kb_tms_i                : in    std_logic;
+   kb_tms_o                : out   std_logic;
+   kb_tdi_o                : out   std_logic;
+   kb_jtagen_o             : out   std_logic;
 
    -- Micro SD Connector (external slot at back of the cover)
    sd_reset_o              : out   std_logic;
@@ -459,6 +459,125 @@ begin
          audio_sda_io   => audio_sda_io
       ); -- i_audio
 
+
+   ---------------------------------------------------------------------------------------------
+   -- C64 Cartridge port
+   ---------------------------------------------------------------------------------------------
+
+   cart_en_o         <= cart_en;
+   cart_reset_io     <= cart_reset_out when cart_reset_oe = '1' else 'Z';
+   cart_game_io      <= cart_game_out  when cart_game_oe  = '1' else 'Z';
+   cart_exrom_io     <= cart_exrom_out when cart_exrom_oe = '1' else 'Z';
+   cart_nmi_io       <= cart_nmi_out   when cart_nmi_oe   = '1' else 'Z';
+   cart_irq_io       <= cart_irq_out   when cart_irq_oe   = '1' else 'Z';
+   cart_roml_io      <= cart_roml_out  when cart_roml_oe  = '1' else 'Z';
+   cart_romh_io      <= cart_romh_out  when cart_romh_oe  = '1' else 'Z';
+   cart_reset_in     <= cart_reset_io;
+   cart_game_in      <= cart_game_io;
+   cart_exrom_in     <= cart_exrom_io;
+   cart_nmi_in       <= cart_nmi_io;
+   cart_irq_in       <= cart_irq_io;
+   cart_roml_in      <= cart_roml_io;
+   cart_romh_in      <= cart_romh_io;
+   cart_reset_oe_n_o <= not cart_reset_oe;
+   cart_game_oe_n_o  <= not cart_game_oe;
+   cart_exrom_oe_n_o <= not cart_exrom_oe;
+   cart_nmi_oe_n_o   <= not cart_nmi_oe;
+   cart_irq_oe_n_o   <= not cart_irq_oe;
+   cart_roml_oe_n_o  <= not cart_roml_oe;
+   cart_romh_oe_n_o  <= not cart_romh_oe;
+
+   cart_ba_io        <= cart_ba_out   when cart_ctrl_oe = '1' else 'Z';
+   cart_rw_io        <= cart_rw_out   when cart_ctrl_oe = '1' else 'Z';
+   cart_io1_io       <= cart_io1_out  when cart_ctrl_oe = '1' else 'Z';
+   cart_io2_io       <= cart_io2_out  when cart_ctrl_oe = '1' else 'Z';
+   cart_ba_in        <= cart_ba_io;
+   cart_rw_in        <= cart_rw_io;
+   cart_io1_in       <= cart_io1_io;
+   cart_io2_in       <= cart_io2_io;
+   cart_ctrl_en_o    <= cart_en;
+   cart_ctrl_dir_o   <= cart_ctrl_oe;
+
+   cart_d_io         <= cart_d_out    when cart_data_oe = '1' else (others => 'Z');
+   cart_d_in         <= cart_d_io;
+   cart_data_en_o    <= cart_en;
+   cart_data_dir_o   <= cart_data_oe;
+
+   cart_a_io         <= cart_a_out    when cart_addr_oe = '1' else (others => 'Z');
+   cart_a_in         <= cart_a_io;
+   cart_addr_en_o    <= cart_en;
+   cart_haddr_dir_o  <= cart_addr_oe;
+   cart_laddr_dir_o  <= cart_addr_oe;
+
+
+   iec_clk_en_n_o    <= not iec_clk_en;
+   iec_data_en_n_o   <= not iec_data_en;
+   iec_srq_en_n_o    <= not iec_srq_en;
+
+
+   ---------------------------------------------------------------------------------------------
+   -- Safe default values for ports not supported by the M2M framework
+   ---------------------------------------------------------------------------------------------
+
+   vga_scl_io            <= 'Z';
+   vga_sda_io            <= 'Z';
+   vdac_psave_n_o        <= '1';
+   hdmi_hiz_en_o         <= '0'; -- HDMI is 50 ohm terminated.
+   hdmi_ls_oe_n_o        <= '0'; -- Enable HDMI output
+   hdmi_scl_io           <= 'Z';
+   hdmi_sda_io           <= 'Z';
+   dbg_io_11             <= 'Z';
+
+   eth_clock_o           <= '0';
+   eth_led2_o            <= '0';
+   eth_mdc_o             <= '0';
+   eth_mdio_io           <= 'Z';
+   eth_reset_o           <= '1';
+   eth_txd_o             <= (others => '0');
+   eth_txen_o            <= '0';
+   f_density_o           <= '0';
+   f_motora_o            <= '0';
+   f_motorb_o            <= '0';
+   f_selecta_o           <= '0';
+   f_selectb_o           <= '0';
+   f_side1_o             <= '0';
+   f_stepdir_o           <= '0';
+   f_step_o              <= '0';
+   f_wdata_o             <= '0';
+   f_wgate_o             <= '0';
+   fpga_sda_io           <= 'Z';
+   fpga_scl_io           <= 'Z';
+   grove_sda_io          <= 'Z';
+   grove_scl_io          <= 'Z';
+   joystick_5v_disable_o <= '0'; -- Enable 5V power supply to joysticks
+   led_g_n_o             <= '1'; -- Off
+   led_r_n_o             <= '1'; -- Off
+   led_o                 <= '0'; -- Off
+   p1lo_io               <= (others => 'Z');
+   p1hi_io               <= (others => 'Z');
+   p2lo_io               <= (others => 'Z');
+   p2hi_io               <= (others => 'Z');
+   pmod1_en_o            <= '0';
+   pmod2_en_o            <= '0';
+   qspidb_io             <= (others => 'Z');
+   qspicsn_o             <= '1';
+   sdram_clk_o           <= '0';
+   sdram_cke_o           <= '0';
+   sdram_ras_n_o         <= '1';
+   sdram_cas_n_o         <= '1';
+   sdram_we_n_o          <= '1';
+   sdram_cs_n_o          <= '1';
+   sdram_ba_o            <= (others => '0');
+   sdram_a_o             <= (others => '0');
+   sdram_dqml_o          <= '0';
+   sdram_dqmh_o          <= '0';
+   sdram_dq_io           <= (others => 'Z');
+
+
+   -----------------------------------------------------------------------------------------
+   -- MiSTer2MEGA framework
+   -----------------------------------------------------------------------------------------
+
    i_framework : entity work.framework
    port map (
       -- Connect to I/O ports
@@ -835,111 +954,6 @@ begin
          cart_a_i                => cart_a_in,
          cart_a_o                => cart_a_out
       ); -- CORE
-
-   cart_en_o         <= cart_en;
-   cart_reset_io     <= cart_reset_out when cart_reset_oe = '1' else 'Z';
-   cart_game_io      <= cart_game_out  when cart_game_oe  = '1' else 'Z';
-   cart_exrom_io     <= cart_exrom_out when cart_exrom_oe = '1' else 'Z';
-   cart_nmi_io       <= cart_nmi_out   when cart_nmi_oe   = '1' else 'Z';
-   cart_irq_io       <= cart_irq_out   when cart_irq_oe   = '1' else 'Z';
-   cart_roml_io      <= cart_roml_out  when cart_roml_oe  = '1' else 'Z';
-   cart_romh_io      <= cart_romh_out  when cart_romh_oe  = '1' else 'Z';
-   cart_reset_in     <= cart_reset_io;
-   cart_game_in      <= cart_game_io;
-   cart_exrom_in     <= cart_exrom_io;
-   cart_nmi_in       <= cart_nmi_io;
-   cart_irq_in       <= cart_irq_io;
-   cart_roml_in      <= cart_roml_io;
-   cart_romh_in      <= cart_romh_io;
-   cart_reset_oe_n_o <= not cart_reset_oe;
-   cart_game_oe_n_o  <= not cart_game_oe;
-   cart_exrom_oe_n_o <= not cart_exrom_oe;
-   cart_nmi_oe_n_o   <= not cart_nmi_oe;
-   cart_irq_oe_n_o   <= not cart_irq_oe;
-   cart_roml_oe_n_o  <= not cart_roml_oe;
-   cart_romh_oe_n_o  <= not cart_romh_oe;
-
-   cart_ba_io        <= cart_ba_out   when cart_ctrl_oe = '1' else 'Z';
-   cart_rw_io        <= cart_rw_out   when cart_ctrl_oe = '1' else 'Z';
-   cart_io1_io       <= cart_io1_out  when cart_ctrl_oe = '1' else 'Z';
-   cart_io2_io       <= cart_io2_out  when cart_ctrl_oe = '1' else 'Z';
-   cart_ba_in        <= cart_ba_io;
-   cart_rw_in        <= cart_rw_io;
-   cart_io1_in       <= cart_io1_io;
-   cart_io2_in       <= cart_io2_io;
-   cart_ctrl_en_o    <= cart_en;
-   cart_ctrl_dir_o   <= cart_ctrl_oe;
-
-   cart_d_io         <= cart_d_out    when cart_data_oe = '1' else (others => 'Z');
-   cart_d_in         <= cart_d_io;
-   cart_data_en_o    <= cart_en;
-   cart_data_dir_o   <= cart_data_oe;
-
-   cart_a_io         <= cart_a_out    when cart_addr_oe = '1' else (others => 'Z');
-   cart_a_in         <= cart_a_io;
-   cart_addr_en_o    <= cart_en;
-   cart_haddr_dir_o  <= cart_addr_oe;
-   cart_laddr_dir_o  <= cart_addr_oe;
-
-
-   iec_clk_en_n_o    <= not iec_clk_en;
-   iec_data_en_n_o   <= not iec_data_en;
-   iec_srq_en_n_o    <= not iec_srq_en;
-
-   -- Safe default values
-   vga_scl_io            <= 'Z';
-   vga_sda_io            <= 'Z';
-   vdac_psave_n_o        <= '1';
-   hdmi_hiz_en_o         <= '0'; -- HDMI is 50 ohm terminated.
-   hdmi_ls_oe_n_o        <= '0'; -- Enable HDMI output
-   hdmi_scl_io           <= 'Z';
-   hdmi_sda_io           <= 'Z';
-   dbg_io_11             <= 'Z';
-
-   eth_clock_o           <= '0';
-   eth_led2_o            <= '0';
-   eth_mdc_o             <= '0';
-   eth_mdio_io           <= 'Z';
-   eth_reset_o           <= '1';
-   eth_txd_o             <= (others => '0');
-   eth_txen_o            <= '0';
-   f_density_o           <= '0';
-   f_motora_o            <= '0';
-   f_motorb_o            <= '0';
-   f_selecta_o           <= '0';
-   f_selectb_o           <= '0';
-   f_side1_o             <= '0';
-   f_stepdir_o           <= '0';
-   f_step_o              <= '0';
-   f_wdata_o             <= '0';
-   f_wgate_o             <= '0';
-   fpga_sda_io           <= 'Z';
-   fpga_scl_io           <= 'Z';
-   grove_sda_io          <= 'Z';
-   grove_scl_io          <= 'Z';
-   joystick_5v_disable_o <= '0'; -- Enable 5V power supply to joysticks
-   led_g_n_o             <= '1'; -- Off
-   led_r_n_o             <= '1'; -- Off
-   led_o                 <= '0'; -- Off
-   p1lo_io               <= (others => 'Z');
-   p1hi_io               <= (others => 'Z');
-   p2lo_io               <= (others => 'Z');
-   p2hi_io               <= (others => 'Z');
-   pmod1_en_o            <= '0';
-   pmod2_en_o            <= '0';
-   qspidb_io             <= (others => 'Z');
-   qspicsn_o             <= '1';
-   sdram_clk_o           <= '0';
-   sdram_cke_o           <= '0';
-   sdram_ras_n_o         <= '1';
-   sdram_cas_n_o         <= '1';
-   sdram_we_n_o          <= '1';
-   sdram_cs_n_o          <= '1';
-   sdram_ba_o            <= (others => '0');
-   sdram_a_o             <= (others => '0');
-   sdram_dqml_o          <= '0';
-   sdram_dqmh_o          <= '0';
-   sdram_dq_io           <= (others => 'Z');
 
 end architecture synthesis;
 
