@@ -26,7 +26,6 @@ workaround is not needed for the KungFu Flash any more
 ## Bugfixes: R4/R5 boards only
 
 * HDMI backpower is no issue any more
-@TODO: Needs update of FAQ and other parts of the documentation
 
 ## Bugfixes: All boards
 

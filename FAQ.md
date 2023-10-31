@@ -1,6 +1,17 @@
 # FAQ - Frequently Asked Questions
 
-## 1) My MEGA65 or the C64 core is behaving somehow weirdly
+## 1) Which core should I install? I am confused what R3/R3A, R4 and R5 means
+
+There are different MEGA65 models on the market. They are called R3, R3A, R4
+and R5. Head over to the [dedicated MEGA65 model documentation](doc/models.md)
+to learn more about the models, which `.cor` files to use and about how the
+C64 for MEGA65 core behaves slightly differently on different MEGA65 models.
+
+## 2) My MEGA65 or the C64 core is behaving somehow weirdly
+
+If you own an R4 or R5 MEGA65, then you can skip this section as the
+underlying hardware bug that haunts R3 and R3A boards is fixed on later
+board revisions.
 
 **The "HDMI back powering problem" is the root of all evil!**
 
@@ -28,7 +39,7 @@ MEGA65 and your device. You will find two Amazon links to devices that are
 known to work
 [here in Dan's MEGA65 Welcome Guide](https://dansanderson.com/mega65/welcome/hardware-issues.html?highlight=hdmi#failure-to-boot-and-keyboard-lights-glow-when-off).
 
-## 2) SD card errors
+## 3) SD card errors
 
 Most SD card problems can be resolved by considering these possible causes:
 
@@ -74,7 +85,7 @@ this case: Step (5) or step (6) will solve the issue.
   official SD card organization provides:
   [Download it here](https://www.sdcard.org/downloads/formatter/sd-memory-card-formatter-for-mac-download/).
 
-## 3) How compatible is the C64 core?
+## 4) How compatible is the C64 core?
 
 It is very compatible. Not yet as good as Vice but the
 core runs hundreds of
@@ -92,21 +103,21 @@ Expansion Port,
 by plugging them into the MEGA65's IEC port. You can even
 [work with retro 15 kHz cathode ray tube monitors](doc/retrotubes.md).
 
-## 4) I cannot format a disk image (`*.d64`)
+## 5) I cannot format a disk image (`*.d64`)
 
 Indeed, the core is not yet able to format disks. We do have this topic on our
 [roadmap](ROADMAP.md). What we suggest is that you use tools like the awesome
 [DirMaster](https://style64.org/dirmaster) to create a bunch of formatted, empty
 `*.d64` disk images and then use these disk images with your C64 for MEGA65 core.
 
-## 5) The screen goes black when I choose JiffyDOS
+## 6) The screen goes black when I choose JiffyDOS
 
 JiffyDOS is commercial software. The C64 core does not come with
 a pre-installed copy of JiffyDOS.
 [Learn here](doc/jiffy.md)
 where to buy and how to install it.
 
-## 6) My game or demo crashes
+## 7) My game or demo crashes
 
 * Are you having an [HDMI back powering problem](#1-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
 
@@ -157,7 +168,7 @@ where to buy and how to install it.
   [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200)
   channel on Discord.
 
-## 7) No image or no sound via HDMI
+## 8) No image or no sound via HDMI
 
 1. Make sure you are running [Version 5](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
    of the core.
@@ -170,7 +181,7 @@ where to buy and how to install it.
    [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200)
    channel on Discord.
 
-## 8) The VGA output looks strange or flickers or I lose VGA sync
+## 9) The VGA output looks strange or flickers or I lose VGA sync
 
 1. Always try the "auto-adjust" (or similarly named feature) of your screen
    first. This resolves 90% of all issues.
@@ -181,7 +192,7 @@ where to buy and how to install it.
 
 3. If your monitor supports it, try to use the [retro "15 kHz RGB" mode](doc/retrotubes.md)
 
-## 9) My retro monitor does not work with the core
+## 10) My retro monitor does not work with the core
 
 ### Analog devices
 
@@ -195,7 +206,7 @@ Make sure that you have
 [switched-off HDMI: Flicker-free](README.md#important-advice-for-users-of-analog-vga-and-retro-15-khz-rgb-over-vga)
 when using retro monitors via the MEGA65's VGA out.
 
-## 10) My mouse does not work
+## 11) My mouse does not work
 
 Make sure that you use either a real C64 mouse or
 [MouSTer](https://retrohax.net/shop/modulesandparts/mouster/).
@@ -210,7 +221,7 @@ Caution: AMIGA mice look pretty much like C64 mice but the C64 core does not
 support AMIGA mice, yet. The MEGA65 core does support AMIGA mice and this
 feature is on our roadmap.
 
-## 11) Can I use cartridges?
+## 12) Can I use cartridges?
 
 Yes, from
 [Version 5](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
@@ -348,27 +359,19 @@ Currently, we cannot automate this manual chore and need to ask users to copy th
 this by following
 [this GitHub issue](https://github.com/MJoergen/C64MEGA65/issues/16).
 
-## 16) Hard-reset aka long reset is not always working
-
-Sometimes, the hard-reset aka long reset is not resetting the machine at all - OR -
-it is not properly resetting the machine leading to the problem that the subsequently
-started application might not work as intended.
-
-Workaround: Power-cycle the MEGA65 but avoid the "HDMI back powering problem".
-
-## 17) Which features are on the roadmap?
+## 16) Which features are on the roadmap?
 
 [Here](ROADMAP.md) is the roadmap for future versions. Additionally, there are also 
 [feature requests](https://github.com/MJoergen/C64MEGA65/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
 that we might consider for future releases.
 
-## 18) Where can I post and discuss my feature request?
+## 17) Where can I post and discuss my feature request?
 
 [Engage with us on GitHub](https://github.com/MJoergen/C64MEGA65/issues) or in the
 [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200) channel
 on Discord to discuss feature requests and the future of the C64 for MEGA65 core.
 
-## 19) Are there cores other than the C64 available or in development?
+## 18) Are there cores other than the C64 available or in development?
 
 Yes. Please visit this website, it contains a list of MEGA65 cores that
 will be constantly updated:
@@ -380,7 +383,7 @@ projects such as MiSTer: The website is also sharing additional information
 about how to get started with doing this and about the
 [MiSTer2MEGA65 framework](https://github.com/sy2002/MiSTer2MEGA65).
 
-## 20) I am a total newby and want to learn FPGA development and making or porting cores
+## 19) I am a total newby and want to learn FPGA development and making or porting cores
 
 If you own a MEGA65, then
 [this short article](https://files.mega65.org?ar=898d573b-d30d-4438-8893-09455bd16400)
