@@ -309,7 +309,7 @@ signal qnice_osm_cfg_xy       : std_logic_vector(15 downto 0);
 signal qnice_osm_cfg_dxdy     : std_logic_vector(15 downto 0);
 signal qnice_hdmax            : std_logic_vector(11 downto 0);
 signal qnice_vdmax            : std_logic_vector(11 downto 0);
-signal qnice_clk_sel          : std_logic;
+signal qnice_clk_sel          : std_logic_vector( 1 downto 0);
 
 signal qnice_h_pixels         : std_logic_vector(11 downto 0); -- horizontal visible display width in pixels
 signal qnice_v_pixels         : std_logic_vector(11 downto 0); -- horizontal visible display width in pixels
@@ -419,9 +419,6 @@ begin
    -- Generate clocks and reset signals
    ---------------------------------------------------------------------------------------------------------------
 
-   -- video modes 0 and 1 needs hdmi_clk_sel_i to be '0', 2 and 3 to be '1'
-   qnice_clk_sel <= '1' when qnice_video_mode_i >= 2 else '0';
-
    i_clk_m2m : entity work.clk_m2m
       port map (
          sys_clk_i       => clk_i,
@@ -433,14 +430,30 @@ begin
          hr_clk_x2_o     => hr_clk_x2,
          hr_clk_x2_del_o => hr_clk_x2_del,
          hr_rst_o        => hr_rst,
-         hdmi_clk_sel_i  => qnice_clk_sel,
-         tmds_clk_o      => tmds_clk,
-         hdmi_clk_o      => hdmi_clk,
-         hdmi_rst_o      => hdmi_rst,
          audio_clk_o     => audio_clk,
          audio_rst_o     => audio_rst,
          sys_pps_o       => sys_pps
       ); -- i_clk_m2m
+
+
+   -- HDMI clock select: 00 = 25.2, 01 = 27.0, 10 = 74.25, 11 = 148.5
+   qnice_clk_sel <= "01" when qnice_video_mode_i >= 2 -- 576p requires 27.00 MHz
+               else "10";                             -- 720p requires 74.25 MHz
+
+   -- reconfigurable MMCM: 25.2MHz, 27MHz, 74.25MHz or 148.5MHz
+   i_video_out_clock : entity work.video_out_clock
+      generic map (
+         fref    => 100.0 -- Clock speed in MHz of the input clk_i
+      )
+      port map (
+         rsti    => not reset_m2m_n_o,
+         clki    => clk_i,
+         sel     => qnice_clk_sel,
+         rsto    => hdmi_rst,
+         clko    => hdmi_clk,
+         clko_x5 => tmds_clk
+      ); -- i_video_out_clock
+
 
    ---------------------------------------------------------------------------------------------------------------
    -- Board Clock Domain: clk_i
