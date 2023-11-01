@@ -25,7 +25,6 @@ use xpm.vcomponents.all;
 entity clk is
    port (
       sys_clk_i       : in  std_logic;   -- expects 100 MHz
-      sys_rstn_i      : in  std_logic;   -- Asynchronous, asserted low
 
       -- switchable clock for the C64 core
       -- 00 = PAL, as close as possible to the C64's original clock:
@@ -195,7 +194,7 @@ begin
          DEST_SYNC_FF    => 10
       )
       port map (
-         src_arst  => not (main_locked_orig and main_locked_slow and sys_rstn_i),   -- 1-bit input: Source reset signal.
+         src_arst  => not (main_locked_orig and main_locked_slow),   -- 1-bit input: Source reset signal.
          dest_clk  => main_clk_o,       -- 1-bit input: Destination clock.
          dest_arst => main_rst_o        -- 1-bit output: src_arst synchronized to the destination clock domain.
                                         -- This output is registered.

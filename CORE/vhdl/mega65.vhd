@@ -106,7 +106,6 @@ port (
    --------------------------------------------------------------------------------------------------------
 
    CLK                     : in  std_logic;                 -- 100 MHz clock
-   RESET_M2M_N             : in  std_logic;                 -- Debounced system reset in system clock domain
 
    -- Share clock and reset with the framework
    main_clk_o              : out std_logic;                 -- CORE's clock
@@ -409,7 +408,6 @@ begin
    clk_gen : entity work.clk
       port map (
          sys_clk_i         => CLK,             -- expects 100 MHz
-         sys_rstn_i        => RESET_M2M_N,     -- Asynchronous, asserted low
 
          core_speed_i      => hr_core_speed,   -- 0=PAL/original C64, 1=PAL/HDMI flicker-free, 2=NTSC
 
