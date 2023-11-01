@@ -38,6 +38,8 @@ port (
    qnice_video_mode_o      : out natural range 0 to 3;      -- HDMI 1280x720 @ 50 Hz resolution = mode 0,
                                                             -- HDMI 1280x720 @ 60 Hz resolution = mode 1,
                                                             -- PAL 576p in 4:3 and 5:4 are modes 2 and 3
+                                                            -- HDMI 640x480  @ 60 Hz = mode 4
+                                                            -- HDMI 720x480  @ 60 Hz = mode 5
    qnice_osm_cfg_scaling_o : out std_logic_vector(8 downto 0);
    qnice_scandoubler_o     : out std_logic;                 -- 0 = no scandoubler, 1 = scandoubler
    qnice_audio_mute_o      : out std_logic;

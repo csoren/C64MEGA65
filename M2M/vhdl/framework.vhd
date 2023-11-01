@@ -209,8 +209,13 @@ architecture synthesis of framework is
 -- Constants
 ---------------------------------------------------------------------------------------------
 
--- HDMI 1280x720 @ 50 Hz resolution = mode 0, 1280x720 @ 60 Hz resolution = mode 1, PAL 576p in 4:3 and 5:4 are modes 2 and 3
-constant VIDEO_MODE_VECTOR    : video_modes_vector(0 to 3) := (C_HDMI_720p_50, C_HDMI_720p_60, C_HDMI_576p_50, C_HDMI_576p_50);
+constant VIDEO_MODE_VECTOR    : video_modes_vector(0 to 5) := (
+   C_HDMI_720p_50,       -- HDMI 1280x720   @ 50 Hz
+   C_HDMI_720p_60,       -- 1280x720        @ 60 Hz
+   C_HDMI_576p_50,       -- PAL 576p in 4:3 @ 50 Hz
+   C_HDMI_576p_50,       -- PAL 576p in 5:4 @ 50 Hz
+   C_HDMI_640x480p_60,   -- HDMI 640x480    @ 60 Hz
+   C_HDMI_720x480p_60);  -- HDMI 720x480    @ 60 Hz
 
 -- Devices: MiSTer2MEGA framework
 constant C_DEV_VRAM_DATA      : std_logic_vector(15 downto 0) := x"0000";
@@ -436,9 +441,7 @@ begin
       ); -- i_clk_m2m
 
 
-   -- HDMI clock select: 00 = 25.2, 01 = 27.0, 10 = 74.25, 11 = 148.5
-   qnice_clk_sel <= "01" when qnice_video_mode_i >= 2 -- 576p requires 27.00 MHz
-               else "10";                             -- 720p requires 74.25 MHz
+   qnice_clk_sel <= VIDEO_MODE_VECTOR(qnice_video_mode_i).CLK_SEL;
 
    -- reconfigurable MMCM: 25.2MHz, 27MHz, 74.25MHz or 148.5MHz
    i_video_out_clock : entity work.video_out_clock
@@ -446,7 +449,7 @@ begin
          fref    => 100.0 -- Clock speed in MHz of the input clk_i
       )
       port map (
-         rsti    => not reset_m2m_n_o,
+         rsti    => not reset_m2m_n,
          clki    => clk_i,
          sel     => qnice_clk_sel,
          rsto    => hdmi_rst,
