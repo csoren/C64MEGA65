@@ -5,7 +5,7 @@
 --
 --   MiSTer's Commodore 64 expects:
 --      PAL:  31,527,778 MHz, this divided by 32 = 0,98525 MHz (C64 clock speed)
---            Additionall (PAL only) we use a 0.25% slower system clock for the HDMI flicker-fix
+--            Additionally (PAL only) we use a 0.25% slower system clock for the HDMI flicker-fix
 --      NTSC: @TODO
 --
 -- Powered by MiSTer2MEGA65
@@ -28,10 +28,10 @@ entity clk is
       sys_rstn_i      : in  std_logic;   -- Asynchronous, asserted low
 
       -- switchable clock for the C64 core
-      -- 00 = PAL, as close as possuble to the C64's original clock:
+      -- 00 = PAL, as close as possible to the C64's original clock:
       --           @TODO exact clock values for main and video here
       --
-      -- 01 = PAL  HDMI flicker-fix that makes sure the C64 is synchonous with the 50 Hz PAL frequency
+      -- 01 = PAL  HDMI flicker-fix that makes sure the C64 is synchronous with the 50 Hz PAL frequency
       --           This is 99.75% of the original system speed.
       --           @TODO exact clock values for main and video here
       --
@@ -166,7 +166,7 @@ begin
       ); -- i_clk_c64_slow
 
    -- This is a glitch-free mux switching between the fast and the slow clock.
-   -- The select signal is treated asynchronuously to the input clocks.
+   -- The select signal is treated asynchronously to the input clocks.
    bufgmux_ctrl_inst : bufgmux_ctrl
       port map (
          i0 => main_clk_mmcm_orig,  -- 1-bit input: clock input (s=0)
@@ -197,7 +197,7 @@ begin
       port map (
          src_arst  => not (main_locked_orig and main_locked_slow and sys_rstn_i),   -- 1-bit input: Source reset signal.
          dest_clk  => main_clk_o,       -- 1-bit input: Destination clock.
-         dest_arst => main_rst_o        -- 1-bit output: src_rst synchronized to the destination clock domain.
+         dest_arst => main_rst_o        -- 1-bit output: src_arst synchronized to the destination clock domain.
                                         -- This output is registered.
       );
 
