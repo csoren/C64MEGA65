@@ -252,24 +252,6 @@ signal main_crt_ioe_ram_data      : std_logic_vector( 7 downto 0);
 signal main_crt_iof_ram_data      : std_logic_vector( 7 downto 0);
 
 -- RAM Expansion Unit
-signal main_ext_cycle             : std_logic;
-signal main_reu_cycle             : std_logic;
-signal main_reu_addr              : std_logic_vector(24 downto 0);
-signal main_reu_dout              : std_logic_vector( 7 downto 0);
-signal main_reu_din               : std_logic_vector( 7 downto 0);
-signal main_reu_we                : std_logic;
-signal main_reu_cs                : std_logic;
-
-signal main_map_write             : std_logic;
-signal main_map_read              : std_logic;
-signal main_map_address           : std_logic_vector(31 downto 0);
-signal main_map_writedata         : std_logic_vector(15 downto 0);
-signal main_map_byteenable        : std_logic_vector( 1 downto 0);
-signal main_map_burstcount        : std_logic_vector( 7 downto 0);
-signal main_map_readdata          : std_logic_vector(15 downto 0);
-signal main_map_readdatavalid     : std_logic;
-signal main_map_waitrequest       : std_logic;
-
 signal main_avm_reu_write         : std_logic;
 signal main_avm_reu_read          : std_logic;
 signal main_avm_reu_address       : std_logic_vector(31 downto 0);
@@ -706,13 +688,15 @@ begin
          cart_d_o               => cart_d_o,
 
          -- RAM Expansion Unit (REU)
-         ext_cycle_o            => main_ext_cycle,
-         reu_cycle_i            => main_reu_cycle,
-         reu_addr_o             => main_reu_addr,
-         reu_dout_o             => main_reu_dout,
-         reu_din_i              => main_reu_din,
-         reu_we_o               => main_reu_we,
-         reu_cs_o               => main_reu_cs,
+         avm_waitrequest_i   => main_avm_reu_waitrequest,
+         avm_write_o         => main_avm_reu_write,
+         avm_read_o          => main_avm_reu_read,
+         avm_address_o       => main_avm_reu_address,
+         avm_writedata_o     => main_avm_reu_writedata,
+         avm_byteenable_o    => main_avm_reu_byteenable,
+         avm_burstcount_o    => main_avm_reu_burstcount,
+         avm_readdata_i      => main_avm_reu_readdata,
+         avm_readdatavalid_i => main_avm_reu_readdatavalid,
 
          -- Support for software based cartridges (aka ".CRT" files)
          cartridge_loading_i    => main_crt_loading,
@@ -748,69 +732,6 @@ begin
          c1541rom_data_i        => qnice_c1541rom_data_to,
          c1541rom_data_o        => qnice_c1541rom_data_from
       ); -- i_main
-
-   -- RAM used by the REU inside i_main:
-   -- Consists of a three-stage pipeline:
-   -- 1) i_avm_fifo does the CDC using a FIFO (as the name suggests) by utilizing Xilinx the specific "xpm_fifo_axis":
-   --    It connects to the raw HyperRAM Avalon Memory Mapped interface that M2M's arbiter offers and converts the
-   --    signals into the core's clock domain
-   -- 2) i_avm_cache optimizes latency, particularly for longer, subsequent RAM accesses
-   -- 3) i_reu_mapper: Converts the Avalon interface into the interface that the REU expects PLUS
-   --    it includes an optimization ("hack") that ensures that the REU is cycle accurate
-   -- The result of stage (3) is then passed to i_main which uses these signals directly with MiSTer's i_reu
-   i_reu_mapper : entity work.reu_mapper
-      generic map (
-         G_BASE_ADDRESS => X"0020_0000"  -- 2MW
-      )
-      port map (
-         clk_i               => main_clk_o,
-         rst_i               => main_reset_core_i,
-         reu_ext_cycle_i     => main_ext_cycle,
-         reu_ext_cycle_o     => main_reu_cycle,
-         reu_addr_i          => main_reu_addr,
-         reu_dout_i          => main_reu_dout,
-         reu_din_o           => main_reu_din,
-         reu_we_i            => main_reu_we,
-         reu_cs_i            => main_reu_cs,
-         avm_write_o         => main_map_write,
-         avm_read_o          => main_map_read,
-         avm_address_o       => main_map_address,
-         avm_writedata_o     => main_map_writedata,
-         avm_byteenable_o    => main_map_byteenable,
-         avm_burstcount_o    => main_map_burstcount,
-         avm_readdata_i      => main_map_readdata,
-         avm_readdatavalid_i => main_map_readdatavalid,
-         avm_waitrequest_i   => main_map_waitrequest
-      ); -- i_reu_mapper
-
-   i_avm_cache : entity work.avm_cache
-      generic map (
-         G_CACHE_SIZE   => 8,
-         G_ADDRESS_SIZE => 32,
-         G_DATA_SIZE    => 16
-      )
-      port map (
-         clk_i                 => main_clk_o,
-         rst_i                 => main_reset_core_i,
-         s_avm_waitrequest_o   => main_map_waitrequest,
-         s_avm_write_i         => main_map_write,
-         s_avm_read_i          => main_map_read,
-         s_avm_address_i       => main_map_address,
-         s_avm_writedata_i     => main_map_writedata,
-         s_avm_byteenable_i    => main_map_byteenable,
-         s_avm_burstcount_i    => main_map_burstcount,
-         s_avm_readdata_o      => main_map_readdata,
-         s_avm_readdatavalid_o => main_map_readdatavalid,
-         m_avm_waitrequest_i   => main_avm_reu_waitrequest,
-         m_avm_write_o         => main_avm_reu_write,
-         m_avm_read_o          => main_avm_reu_read,
-         m_avm_address_o       => main_avm_reu_address,
-         m_avm_writedata_o     => main_avm_reu_writedata,
-         m_avm_byteenable_o    => main_avm_reu_byteenable,
-         m_avm_burstcount_o    => main_avm_reu_burstcount,
-         m_avm_readdata_i      => main_avm_reu_readdata,
-         m_avm_readdatavalid_i => main_avm_reu_readdatavalid
-      ); -- i_avm_cache
 
    ---------------------------------------------------------------------------------------------
    -- Audio and video settings (QNICE clock domain)

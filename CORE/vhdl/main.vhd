@@ -121,7 +121,7 @@ entity main is
       c64_qnice_data_o       : out std_logic_vector(15 downto 0);
       c64_qnice_ce_i         : in  std_logic;
       c64_qnice_we_i         : in  std_logic;
-      
+
       -- CBM-488/IEC serial (hardware) port
       iec_hardware_port_en   : in  std_logic;
       iec_reset_n_o          : out std_logic;
@@ -179,13 +179,15 @@ entity main is
       cart_d_o               : out unsigned( 7 downto 0);
 
       -- RAM Expansion Unit
-      ext_cycle_o            : out std_logic;
-      reu_cycle_i            : in  std_logic;
-      reu_addr_o             : out std_logic_vector(24 downto 0);
-      reu_dout_o             : out std_logic_vector( 7 downto 0);
-      reu_din_i              : in  std_logic_vector( 7 downto 0);
-      reu_we_o               : out std_logic;
-      reu_cs_o               : out std_logic;
+      avm_waitrequest_i      : in  std_logic;
+      avm_write_o            : out std_logic;
+      avm_read_o             : out std_logic;
+      avm_address_o          : out std_logic_vector(31 downto 0);
+      avm_writedata_o        : out std_logic_vector(15 downto 0);
+      avm_byteenable_o       : out std_logic_vector( 1 downto 0);
+      avm_burstcount_o       : out std_logic_vector( 7 downto 0);
+      avm_readdata_i         : in  std_logic_vector(15 downto 0);
+      avm_readdatavalid_i    : in  std_logic;
 
       -- Support for software based cartridges (aka ".CRT" files)
       cartridge_loading_i    : in  std_logic;
@@ -208,13 +210,13 @@ entity main is
       crt_iof_we_o           : out std_logic;
       crt_bank_lo_o          : out std_logic_vector( 6 downto 0);
       crt_bank_hi_o          : out std_logic_vector( 6 downto 0);
-      
+
 		-- Access custom Kernal: C64's Basic and DOS (in QNICE clock domain via c64_clk_sd_i)
       c64rom_we_i            : in std_logic;
       c64rom_addr_i          : in std_logic_vector(13 downto 0);
       c64rom_data_i          : in std_logic_vector(7 downto 0);
       c64rom_data_o          : out std_logic_vector(7 downto 0);
-      
+
       -- Access custom DOS for the simulated C1541 (in QNICE clock domain via c64_clk_sd_i)
       c1541rom_we_i          : in std_logic;
       c1541rom_addr_i        : in std_logic_vector(15 downto 0);
@@ -260,7 +262,7 @@ architecture synthesis of main is
    signal hw_iec_clk_n_i       : std_logic;
    signal hw_iec_data_n_i      : std_logic;
 
-   -- Simulated IEC drives   
+   -- Simulated IEC drives
    signal iec_drive_ce         : std_logic;      -- chip enable for iec_drive (clock divider, see generate_drive_ce below)
    signal iec_dce_sum          : integer := 0;   -- caution: we expect 32-bit integers here and we expect the initialization to 0
 
@@ -273,7 +275,7 @@ architecture synthesis of main is
    signal vdrives_mounted      : std_logic_vector(G_VDNUM - 1 downto 0);
    signal cache_dirty          : std_logic_vector(G_VDNUM - 1 downto 0);
    signal prevent_reset        : std_logic;
-  
+
    signal iec_sd_lba_o         : vd_vec_array(G_VDNUM - 1 downto 0)(31 downto 0);
    signal iec_sd_blk_cnt_o     : vd_vec_array(G_VDNUM - 1 downto 0)( 5 downto 0);
    signal iec_sd_rd_o          : vd_std_array(G_VDNUM - 1 downto 0);
@@ -303,7 +305,7 @@ architecture synthesis of main is
    signal video_ce             : std_logic_vector(1 downto 0);
 
    -- Hard reset handling:
-   -- Do not use hard_reset_n anywhere in main.vhd other than in cpu_data_in. Use reset_core_n instead.         
+   -- Do not use hard_reset_n anywhere in main.vhd other than in cpu_data_in. Use reset_core_n instead.
    constant C_HARD_RST_DELAY   : natural   := 100_000; -- roundabout 1/30 of a second
    signal hard_rst_counter     : natural   := 0;
    signal reset_core_n         : std_logic := '1';
@@ -342,7 +344,7 @@ architecture synthesis of main is
    signal cart_exrom_n         : std_logic;
    signal cart_game_n          : std_logic;
    signal data_from_cart       : unsigned(7 downto 0);
-   
+
    -- Hardware Expansion Port: Handle specifics of certain cartridges
    constant C_EF3_RESET_LEN    : natural := 7;           -- measured in phi2 cycles
    signal cart_reset_counter   : natural range 0 to C_EF3_RESET_LEN := 0;
@@ -371,6 +373,25 @@ architecture synthesis of main is
    signal crt_nmi              : std_logic;
    signal crt_ioe_wr_ena       : std_logic;
    signal crt_iof_wr_ena       : std_logic;
+
+   -- RAM Expansion Unit
+   signal sim_ext_cycle        : std_logic;
+   signal sim_reu_cycle        : std_logic;
+   signal sim_reu_addr         : std_logic_vector(24 downto 0);
+   signal sim_reu_dout         : std_logic_vector( 7 downto 0);
+   signal sim_reu_din          : std_logic_vector( 7 downto 0);
+   signal sim_reu_we           : std_logic;
+   signal sim_reu_cs           : std_logic;
+
+   signal map_write            : std_logic;
+   signal map_read             : std_logic;
+   signal map_address          : std_logic_vector(31 downto 0);
+   signal map_writedata        : std_logic_vector(15 downto 0);
+   signal map_byteenable       : std_logic_vector( 1 downto 0);
+   signal map_burstcount       : std_logic_vector( 7 downto 0);
+   signal map_readdata         : std_logic_vector(15 downto 0);
+   signal map_readdatavalid    : std_logic;
+   signal map_waitrequest      : std_logic;
 
    -- Verilog file from MiSTer core
    component reu
@@ -423,7 +444,7 @@ begin
    hard_reset : process(clk_main_i)
    begin
       if rising_edge(clk_main_i) then
-         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then     
+         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then
             -- Due to sw_cartridge_wrapper's logic, reset_soft_i stays high longer than reset_hard_i.
             -- We need to make sure that this is not interfering with hard_reset_n
             if reset_hard_i = '1' then
@@ -439,7 +460,7 @@ begin
             -- running (not being reset any more), hard_reset_n stays low for C_HARD_RST_DELAY clock cycles.
             -- Reason: We need to give the KERNAL time to execute the routine $FD02 where it checks for the
             -- cartridge signature "CBM80" in $8003 onwards. In case reset_n = '0' during these tests (i.e. hard
-            -- reset active) we will return zero instead of "CBM80" and therefore perform a hard reset.  
+            -- reset active) we will return zero instead of "CBM80" and therefore perform a hard reset.
             reset_core_n      <= '1';
             if hard_rst_counter = 0 then
                hard_reset_n   <= '1';
@@ -449,7 +470,7 @@ begin
          end if;
       end if;
    end process;
-   
+
    -- To make sure that cartridges in the Expansion Port start properly, we must not do a hard reset and mask the $8000 memory area,
    -- when the core is launched for the first time (cold start).
    handle_cold_start : process(clk_main_i)
@@ -461,7 +482,7 @@ begin
             cold_start_done <= '1';
          end if;
       end if;
-   end process;   
+   end process;
 
    --------------------------------------------------------------------------------------------------
    -- Access to C64's RAM and hardware/simulated cartridge ROM
@@ -515,7 +536,7 @@ begin
          clk32       => clk_main_i,
          clk32_speed => clk_main_speed_i,
          reset_n     => reset_core_n,
-         
+
          -- Select C64's ROM: 0=Custom, 1=Standard, 2=GS, 3=Japan
          bios        => c64_rom_i,
 
@@ -536,7 +557,7 @@ begin
          ramWE       => c64_ram_we,
 
          io_cycle    => open,
-         ext_cycle   => ext_cycle_o,
+         ext_cycle   => sim_ext_cycle,
          refresh     => open,
 
          cia_mode    => c64_cia_ver_i, -- 0 - 6526 "old", 1 - 8521 "new"
@@ -713,7 +734,7 @@ begin
          cart_io2_o      <= cart_io2_n;
          cart_rw_o       <= not c64_ram_we;
          cart_phi2_o     <= core_phi2;
-         
+
          -- @TODO: When implementing this, we need to perform more research. It seems that just using
          -- the C64 cores's "cpuHasBus" signal leads to less compatibility than more. For example it
          -- seemed, that the Kung Fu Flash is not working at all any more.
@@ -820,33 +841,33 @@ begin
          phi2_i               => core_phi2,
          is_an_EF3_o          => cart_is_an_EF3
       ); -- i_cartridge_heuristics
-   
+
    -- Cartridge-specific workaround due to the fact, that R3 and R3A board do not allow cartridges to pull the reset line to low (i.e. trigger a reset)
    handle_cartridge_triggered_resets : process (clk_main_i)
    begin
       if rising_edge(clk_main_i) then
          core_phi2_prev <= core_phi2;
-      
+
          -- We cannot use reset_core_n here because as soon as cart_reset_counter is > 0 reset_core_n goes low
-         -- and then cart_reset_counter would be reset back to 0 prematurely 
+         -- and then cart_reset_counter would be reset back to 0 prematurely
          if reset_soft_i or reset_hard_i then
             cart_reset_counter <= 0;
             cart_res_flckr_ign <= 0;
-            
+
          -- The reset duration is measured in multiples of phi2 cycles
          elsif cart_reset_counter > 0 and core_phi2_prev = '1' and core_phi2 = '0' then
             cart_reset_counter <= cart_reset_counter - 1;
          end if;
-         
+
          -- Avoid the "flickering" (trailing) output of the reset to the cartridge after reset_core_n goes high again after the reset
          if reset_core_n = '0' and cart_reset_counter = 0 and cart_res_flckr_ign /= 0 then
             cart_res_flckr_ign <= cart_res_flckr_ign - 1;
          end if;
-            
+
          -------------------------------------------------------------------------------------------------
          -- EasyFlash 3
          -------------------------------------------------------------------------------------------------
-         
+
          -- The EF3 needs to send a reset signal to the C64 core
          -- Learn more about the exact mechanics here: https://github.com/MJoergen/C64MEGA65/issues/60
          -- And/or look at the EF3 source code:
@@ -884,12 +905,12 @@ begin
          dma_dout  => reu_dma_dout,
          dma_din   => std_logic_vector(reu_dma_din),
          dma_we    => reu_dma_we,
-         ram_cycle => reu_cycle_i,
-         ram_addr  => reu_addr_o,
-         ram_dout  => reu_dout_o,
-         ram_din   => reu_din_i,
-         ram_we    => reu_we_o,
-         ram_cs    => reu_cs_o,
+         ram_cycle => sim_reu_cycle,
+         ram_addr  => sim_reu_addr,
+         ram_dout  => sim_reu_dout,
+         ram_din   => sim_reu_din,
+         ram_we    => sim_reu_we,
+         ram_cs    => sim_reu_cs,
          cpu_addr  => c64_ram_addr_o,
          cpu_dout  => c64_ram_data_o,
          cpu_din   => reu_dout,
@@ -1065,13 +1086,13 @@ begin
 
    audio_left_o  <= signed(alo);
    audio_right_o <= signed(aro);
-   
+
    --------------------------------------------------------------------------------------------------
    -- Hardware IEC port
    --------------------------------------------------------------------------------------------------
-   
+
    handle_hardware_iec_port : process(all)
-   begin      
+   begin
       iec_reset_n_o     <= '1';
       iec_atn_n_o       <= '1';
       iec_clk_en_o      <= '0';
@@ -1088,16 +1109,16 @@ begin
       -- need to have some more signals for the bus instead of directly connecting them as we do today.
       hw_iec_clk_n_i    <= '1';
       hw_iec_data_n_i   <= '1';
-      
+
       -- According to https://www.c64-wiki.com/wiki/Serial_Port, the C64 does not use the SRQ line and therefore
       -- we are at this time also not using it. The wiki article states, hat even though it is not used, it is
       -- still connected with the read line of the cassette port (although this can only detect signal edges,
       -- but not signal levels).
       -- @TODO: Investigate, if there are some edge-case use-cases that are using this "feature" and
       -- in this case enhance our simulation
-      iec_srq_en_o      <= '0';   
+      iec_srq_en_o      <= '0';
       iec_srq_n_o       <= '1';
-        
+
       if iec_hardware_port_en = '1' then
          -- The IEC bus is low active. By default, we let the hardware bus lines float by setting the NC7SZ126P5X
          -- output driver's OE to zero. We hardcode all output lines to zero and as soon as we need to pull a line
@@ -1106,16 +1127,16 @@ begin
          -- that the lines keep floating when we have "nothing to say" to the bus.
          iec_clk_n_o       <= '0';
          iec_data_n_o      <= '0';
-         
+
          -- These lines are not connected to a NC7SZ126P5X since the C64 is supposed to be the only
          -- party in the bus who is allowed to pull this line to zero
          iec_reset_n_o     <= reset_core_n;
          iec_atn_n_o       <= c64_iec_atn_o;
 
          -- Read from the hardware IEC port (see comment above: We need to connect this to i_fpga64_sid_iec and i_iec_drive)
-         hw_iec_clk_n_i    <= iec_clk_n_i; 
+         hw_iec_clk_n_i    <= iec_clk_n_i;
          hw_iec_data_n_i   <= iec_data_n_i;
-                           
+
          -- Write to the IEC port by pulling the signals low and otherwise let them float (using the NC7SZ126P5X chip)
          -- We need to invert the logic, because if the C64 wants to pull something to LOW we need to ENABLE the NC7SZ126P5X's OE
          iec_clk_en_o      <= not c64_iec_clk_o;
@@ -1276,4 +1297,68 @@ begin
          qnice_we_i           => c64_qnice_we_i
       ); -- i_vdrives
 
+   -- RAM used by the REU inside i_main:
+   -- Consists of a three-stage pipeline:
+   -- 1) i_avm_fifo does the CDC using a FIFO (as the name suggests) by utilizing Xilinx the specific "xpm_fifo_axis":
+   --    It connects to the raw HyperRAM Avalon Memory Mapped interface that M2M's arbiter offers and converts the
+   --    signals into the core's clock domain
+   -- 2) i_avm_cache optimizes latency, particularly for longer, subsequent RAM accesses
+   -- 3) i_reu_mapper: Converts the Avalon interface into the interface that the REU expects PLUS
+   --    it includes an optimization ("hack") that ensures that the REU is cycle accurate
+   -- The result of stage (3) is then passed to i_main which uses these signals directly with MiSTer's i_reu
+   i_reu_mapper : entity work.reu_mapper
+      generic map (
+         G_BASE_ADDRESS => X"0020_0000"  -- 2MW
+      )
+      port map (
+         clk_i               => clk_main_i,
+         rst_i               => reset_soft_i,
+         reu_ext_cycle_i     => sim_ext_cycle,
+         reu_ext_cycle_o     => sim_reu_cycle,
+         reu_addr_i          => sim_reu_addr,
+         reu_dout_i          => sim_reu_dout,
+         reu_din_o           => sim_reu_din,
+         reu_we_i            => sim_reu_we,
+         reu_cs_i            => sim_reu_cs,
+         avm_write_o         => map_write,
+         avm_read_o          => map_read,
+         avm_address_o       => map_address,
+         avm_writedata_o     => map_writedata,
+         avm_byteenable_o    => map_byteenable,
+         avm_burstcount_o    => map_burstcount,
+         avm_readdata_i      => map_readdata,
+         avm_readdatavalid_i => map_readdatavalid,
+         avm_waitrequest_i   => map_waitrequest
+      ); -- i_reu_mapper
+
+   i_avm_cache : entity work.avm_cache
+      generic map (
+         G_CACHE_SIZE   => 8,
+         G_ADDRESS_SIZE => 32,
+         G_DATA_SIZE    => 16
+      )
+      port map (
+         clk_i                 => clk_main_i,
+         rst_i                 => reset_soft_i,
+         s_avm_waitrequest_o   => map_waitrequest,
+         s_avm_write_i         => map_write,
+         s_avm_read_i          => map_read,
+         s_avm_address_i       => map_address,
+         s_avm_writedata_i     => map_writedata,
+         s_avm_byteenable_i    => map_byteenable,
+         s_avm_burstcount_i    => map_burstcount,
+         s_avm_readdata_o      => map_readdata,
+         s_avm_readdatavalid_o => map_readdatavalid,
+         m_avm_waitrequest_i   => avm_waitrequest_i,
+         m_avm_write_o         => avm_write_o,
+         m_avm_read_o          => avm_read_o,
+         m_avm_address_o       => avm_address_o,
+         m_avm_writedata_o     => avm_writedata_o,
+         m_avm_byteenable_o    => avm_byteenable_o,
+         m_avm_burstcount_o    => avm_burstcount_o,
+         m_avm_readdata_i      => avm_readdata_i,
+         m_avm_readdatavalid_i => avm_readdatavalid_i
+      ); -- i_avm_cache
+
 end architecture synthesis;
+
