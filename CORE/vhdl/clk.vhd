@@ -5,7 +5,7 @@
 --
 --   MiSTer's Commodore 64 expects:
 --      PAL:  31,527,778 MHz, this divided by 32 = 0,98525 MHz (C64 clock speed)
---            Additionall (PAL only) we use a 0.25% slower system clock for the HDMI flicker-fix
+--            Additionally (PAL only) we use a 0.25% slower system clock for the HDMI flicker-fix
 --      NTSC: @TODO
 --
 -- Powered by MiSTer2MEGA65
@@ -25,18 +25,17 @@ use xpm.vcomponents.all;
 entity clk is
    port (
       sys_clk_i       : in  std_logic;   -- expects 100 MHz
-      sys_rstn_i      : in  std_logic;   -- Asynchronous, asserted low
 
       -- switchable clock for the C64 core
-      -- 00 = PAL, as close as possuble to the C64's original clock:
+      -- 00 = PAL, as close as possible to the C64's original clock:
       --           @TODO exact clock values for main and video here
       --
-      -- 01 = PAL  HDMI flicker-fix that makes sure the C64 is synchonous with the 50 Hz PAL frequency
+      -- 01 = PAL  HDMI flicker-fix that makes sure the C64 is synchronous with the 50 Hz PAL frequency
       --           This is 99.75% of the original system speed.
       --           @TODO exact clock values for main and video here
       --
       -- 10 = NTSC @TODO
-      core_speed_i      : unsigned(1 downto 0); -- must be in qnice clock domain
+      core_speed_i      : unsigned(1 downto 0); -- asynchronous
 
       main_clk_o        : out std_logic;
       main_rst_o        : out std_logic
@@ -60,7 +59,7 @@ begin
 
    ---------------------------------------------------------------------------------------
    -- Generate as-close-as-possible-to-the-original version of the C64 clock
-   -- This has a frame rate of 50.124 Hz
+   -- This has a frame rate of 31527777/(312*63*32) = 50.124 Hz
    ---------------------------------------------------------------------------------------
 
    i_clk_c64_orig : MMCME2_ADV
@@ -113,7 +112,7 @@ begin
 
    ---------------------------------------------------------------------------------------
    -- Generate a slightly slower version of the C64 clock
-   -- This has a frame rate of 49.999 Hz
+   -- This has a frame rate of 31448993/(312*63*32) = 49.999 Hz
    -- It's important that this rate is slightly *slower* than 50 Hz.
    ---------------------------------------------------------------------------------------
 
@@ -129,7 +128,7 @@ begin
          CLKFBOUT_MULT_F      => 60.500,     -- 672.222 MHz
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 21.375,     -- 31.449 MHz
+         CLKOUT0_DIVIDE_F     => 21.375,     -- 31.448993 MHz
          CLKOUT0_PHASE        => 0.000,
          CLKOUT0_DUTY_CYCLE   => 0.500,
          CLKOUT0_USE_FINE_PS  => FALSE
@@ -166,7 +165,7 @@ begin
       ); -- i_clk_c64_slow
 
    -- This is a glitch-free mux switching between the fast and the slow clock.
-   -- The select signal is treated asynchronuously to the input clocks.
+   -- The select signal is treated asynchronously to the input clocks.
    bufgmux_ctrl_inst : bufgmux_ctrl
       port map (
          i0 => main_clk_mmcm_orig,  -- 1-bit input: clock input (s=0)
@@ -195,9 +194,9 @@ begin
          DEST_SYNC_FF    => 10
       )
       port map (
-         src_arst  => not (main_locked_orig and main_locked_slow and sys_rstn_i),   -- 1-bit input: Source reset signal.
+         src_arst  => not (main_locked_orig and main_locked_slow),   -- 1-bit input: Source reset signal.
          dest_clk  => main_clk_o,       -- 1-bit input: Destination clock.
-         dest_arst => main_rst_o        -- 1-bit output: src_rst synchronized to the destination clock domain.
+         dest_arst => main_rst_o        -- 1-bit output: src_arst synchronized to the destination clock domain.
                                         -- This output is registered.
       );
 

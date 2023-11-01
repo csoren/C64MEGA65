@@ -155,24 +155,14 @@ This repository does not contain any copyrighted material.
 Installation
 ------------
 
-### IMPORTANT: Choose the right core variant for your hardware
-
-We are supporting these MEGA65 variants: R3/R3A, R4 and R5. Use
-the following table to ensure that you select and flash the correct `.cor`
-from the [ZIP file](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
-
-| MEGA65 Variant |   Years   | File name             | Comment
-|:--------------:|:---------:|:---------------------:|-------------------------
-| R3/R3A         | @TODO     | C64MEGA65-V5.1-R3.cor | R3 is the "DevKit" (100 were built) and R3A are batches 1 and 2. If you bought your MEGA65 between @TODO then you are very likely to have an R3 or R3A machine.
-| R4             | @TODO     | C64MEGA65-V5.1-R4.cor | Development board on our way to the R5. Only @TODO of them were manufactured (board only, no complete machines)
-| R5             | @TODO     | C64MEGA65-V5.1-R5.cor | @TODO
-
-Only use `*.bit` files if you know what you are doing.
-
-### How to install the C64 for MEGA65 core
-
 1. [Download](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
    the ZIP file that contains the bitstream and the core file and unpack it.
+2. Choose the correct `.cor` file for your [MEGA65 model](doc/models.md):
+   Please be aware that there are [multiple MEGA65 models](doc/models.md) out
+   there and that each `.cor` file only works with the model that it was
+   built for. So in case you are not sure, what R3/R3A, R4 and R5 means and
+   which model you have, head over to the [model documentation](doc/models.md)
+   to learn more.
 2. Copy the `.cor` file on an SD card that has been formatted using the
    MEGA65's built-in formatting tool. If you want to be on the safe side, just
    use the internal SD card (bottom tray), which is formatted like this

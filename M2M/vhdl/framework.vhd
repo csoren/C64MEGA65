@@ -102,7 +102,6 @@ port (
    -- Connect to CORE
    qnice_clk_o             : out   std_logic;
    qnice_rst_o             : out   std_logic;
-   reset_m2m_n_o           : out   std_logic;
    main_clk_i              : in    std_logic;
    main_rst_i              : in    std_logic;
    main_qnice_reset_o      : out   std_logic;
@@ -252,6 +251,7 @@ signal hdmi_rst               : std_logic;
 
 signal reset_n_dbnce          : std_logic;
 signal reset_core_n           : std_logic;
+signal reset_m2m_n            : std_logic;
 
 --------------------------------------------------------------------------------------------
 -- main_clk_i (MiSTer core's clock)
@@ -422,7 +422,7 @@ begin
    i_clk_m2m : entity work.clk_m2m
       port map (
          sys_clk_i       => clk_i,
-         sys_rstn_i      => reset_m2m_n_o,      -- reset everything
+         sys_rstn_i      => reset_m2m_n,        -- reset everything
          core_rstn_i     => reset_core_n,       -- reset only the core (means the HyperRAM needs to be reset, too)
          qnice_clk_o     => qnice_clk,
          qnice_rst_o     => qnice_rst,
@@ -466,7 +466,7 @@ begin
       port map (
          CLK            => clk_i,
          RESET_N        => reset_n_dbnce,
-         reset_m2m_n_o  => reset_m2m_n_o,
+         reset_m2m_n_o  => reset_m2m_n,
          reset_core_n_o => reset_core_n
       ); -- i_reset_manager
 
@@ -943,7 +943,7 @@ begin
       )
       port map (
          src_clk                 => clk_i,
-         src_in(0)               => not reset_m2m_n_o,
+         src_in(0)               => not reset_m2m_n,
          src_in(1)               => not reset_core_n,
          dest_clk                => main_clk_i,
          dest_out(0)             => main_reset_m2m_o,
