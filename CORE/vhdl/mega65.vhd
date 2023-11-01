@@ -25,13 +25,6 @@ generic (
    G_BOARD : string                                         -- Which platform are we running on.
 );
 port (
-   CLK                     : in  std_logic;                 -- 100 MHz clock
-   RESET_M2M_N             : in  std_logic;                 -- Debounced system reset in system clock domain
-
-   -- Share clock and reset with the framework
-   main_clk_o              : out std_logic;                 -- CORE's clock
-   main_rst_o              : out std_logic;                 -- CORE's reset, synchronized
-
    --------------------------------------------------------------------------------------------------------
    -- QNICE Clock Domain
    --------------------------------------------------------------------------------------------------------
@@ -43,8 +36,8 @@ port (
    -- Video and audio mode control
    qnice_dvi_o             : out std_logic;                 -- 0=HDMI (with sound), 1=DVI (no sound)
    qnice_video_mode_o      : out natural range 0 to 3;      -- HDMI 1280x720 @ 50 Hz resolution = mode 0,
-                                                             -- HDMI 1280x720 @ 60 Hz resolution = mode 1,
-                                                             -- PAL 576p in 4:3 and 5:4 are modes 2 and 3
+                                                            -- HDMI 1280x720 @ 60 Hz resolution = mode 1,
+                                                            -- PAL 576p in 4:3 and 5:4 are modes 2 and 3
    qnice_osm_cfg_scaling_o : out std_logic_vector(8 downto 0);
    qnice_scandoubler_o     : out std_logic;                 -- 0 = no scandoubler, 1 = scandoubler
    qnice_audio_mute_o      : out std_logic;
@@ -54,7 +47,7 @@ port (
    qnice_ascal_polyphase_o : out std_logic;
    qnice_ascal_triplebuf_o : out std_logic;
    qnice_retro15kHz_o      : out std_logic;
-   qnice_csync_o           : out std_logic;                 -- 0 = normal HS/VS, 1 = Composite Sync 
+   qnice_csync_o           : out std_logic;                 -- 0 = normal HS/VS, 1 = Composite Sync
 
    -- Flip joystick ports
    qnice_flip_joyports_o   : out std_logic;
@@ -75,8 +68,49 @@ port (
    qnice_dev_wait_o        : out std_logic;
 
    --------------------------------------------------------------------------------------------------------
+   -- HyperRAM Clock Domain
+   --------------------------------------------------------------------------------------------------------
+
+   hr_clk_i                : in  std_logic;
+   hr_rst_i                : in  std_logic;
+   hr_core_write_o         : out std_logic;
+   hr_core_read_o          : out std_logic;
+   hr_core_address_o       : out std_logic_vector(31 downto 0);
+   hr_core_writedata_o     : out std_logic_vector(15 downto 0);
+   hr_core_byteenable_o    : out std_logic_vector( 1 downto 0);
+   hr_core_burstcount_o    : out std_logic_vector( 7 downto 0);
+   hr_core_readdata_i      : in  std_logic_vector(15 downto 0);
+   hr_core_readdatavalid_i : in  std_logic;
+   hr_core_waitrequest_i   : in  std_logic;
+   hr_high_i               : in  std_logic; -- Core is too fast
+   hr_low_i                : in  std_logic; -- Core is too slow
+
+   --------------------------------------------------------------------------------------------------------
+   -- Video Clock Domain
+   --------------------------------------------------------------------------------------------------------
+
+   video_clk_o             : out std_logic;
+   video_rst_o             : out std_logic;
+   video_ce_o              : out std_logic;
+   video_ce_ovl_o          : out std_logic;
+   video_red_o             : out std_logic_vector(7 downto 0);
+   video_green_o           : out std_logic_vector(7 downto 0);
+   video_blue_o            : out std_logic_vector(7 downto 0);
+   video_vs_o              : out std_logic;
+   video_hs_o              : out std_logic;
+   video_hblank_o          : out std_logic;
+   video_vblank_o          : out std_logic;
+
+   --------------------------------------------------------------------------------------------------------
    -- Core Clock Domain
    --------------------------------------------------------------------------------------------------------
+
+   CLK                     : in  std_logic;                 -- 100 MHz clock
+   RESET_M2M_N             : in  std_logic;                 -- Debounced system reset in system clock domain
+
+   -- Share clock and reset with the framework
+   main_clk_o              : out std_logic;                 -- CORE's clock
+   main_rst_o              : out std_logic;                 -- CORE's reset, synchronized
 
    -- M2M's reset manager provides 2 signals:
    --    m2m:   Reset the whole machine: Core and Framework
@@ -91,19 +125,6 @@ port (
 
    -- QNICE general purpose register converted to main clock domain
    main_qnice_gp_reg_i     : in  std_logic_vector(255 downto 0);
-
-   -- Video output
-   video_clk_o             : out std_logic;
-   video_rst_o             : out std_logic;
-   video_ce_o              : out std_logic;
-   video_ce_ovl_o          : out std_logic;
-   video_red_o             : out std_logic_vector(7 downto 0);
-   video_green_o           : out std_logic_vector(7 downto 0);
-   video_blue_o            : out std_logic_vector(7 downto 0);
-   video_vs_o              : out std_logic;
-   video_hs_o              : out std_logic;
-   video_hblank_o          : out std_logic;
-   video_vblank_o          : out std_logic;
 
    -- Audio output (Signed PCM)
    main_audio_left_o       : out signed(15 downto 0);
@@ -143,29 +164,6 @@ port (
    main_pot1_y_i           : in  std_logic_vector(7 downto 0);
    main_pot2_x_i           : in  std_logic_vector(7 downto 0);
    main_pot2_y_i           : in  std_logic_vector(7 downto 0);
-
-   --------------------------------------------------------------------------------------------------------
-   -- Provide support for external memory (Avalon Memory Map)
-   -- These signals run in the HyperRAM clock domain (i.e. 100 MHz)
-   --------------------------------------------------------------------------------------------------------
-
-   hr_clk_i                : in  std_logic;
-   hr_rst_i                : in  std_logic;
-   hr_core_write_o         : out std_logic;
-   hr_core_read_o          : out std_logic;
-   hr_core_address_o       : out std_logic_vector(31 downto 0);
-   hr_core_writedata_o     : out std_logic_vector(15 downto 0);
-   hr_core_byteenable_o    : out std_logic_vector( 1 downto 0);
-   hr_core_burstcount_o    : out std_logic_vector( 7 downto 0);
-   hr_core_readdata_i      : in  std_logic_vector(15 downto 0);
-   hr_core_readdatavalid_i : in  std_logic;
-   hr_core_waitrequest_i   : in  std_logic;
-   hr_high_i               : in  std_logic; -- Core is too fast
-   hr_low_i                : in  std_logic; -- Core is too slow
-
-   --------------------------------------------------------------------
-   -- C64 specific ports that are not supported by the M2M framework
-   --------------------------------------------------------------------
 
    -- CBM-488/IEC serial port
    iec_reset_n_o           : out std_logic;
@@ -232,7 +230,6 @@ architecture synthesis of MEGA65_Core is
 
 -- C64 specific signals for PAL/NTSC and core speed switching
 signal c64_rom                    : std_logic_vector(1 downto 0); -- Select C64's ROM: 0=Custom, 1=Standard, 2=GS, 3=Japan
-signal core_speed                 : unsigned(1 downto 0);    -- see clock.vhd for details
 signal c64_ntsc                   : std_logic;               -- global switch: 0 = PAL mode, 1 = NTSC mode
 signal c64_clock_speed            : natural;                 -- clock speed depending on PAL/NTSC
 signal c64_exp_port_mode          : natural range 0 to 2;    -- Expansion Port:
@@ -308,6 +305,8 @@ signal main_prg_trigger_run       : std_logic;
 ---------------------------------------------------------------------------------------------
 -- hr_clk
 ---------------------------------------------------------------------------------------------
+
+signal hr_core_speed              : unsigned(1 downto 0);    -- see clock.vhd for details
 
 signal hr_reu_write               : std_logic;
 signal hr_reu_read                : std_logic;
@@ -430,7 +429,7 @@ begin
          sys_clk_i         => CLK,             -- expects 100 MHz
          sys_rstn_i        => RESET_M2M_N,     -- Asynchronous, asserted low
 
-         core_speed_i      => core_speed,      -- 0=PAL/original C64, 1=PAL/HDMI flicker-free, 2=NTSC
+         core_speed_i      => hr_core_speed,   -- 0=PAL/original C64, 1=PAL/HDMI flicker-free, 2=NTSC
 
          main_clk_o        => main_clk_o,      -- core's clock
          main_rst_o        => main_rst_o       -- core's reset, synchronized
@@ -441,7 +440,65 @@ begin
    video_rst_o <= main_rst_o;
 
    ---------------------------------------------------------------------------------------------
-   -- Global switches for the core
+   -- hr_clk (HyperRAM clock)
+   ---------------------------------------------------------------------------------------------
+
+   -- Switch between two clock rates for the CORE, corresponding to frame rates that
+   -- closely "embrace" the output rate of exactly 50 Hz (determined by the HDMI resolution).
+   process (hr_clk_i)
+   begin
+      if rising_edge(hr_clk_i) then
+         if hr_low_i = '1' then     -- the core is too slow ...
+            hr_core_speed <= "00";  -- ... switch to PAL original (50.124 Hz)
+         end if;
+         if hr_high_i = '1' then    -- the core is too fast ...
+            hr_core_speed <= "01";  -- ... switch to PAL slow (49.999 Hz)
+         end if;
+         if hr_hdmi_ff = '0' then
+            hr_core_speed <= "00";
+         end if;
+      end if;
+   end process;
+
+   i_avm_arbit : entity work.avm_arbit
+      generic map (
+         G_ADDRESS_SIZE  => 32,
+         G_DATA_SIZE     => 16
+      )
+      port map (
+         clk_i                  => hr_clk_i,
+         rst_i                  => hr_rst_i,
+         s0_avm_write_i         => hr_reu_write,
+         s0_avm_read_i          => hr_reu_read,
+         s0_avm_address_i       => hr_reu_address,
+         s0_avm_writedata_i     => hr_reu_writedata,
+         s0_avm_byteenable_i    => hr_reu_byteenable,
+         s0_avm_burstcount_i    => hr_reu_burstcount,
+         s0_avm_readdata_o      => hr_reu_readdata,
+         s0_avm_readdatavalid_o => hr_reu_readdatavalid,
+         s0_avm_waitrequest_o   => hr_reu_waitrequest,
+         s1_avm_write_i         => hr_crt_write,
+         s1_avm_read_i          => hr_crt_read,
+         s1_avm_address_i       => hr_crt_address,
+         s1_avm_writedata_i     => hr_crt_writedata,
+         s1_avm_byteenable_i    => hr_crt_byteenable,
+         s1_avm_burstcount_i    => hr_crt_burstcount,
+         s1_avm_readdata_o      => hr_crt_readdata,
+         s1_avm_readdatavalid_o => hr_crt_readdatavalid,
+         s1_avm_waitrequest_o   => hr_crt_waitrequest,
+         m_avm_write_o          => hr_core_write_o,
+         m_avm_read_o           => hr_core_read_o,
+         m_avm_address_o        => hr_core_address_o,
+         m_avm_writedata_o      => hr_core_writedata_o,
+         m_avm_byteenable_o     => hr_core_byteenable_o,
+         m_avm_burstcount_o     => hr_core_burstcount_o,
+         m_avm_readdata_i       => hr_core_readdata_i,
+         m_avm_readdatavalid_i  => hr_core_readdatavalid_i,
+         m_avm_waitrequest_i    => hr_core_waitrequest_i
+      ); -- i_avm_arbit
+
+   ---------------------------------------------------------------------------------------------
+   -- main_clk (C64 MiSTer Core clock)
    ---------------------------------------------------------------------------------------------
 
    c64_ntsc          <= '0'; -- @TODO: For now, we hardcode PAL mode
@@ -451,23 +508,6 @@ begin
               "10" when main_osm_control_i(C_MENU_KERNAL_GS)      else
               "11" when main_osm_control_i(C_MENU_KERNAL_JAPAN)   else
               "01";   -- Use standard ROM as default
-
-   -- Switch between two clock rates for the CORE, corresponding to frame rates that
-   -- closely "embrace" the output rate of exactly 50 Hz (determined by the HDMI resolution).
-   process (hr_clk_i)
-   begin
-      if rising_edge(hr_clk_i) then
-         if hr_low_i = '1' then  -- the core is too slow ...
-            core_speed <= "00";  -- ... switch to PAL original (50.124 Hz)
-         end if;
-         if hr_high_i = '1' then -- the core is too fast ...
-            core_speed <= "01";  -- ... switch to PAL slow (49.999 Hz)
-         end if;
-         if hr_hdmi_ff = '0' then
-            core_speed <= "00";
-         end if;
-      end if;
-   end process;
 
    -- needs to be in main clock domain
    c64_clock_speed   <= CORE_CLK_SPEED;
@@ -480,7 +520,7 @@ begin
                         2 when main_osm_control_i(C_MENU_EXP_PORT_CRT)  else
                         0;
 
-   -- SID version, 0=6581, 1=8580, low bit = left SID                        
+   -- SID version, 0=6581, 1=8580, low bit = left SID
    sid_setup <= "00" when main_osm_control_i(C_MENU_MONO_6581)    else
                 "11" when main_osm_control_i(C_MENU_MONO_8580)    else
                 "00" when main_osm_control_i(C_MENU_STEREO_L6R6)  else
@@ -496,10 +536,6 @@ begin
                 3 when main_osm_control_i(C_MENU_STEREO_R_D500) else
                 4 when main_osm_control_i(C_MENU_STEREO_R_DF00) else
                 0;
-
-   ---------------------------------------------------------------------------------------------
-   -- main_clk (C64 MiSTer Core clock)
-   ---------------------------------------------------------------------------------------------
 
    -- MEGA65's power led: By default, it is on and glows green when the MEGA65 is powered on.
    -- We switch it to blue when a long reset is detected and as long as the user keeps pressing the preset button
@@ -612,7 +648,7 @@ begin
          c64_qnice_data_o       => qnice_c64_qnice_data,
          c64_qnice_ce_i         => qnice_c64_qnice_ce,
          c64_qnice_we_i         => qnice_c64_qnice_we,
-         
+
          -- CBM-488/IEC serial (hardware) port
          iec_hardware_port_en   => main_osm_control_i(C_MENU_IEC),
          iec_reset_n_o          => iec_reset_n_o,
@@ -705,305 +741,13 @@ begin
          c64rom_addr_i          => qnice_c64rom_addr,
          c64rom_data_i          => qnice_c64rom_data_to,
          c64rom_data_o          => qnice_c64rom_data_from,
-         
+
          -- Access custom DOS for the simulated C1541 (in QNICE clock domain via c64_clk_sd_i)
          c1541rom_we_i          => qnice_c1541rom_we,
          c1541rom_addr_i        => qnice_c1541rom_addr,
          c1541rom_data_i        => qnice_c1541rom_data_to,
-         c1541rom_data_o        => qnice_c1541rom_data_from               
+         c1541rom_data_o        => qnice_c1541rom_data_from
       ); -- i_main
-
-   ---------------------------------------------------------------------------------------------
-   -- Audio and video settings (QNICE clock domain)
-   ---------------------------------------------------------------------------------------------
-
-   -- Due to a discussion on the MEGA65 discord (https://discord.com/channels/719326990221574164/794775503818588200/1039457688020586507)
-   -- we decided to choose a naming convention for the PAL modes that might be more intuitive for the end users than it is
-   -- for the programmers: "4:3" means "meant to be run on a 4:3 monitor", "5:4 on a 5:4 monitor".
-   -- The technical reality is though, that in our "5:4" mode we are actually doing a 4/3 aspect ratio adjustment
-   -- while in the 4:3 mode we are outputting a 5:4 image. This is kind of odd, but it seemed that our 4/3 aspect ratio
-   -- adjusted image looks best on a 5:4 monitor and the other way round.
-   -- Not sure if this will stay forever or if we will come up with a better naming convention.
-   qnice_video_mode_o <= 3 when qnice_osm_control_i(C_MENU_HDMI_5_4_50)  = '1' else
-                         2 when qnice_osm_control_i(C_MENU_HDMI_4_3_50)  = '1' else
-                         1 when qnice_osm_control_i(C_MENU_HDMI_16_9_60) = '1' else
-                         0;
-
-   -- Use On-Screen-Menu selections to configure several audio and video settings
-   -- Video and audio mode control
-   qnice_dvi_o                <= qnice_osm_control_i(C_MENU_HDMI_DVI);        -- 0=HDMI (with sound), 1=DVI (no sound)
-   
-   -- no scandoubler when using the retro 15 kHz RGB mode
-   qnice_scandoubler_o        <= (not qnice_osm_control_i(C_MENU_VGA_15KHZHSVS)) and
-                                 (not qnice_osm_control_i(C_MENU_VGA_15KHZCS));
-   
-   qnice_audio_mute_o         <= '0';                                         -- audio is not muted
-   qnice_audio_filter_o       <= qnice_osm_control_i(C_MENU_IMPROVE_AUDIO);   -- 0 = raw audio, 1 = use filters from globals.vhd
-   qnice_zoom_crop_o          <= qnice_osm_control_i(C_MENU_HDMI_ZOOM);       -- 0 = no zoom/crop
-   qnice_retro15kHz_o         <= qnice_osm_control_i(C_MENU_VGA_15KHZHSVS) or qnice_osm_control_i(C_MENU_VGA_15KHZCS);
-   qnice_csync_o              <= qnice_osm_control_i(C_MENU_VGA_15KHZCS);     -- Composite sync (CSYNC)
-   qnice_osm_cfg_scaling_o    <= qnice_osm_control_i(C_MENU_OSM_SCALING);
-
-   -- ascal filters that are applied while processing the input
-   -- 00 : Nearest Neighbour
-   -- 01 : Bilinear
-   -- 10 : Sharp Bilinear
-   -- 11 : Bicubic
-   qnice_ascal_mode_o         <= "00";
-
-   -- If polyphase is '1' then the ascal filter mode is ignored and polyphase filters are used instead
-   -- @TODO: Right now, the filters are hardcoded in the M2M framework, we need to make them changeable inside m2m-rom.asm
-   qnice_ascal_polyphase_o    <= qnice_osm_control_i(C_MENU_CRT_EMULATION);
-
-   -- ascal triple-buffering
-   -- @TODO: Right now, the M2M framework only supports OFF, so do not touch until the framework is upgraded
-   qnice_ascal_triplebuf_o    <= '0';
-
-   -- Flip joystick ports (i.e. the joystick in port 2 is used as joystick 1 and vice versa)
-   qnice_flip_joyports_o      <= qnice_osm_control_i(C_MENU_FLIP_JOYS);
-
-   ---------------------------------------------------------------------------------------------
-   -- Core specific device handling (QNICE clock domain, device IDs in globals.vhd)
-   ---------------------------------------------------------------------------------------------
-
-   core_specific_devices : process(all)
-   begin
-      -- avoid latches
-      qnice_dev_data_o           <= x"EEEE";
-      qnice_dev_wait_o           <= '0';     
-      qnice_c64_ram_we           <= '0';
-      qnice_c64_qnice_ce         <= '0';
-      qnice_c64_qnice_we         <= '0';
-      qnice_c64_mount_buf_ram_we <= '0';
-      qnice_prg_qnice_ce         <= '0';
-      qnice_prg_qnice_we         <= '0';
-      qnice_prg_c64ram_d_frm     <= (others => '0');     
-      qnice_crt_qnice_ce         <= '0';
-      qnice_crt_qnice_we         <= '0';
-      qnice_c64_ramx_addr        <= (others => '0');
-      qnice_c64_ramx_d_to        <= (others => '0');
-      qnice_c64_ramx_we          <= '0';
-      qnice_c64rom_we            <= '0';
-      qnice_c64rom_addr          <= (others => '0');
-      qnice_c64rom_data_to       <= (others => '0');
-      qnice_c1541rom_we          <= '0';
-      qnice_c1541rom_addr        <= (others => '0');
-      qnice_c1541rom_data_to     <= (others => '0');
-
-      case qnice_dev_id_i is
-         -- C64 RAM
-         when C_DEV_C64_RAM =>
-            qnice_c64_ramx_addr        <= qnice_dev_addr_i(15 downto 0);
-            qnice_c64_ramx_we          <= qnice_dev_we_i;
-            qnice_c64_ramx_d_to        <= qnice_dev_data_i(7 downto 0);
-            qnice_dev_data_o           <= x"00" & qnice_c64_ramx_d_from;
-
-         -- C64 IEC drives
-         when C_VD_DEVICE =>
-            qnice_c64_qnice_ce         <= qnice_dev_ce_i;
-            qnice_c64_qnice_we         <= qnice_dev_we_i;
-            qnice_dev_data_o           <= qnice_c64_qnice_data;
-
-         -- Disk mount buffer RAM
-         when C_DEV_C64_MOUNT =>
-            qnice_c64_mount_buf_ram_we <= qnice_dev_we_i;
-            qnice_dev_data_o           <= x"00" & qnice_c64_mount_buf_ram_data;
-
-         -- PRG file loader (*.PRG)
-         when C_DEV_C64_PRG =>
-            qnice_c64_ramx_addr        <= qnice_prg_c64ram_addr;
-            qnice_c64_ramx_we          <= qnice_prg_c64ram_we;
-            qnice_c64_ramx_d_to        <= qnice_prg_c64ram_d_to;
-            qnice_prg_c64ram_d_frm     <= qnice_c64_ramx_d_from;
-            qnice_prg_qnice_ce         <= qnice_dev_ce_i;
-            qnice_prg_qnice_we         <= qnice_dev_we_i;
-            qnice_dev_data_o           <= qnice_prg_qnice_data;
-            qnice_dev_wait_o           <= qnice_prg_wait;          
-
-         -- SW cartridges (*.CRT)
-         when C_DEV_C64_CRT =>
-            qnice_crt_qnice_ce         <= qnice_dev_ce_i;
-            qnice_crt_qnice_we         <= qnice_dev_we_i;
-            qnice_dev_data_o           <= qnice_crt_qnice_data;
-            qnice_dev_wait_o           <= qnice_crt_qnice_wait;
-            
-         -- Custom Kernal Access: C64 ROM
-         when C_DEV_C64_KERNAL_C64 =>
-            qnice_c64rom_addr          <= qnice_dev_addr_i(13 downto 0);
-            qnice_c64rom_we            <= qnice_dev_we_i;
-            qnice_dev_data_o           <= x"00" & qnice_c64rom_data_from;
-            qnice_c64rom_data_to       <= qnice_dev_data_i(7 downto 0);
-         
-         -- Custom Kernal Access: C1541 ROM
-         when C_DEV_C64_KERNAL_C1541 =>
-            qnice_c1541rom_addr        <= "00" & qnice_dev_addr_i(13 downto 0);
-            qnice_c1541rom_we          <= qnice_dev_we_i;
-            qnice_dev_data_o           <= x"00" & qnice_c1541rom_data_from;
-            qnice_c1541rom_data_to     <= qnice_dev_data_i(7 downto 0);
-
-         when others => null;
-      end case;
-   end process core_specific_devices;
-
-   ---------------------------------------------------------------------------------------------
-   -- Dual Clocks
-   ---------------------------------------------------------------------------------------------
-
-   -- Clock Domain Crossing: CORE -> HyperRAM
-   i_cdc_main2hr : entity work.cdc_stable
-      generic map (
-         G_DATA_SIZE => 3
-      )
-      port map (
-         src_clk_i              => main_clk_o,
-         src_data_i(1 downto 0) => std_logic_vector(to_unsigned(c64_exp_port_mode, 2)),
-         src_data_i(2)          => main_osm_control_i(C_MENU_HDMI_FF),
-         dst_clk_i              => hr_clk_i,
-         dst_data_o(1 downto 0) => hr_c64_exp_port_mode,
-         dst_data_o(2)          => hr_hdmi_ff
-      ); -- i_cdc_main2hr
-      
-   i_cdc_main2qnice : xpm_cdc_array_single
-      generic map (
-         WIDTH => 1
-      )
-      port map (
-         src_clk           => main_clk_o,
-         src_in(0)         => main_reset_core_i or main_reset_core,
-         dest_clk          => qnice_clk_i,
-         dest_out(0)       => qnice_reset_for_prgloader
-      ); -- i_cdc_main2qnice
-   
-
-   i_cdc_qnice2main : xpm_cdc_array_single
-      generic map (
-         WIDTH => 2
-      )
-      port map (
-         src_clk           => qnice_clk_i,
-         src_in(0)         => qnice_reset_from_prgloader,
-         src_in(1)         => qnice_prg_trigger_run,
-         dest_clk          => main_clk_o,
-         dest_out(0)       => main_reset_from_prgloader,
-         dest_out(1)       => main_prg_trigger_run
-      ); -- i_cdc_qnice2main
-    
-
-   -- C64's RAM modelled as dual clock & dual port RAM so that the Commodore 64 core
-   -- as well as QNICE can access it
-   c64_ram : entity work.dualport_2clk_ram
-      generic map (
-         ADDR_WIDTH        => 16,
-         DATA_WIDTH        => 8,
-         FALLING_A         => false,      -- C64 expects read/write to happen at the rising clock edge
-         FALLING_B         => true        -- QNICE expects read/write to happen at the falling clock edge
-      )
-      port map (
-         -- C64 MiSTer core
-         clock_a           => main_clk_o,
-         address_a         => std_logic_vector(main_ram_addr),
-         data_a            => std_logic_vector(main_ram_data_from_c64),
-         wren_a            => main_ram_we,
-         q_a               => main_ram_data_to_c64,
-
-         -- QNICE
-         clock_b           => qnice_clk_i,
-         address_b         => qnice_c64_ramx_addr,
-         data_b            => qnice_c64_ramx_d_to,
-         wren_b            => qnice_c64_ramx_we,
-         q_b               => qnice_c64_ramx_d_from
-      ); -- c64_ram
-      
-   -- For now: Let's use a simple BRAM (using only 1 port will make a BRAM) for buffering
-   -- the disks that we are mounting. This will work for D64 only.
-   -- @TODO: Switch to HyperRAM at a later stage
-   mount_buf_ram : entity work.dualport_2clk_ram
-      generic map (
-         ADDR_WIDTH        => 18,
-         DATA_WIDTH        => 8,
-         MAXIMUM_SIZE      => 197376,        -- maximum size of any D64 image: non-standard 40-track incl. 768 error bytes
-         FALLING_A         => true
-      )
-      port map (
-         -- QNICE only
-         clock_a           => qnice_clk_i,
-         address_a         => qnice_dev_addr_i(17 downto 0),
-         data_a            => qnice_dev_data_i(7 downto 0),
-         wren_a            => qnice_c64_mount_buf_ram_we,
-         q_a               => qnice_c64_mount_buf_ram_data
-      ); -- mount_buf_ram
-
-   -- PRG file loader
-   i_prg_loader : entity work.prg_loader
-      port map(
-         qnice_clk_i       => qnice_clk_i,
-         qnice_rst_i       => qnice_rst_i or qnice_reset_for_prgloader,
-         qnice_addr_i      => qnice_dev_addr_i,
-         qnice_data_i      => qnice_dev_data_i,
-         qnice_ce_i        => qnice_prg_qnice_ce,
-         qnice_we_i        => qnice_prg_qnice_we,
-         qnice_data_o      => qnice_prg_qnice_data,
-         qnice_wait_o      => qnice_prg_wait,         
-      
-         c64ram_we_o       => qnice_prg_c64ram_we,
-         c64ram_addr_o     => qnice_prg_c64ram_addr,
-         c64ram_data_i     => qnice_prg_c64ram_d_frm,
-         c64ram_data_o     => qnice_prg_c64ram_d_to,
-         
-         core_reset_o      => qnice_reset_from_prgloader,
-         core_triggerrun_o => qnice_prg_trigger_run
-      );
-
-   -- Handle SW based cartridges, aka *.CRT files
-   i_sw_cartridge_wrapper : entity work.sw_cartridge_wrapper
-   generic map (
-      G_BASE_ADDRESS => C_HMAP_CRT(9 downto 0) & X"000"
-   )
-   port map (
-      qnice_clk_i          => qnice_clk_i,
-      qnice_rst_i          => qnice_rst_i,
-      qnice_addr_i         => qnice_dev_addr_i,
-      qnice_data_i         => qnice_dev_data_i,
-      qnice_ce_i           => qnice_crt_qnice_ce,
-      qnice_we_i           => qnice_crt_qnice_we,
-      qnice_data_o         => qnice_crt_qnice_data,
-      qnice_wait_o         => qnice_crt_qnice_wait,
-      main_clk_i           => main_clk_o,
-      main_rst_i           => main_reset_m2m_i,
-      main_reset_core_o    => main_reset_core,
-      main_loading_o       => main_crt_loading,
-      main_id_o            => main_crt_id,
-      main_exrom_o         => main_crt_exrom,
-      main_game_o          => main_crt_game,
-      main_size_o          => main_crt_size,
-      main_bank_laddr_o    => main_crt_bank_laddr,
-      main_bank_size_o     => main_crt_bank_size,
-      main_bank_num_o      => main_crt_bank_num,
-      main_bank_raddr_o    => main_crt_bank_raddr,
-      main_bank_wr_o       => main_crt_bank_wr,
-      main_bank_lo_i       => main_crt_bank_lo,
-      main_bank_hi_i       => main_crt_bank_hi,
-      main_bank_wait_o     => main_crt_bank_wait,
-      main_ram_addr_i      => std_logic_vector(main_crt_addr_bus),
-      main_ram_data_i      => std_logic_vector(main_ram_data_from_c64),
-      main_ioe_we_i        => main_crt_ioe_we,
-      main_iof_we_i        => main_crt_iof_we,
-      main_lo_ram_data_o   => main_crt_lo_ram_data,
-      main_hi_ram_data_o   => main_crt_hi_ram_data,
-      main_ioe_ram_data_o  => main_crt_ioe_ram_data,
-      main_iof_ram_data_o  => main_crt_iof_ram_data,
-      hr_clk_i             => hr_clk_i,
-      hr_rst_i             => hr_rst_i,
-      hr_write_o           => hr_crt_write,
-      hr_read_o            => hr_crt_read,
-      hr_address_o         => hr_crt_address,
-      hr_writedata_o       => hr_crt_writedata,
-      hr_byteenable_o      => hr_crt_byteenable,
-      hr_burstcount_o      => hr_crt_burstcount,
-      hr_readdata_i        => hr_crt_readdata,
-      hr_readdatavalid_i   => hr_crt_readdatavalid,
-      hr_waitrequest_i     => hr_crt_waitrequest
-   ); -- i_sw_cartridge_wrapper
 
    -- RAM used by the REU inside i_main:
    -- Consists of a three-stage pipeline:
@@ -1068,7 +812,301 @@ begin
          m_avm_readdatavalid_i => main_avm_reu_readdatavalid
       ); -- i_avm_cache
 
-   avm_fifo : entity work.avm_fifo
+   ---------------------------------------------------------------------------------------------
+   -- Audio and video settings (QNICE clock domain)
+   ---------------------------------------------------------------------------------------------
+
+   -- Due to a discussion on the MEGA65 discord (https://discord.com/channels/719326990221574164/794775503818588200/1039457688020586507)
+   -- we decided to choose a naming convention for the PAL modes that might be more intuitive for the end users than it is
+   -- for the programmers: "4:3" means "meant to be run on a 4:3 monitor", "5:4 on a 5:4 monitor".
+   -- The technical reality is though, that in our "5:4" mode we are actually doing a 4/3 aspect ratio adjustment
+   -- while in the 4:3 mode we are outputting a 5:4 image. This is kind of odd, but it seemed that our 4/3 aspect ratio
+   -- adjusted image looks best on a 5:4 monitor and the other way round.
+   -- Not sure if this will stay forever or if we will come up with a better naming convention.
+   qnice_video_mode_o <= 3 when qnice_osm_control_i(C_MENU_HDMI_5_4_50)  = '1' else
+                         2 when qnice_osm_control_i(C_MENU_HDMI_4_3_50)  = '1' else
+                         1 when qnice_osm_control_i(C_MENU_HDMI_16_9_60) = '1' else
+                         0;
+
+   -- Use On-Screen-Menu selections to configure several audio and video settings
+   -- Video and audio mode control
+   qnice_dvi_o                <= qnice_osm_control_i(C_MENU_HDMI_DVI);        -- 0=HDMI (with sound), 1=DVI (no sound)
+
+   -- no scandoubler when using the retro 15 kHz RGB mode
+   qnice_scandoubler_o        <= (not qnice_osm_control_i(C_MENU_VGA_15KHZHSVS)) and
+                                 (not qnice_osm_control_i(C_MENU_VGA_15KHZCS));
+
+   qnice_audio_mute_o         <= '0';                                         -- audio is not muted
+   qnice_audio_filter_o       <= qnice_osm_control_i(C_MENU_IMPROVE_AUDIO);   -- 0 = raw audio, 1 = use filters from globals.vhd
+   qnice_zoom_crop_o          <= qnice_osm_control_i(C_MENU_HDMI_ZOOM);       -- 0 = no zoom/crop
+   qnice_retro15kHz_o         <= qnice_osm_control_i(C_MENU_VGA_15KHZHSVS) or qnice_osm_control_i(C_MENU_VGA_15KHZCS);
+   qnice_csync_o              <= qnice_osm_control_i(C_MENU_VGA_15KHZCS);     -- Composite sync (CSYNC)
+   qnice_osm_cfg_scaling_o    <= qnice_osm_control_i(C_MENU_OSM_SCALING);
+
+   -- ascal filters that are applied while processing the input
+   -- 00 : Nearest Neighbour
+   -- 01 : Bilinear
+   -- 10 : Sharp Bilinear
+   -- 11 : Bicubic
+   qnice_ascal_mode_o         <= "00";
+
+   -- If polyphase is '1' then the ascal filter mode is ignored and polyphase filters are used instead
+   -- @TODO: Right now, the filters are hardcoded in the M2M framework, we need to make them changeable inside m2m-rom.asm
+   qnice_ascal_polyphase_o    <= qnice_osm_control_i(C_MENU_CRT_EMULATION);
+
+   -- ascal triple-buffering
+   -- @TODO: Right now, the M2M framework only supports OFF, so do not touch until the framework is upgraded
+   qnice_ascal_triplebuf_o    <= '0';
+
+   -- Flip joystick ports (i.e. the joystick in port 2 is used as joystick 1 and vice versa)
+   qnice_flip_joyports_o      <= qnice_osm_control_i(C_MENU_FLIP_JOYS);
+
+   ---------------------------------------------------------------------------------------------
+   -- Core specific device handling (QNICE clock domain, device IDs in globals.vhd)
+   ---------------------------------------------------------------------------------------------
+
+   core_specific_devices : process(all)
+   begin
+      -- avoid latches
+      qnice_dev_data_o           <= x"EEEE";
+      qnice_dev_wait_o           <= '0';
+      qnice_c64_ram_we           <= '0';
+      qnice_c64_qnice_ce         <= '0';
+      qnice_c64_qnice_we         <= '0';
+      qnice_c64_mount_buf_ram_we <= '0';
+      qnice_prg_qnice_ce         <= '0';
+      qnice_prg_qnice_we         <= '0';
+      qnice_prg_c64ram_d_frm     <= (others => '0');
+      qnice_crt_qnice_ce         <= '0';
+      qnice_crt_qnice_we         <= '0';
+      qnice_c64_ramx_addr        <= (others => '0');
+      qnice_c64_ramx_d_to        <= (others => '0');
+      qnice_c64_ramx_we          <= '0';
+      qnice_c64rom_we            <= '0';
+      qnice_c64rom_addr          <= (others => '0');
+      qnice_c64rom_data_to       <= (others => '0');
+      qnice_c1541rom_we          <= '0';
+      qnice_c1541rom_addr        <= (others => '0');
+      qnice_c1541rom_data_to     <= (others => '0');
+
+      case qnice_dev_id_i is
+         -- C64 RAM
+         when C_DEV_C64_RAM =>
+            qnice_c64_ramx_addr        <= qnice_dev_addr_i(15 downto 0);
+            qnice_c64_ramx_we          <= qnice_dev_we_i;
+            qnice_c64_ramx_d_to        <= qnice_dev_data_i(7 downto 0);
+            qnice_dev_data_o           <= x"00" & qnice_c64_ramx_d_from;
+
+         -- C64 IEC drives
+         when C_VD_DEVICE =>
+            qnice_c64_qnice_ce         <= qnice_dev_ce_i;
+            qnice_c64_qnice_we         <= qnice_dev_we_i;
+            qnice_dev_data_o           <= qnice_c64_qnice_data;
+
+         -- Disk mount buffer RAM
+         when C_DEV_C64_MOUNT =>
+            qnice_c64_mount_buf_ram_we <= qnice_dev_we_i;
+            qnice_dev_data_o           <= x"00" & qnice_c64_mount_buf_ram_data;
+
+         -- PRG file loader (*.PRG)
+         when C_DEV_C64_PRG =>
+            qnice_c64_ramx_addr        <= qnice_prg_c64ram_addr;
+            qnice_c64_ramx_we          <= qnice_prg_c64ram_we;
+            qnice_c64_ramx_d_to        <= qnice_prg_c64ram_d_to;
+            qnice_prg_c64ram_d_frm     <= qnice_c64_ramx_d_from;
+            qnice_prg_qnice_ce         <= qnice_dev_ce_i;
+            qnice_prg_qnice_we         <= qnice_dev_we_i;
+            qnice_dev_data_o           <= qnice_prg_qnice_data;
+            qnice_dev_wait_o           <= qnice_prg_wait;
+
+         -- SW cartridges (*.CRT)
+         when C_DEV_C64_CRT =>
+            qnice_crt_qnice_ce         <= qnice_dev_ce_i;
+            qnice_crt_qnice_we         <= qnice_dev_we_i;
+            qnice_dev_data_o           <= qnice_crt_qnice_data;
+            qnice_dev_wait_o           <= qnice_crt_qnice_wait;
+
+         -- Custom Kernal Access: C64 ROM
+         when C_DEV_C64_KERNAL_C64 =>
+            qnice_c64rom_addr          <= qnice_dev_addr_i(13 downto 0);
+            qnice_c64rom_we            <= qnice_dev_we_i;
+            qnice_dev_data_o           <= x"00" & qnice_c64rom_data_from;
+            qnice_c64rom_data_to       <= qnice_dev_data_i(7 downto 0);
+
+         -- Custom Kernal Access: C1541 ROM
+         when C_DEV_C64_KERNAL_C1541 =>
+            qnice_c1541rom_addr        <= "00" & qnice_dev_addr_i(13 downto 0);
+            qnice_c1541rom_we          <= qnice_dev_we_i;
+            qnice_dev_data_o           <= x"00" & qnice_c1541rom_data_from;
+            qnice_c1541rom_data_to     <= qnice_dev_data_i(7 downto 0);
+
+         when others => null;
+      end case;
+   end process core_specific_devices;
+
+   -- For now: Let's use a simple BRAM (using only 1 port will make a BRAM) for buffering
+   -- the disks that we are mounting. This will work for D64 only.
+   -- @TODO: Switch to HyperRAM at a later stage
+   mount_buf_ram : entity work.dualport_2clk_ram
+      generic map (
+         ADDR_WIDTH        => 18,
+         DATA_WIDTH        => 8,
+         MAXIMUM_SIZE      => 197376,        -- maximum size of any D64 image: non-standard 40-track incl. 768 error bytes
+         FALLING_A         => true
+      )
+      port map (
+         -- QNICE only
+         clock_a           => qnice_clk_i,
+         address_a         => qnice_dev_addr_i(17 downto 0),
+         data_a            => qnice_dev_data_i(7 downto 0),
+         wren_a            => qnice_c64_mount_buf_ram_we,
+         q_a               => qnice_c64_mount_buf_ram_data
+      ); -- mount_buf_ram
+
+   -- PRG file loader
+   i_prg_loader : entity work.prg_loader
+      port map(
+         qnice_clk_i       => qnice_clk_i,
+         qnice_rst_i       => qnice_rst_i or qnice_reset_for_prgloader,
+         qnice_addr_i      => qnice_dev_addr_i,
+         qnice_data_i      => qnice_dev_data_i,
+         qnice_ce_i        => qnice_prg_qnice_ce,
+         qnice_we_i        => qnice_prg_qnice_we,
+         qnice_data_o      => qnice_prg_qnice_data,
+         qnice_wait_o      => qnice_prg_wait,
+
+         c64ram_we_o       => qnice_prg_c64ram_we,
+         c64ram_addr_o     => qnice_prg_c64ram_addr,
+         c64ram_data_i     => qnice_prg_c64ram_d_frm,
+         c64ram_data_o     => qnice_prg_c64ram_d_to,
+
+         core_reset_o      => qnice_reset_from_prgloader,
+         core_triggerrun_o => qnice_prg_trigger_run
+      );
+
+   ---------------------------------------------------------------------------------------------
+   -- Dual Clocks
+   ---------------------------------------------------------------------------------------------
+
+   -- Clock Domain Crossing: CORE -> HyperRAM
+   i_cdc_main2hr : entity work.cdc_stable
+      generic map (
+         G_DATA_SIZE => 3
+      )
+      port map (
+         src_clk_i              => main_clk_o,
+         src_data_i(1 downto 0) => std_logic_vector(to_unsigned(c64_exp_port_mode, 2)),
+         src_data_i(2)          => main_osm_control_i(C_MENU_HDMI_FF),
+         dst_clk_i              => hr_clk_i,
+         dst_data_o(1 downto 0) => hr_c64_exp_port_mode,
+         dst_data_o(2)          => hr_hdmi_ff
+      ); -- i_cdc_main2hr
+
+   -- Clock Domain Crossing: CORE -> QNICE
+   i_cdc_main2qnice : xpm_cdc_array_single
+      generic map (
+         WIDTH => 1
+      )
+      port map (
+         src_clk           => main_clk_o,
+         src_in(0)         => main_reset_core_i or main_reset_core,
+         dest_clk          => qnice_clk_i,
+         dest_out(0)       => qnice_reset_for_prgloader
+      ); -- i_cdc_main2qnice
+
+
+   -- Clock Domain Crossing: QNICE -> CORE
+   i_cdc_qnice2main : xpm_cdc_array_single
+      generic map (
+         WIDTH => 2
+      )
+      port map (
+         src_clk           => qnice_clk_i,
+         src_in(0)         => qnice_reset_from_prgloader,
+         src_in(1)         => qnice_prg_trigger_run,
+         dest_clk          => main_clk_o,
+         dest_out(0)       => main_reset_from_prgloader,
+         dest_out(1)       => main_prg_trigger_run
+      ); -- i_cdc_qnice2main
+
+
+   -- C64's RAM modelled as dual clock & dual port RAM so that the Commodore 64 core
+   -- as well as QNICE can access it
+   c64_ram : entity work.dualport_2clk_ram
+      generic map (
+         ADDR_WIDTH        => 16,
+         DATA_WIDTH        => 8,
+         FALLING_A         => false,      -- C64 expects read/write to happen at the rising clock edge
+         FALLING_B         => true        -- QNICE expects read/write to happen at the falling clock edge
+      )
+      port map (
+         -- C64 MiSTer core
+         clock_a           => main_clk_o,
+         address_a         => std_logic_vector(main_ram_addr),
+         data_a            => std_logic_vector(main_ram_data_from_c64),
+         wren_a            => main_ram_we,
+         q_a               => main_ram_data_to_c64,
+
+         -- QNICE
+         clock_b           => qnice_clk_i,
+         address_b         => qnice_c64_ramx_addr,
+         data_b            => qnice_c64_ramx_d_to,
+         wren_b            => qnice_c64_ramx_we,
+         q_b               => qnice_c64_ramx_d_from
+      ); -- c64_ram
+
+   -- Handle SW based cartridges, aka *.CRT files
+   i_sw_cartridge_wrapper : entity work.sw_cartridge_wrapper
+   generic map (
+      G_BASE_ADDRESS => C_HMAP_CRT(9 downto 0) & X"000"
+   )
+   port map (
+      qnice_clk_i          => qnice_clk_i,
+      qnice_rst_i          => qnice_rst_i,
+      qnice_addr_i         => qnice_dev_addr_i,
+      qnice_data_i         => qnice_dev_data_i,
+      qnice_ce_i           => qnice_crt_qnice_ce,
+      qnice_we_i           => qnice_crt_qnice_we,
+      qnice_data_o         => qnice_crt_qnice_data,
+      qnice_wait_o         => qnice_crt_qnice_wait,
+      main_clk_i           => main_clk_o,
+      main_rst_i           => main_reset_m2m_i,
+      main_reset_core_o    => main_reset_core,
+      main_loading_o       => main_crt_loading,
+      main_id_o            => main_crt_id,
+      main_exrom_o         => main_crt_exrom,
+      main_game_o          => main_crt_game,
+      main_size_o          => main_crt_size,
+      main_bank_laddr_o    => main_crt_bank_laddr,
+      main_bank_size_o     => main_crt_bank_size,
+      main_bank_num_o      => main_crt_bank_num,
+      main_bank_raddr_o    => main_crt_bank_raddr,
+      main_bank_wr_o       => main_crt_bank_wr,
+      main_bank_lo_i       => main_crt_bank_lo,
+      main_bank_hi_i       => main_crt_bank_hi,
+      main_bank_wait_o     => main_crt_bank_wait,
+      main_ram_addr_i      => std_logic_vector(main_crt_addr_bus),
+      main_ram_data_i      => std_logic_vector(main_ram_data_from_c64),
+      main_ioe_we_i        => main_crt_ioe_we,
+      main_iof_we_i        => main_crt_iof_we,
+      main_lo_ram_data_o   => main_crt_lo_ram_data,
+      main_hi_ram_data_o   => main_crt_hi_ram_data,
+      main_ioe_ram_data_o  => main_crt_ioe_ram_data,
+      main_iof_ram_data_o  => main_crt_iof_ram_data,
+      hr_clk_i             => hr_clk_i,
+      hr_rst_i             => hr_rst_i,
+      hr_write_o           => hr_crt_write,
+      hr_read_o            => hr_crt_read,
+      hr_address_o         => hr_crt_address,
+      hr_writedata_o       => hr_crt_writedata,
+      hr_byteenable_o      => hr_crt_byteenable,
+      hr_burstcount_o      => hr_crt_burstcount,
+      hr_readdata_i        => hr_crt_readdata,
+      hr_readdatavalid_i   => hr_crt_readdatavalid,
+      hr_waitrequest_i     => hr_crt_waitrequest
+   ); -- i_sw_cartridge_wrapper
+
+   main2hr_avm_fifo : entity work.avm_fifo
       generic map (
          G_WR_DEPTH     => 16,
          G_RD_DEPTH     => 16,
@@ -1099,44 +1137,7 @@ begin
          m_avm_burstcount_o    => hr_reu_burstcount,
          m_avm_readdata_i      => hr_reu_readdata,
          m_avm_readdatavalid_i => hr_reu_readdatavalid
-      ); -- avm_fifo
-
-   i_avm_arbit : entity work.avm_arbit
-      generic map (
-         G_ADDRESS_SIZE  => 32,
-         G_DATA_SIZE     => 16
-      )
-      port map (
-         clk_i                  => hr_clk_i,
-         rst_i                  => hr_rst_i,
-         s0_avm_write_i         => hr_reu_write,
-         s0_avm_read_i          => hr_reu_read,
-         s0_avm_address_i       => hr_reu_address,
-         s0_avm_writedata_i     => hr_reu_writedata,
-         s0_avm_byteenable_i    => hr_reu_byteenable,
-         s0_avm_burstcount_i    => hr_reu_burstcount,
-         s0_avm_readdata_o      => hr_reu_readdata,
-         s0_avm_readdatavalid_o => hr_reu_readdatavalid,
-         s0_avm_waitrequest_o   => hr_reu_waitrequest,
-         s1_avm_write_i         => hr_crt_write,
-         s1_avm_read_i          => hr_crt_read,
-         s1_avm_address_i       => hr_crt_address,
-         s1_avm_writedata_i     => hr_crt_writedata,
-         s1_avm_byteenable_i    => hr_crt_byteenable,
-         s1_avm_burstcount_i    => hr_crt_burstcount,
-         s1_avm_readdata_o      => hr_crt_readdata,
-         s1_avm_readdatavalid_o => hr_crt_readdatavalid,
-         s1_avm_waitrequest_o   => hr_crt_waitrequest,
-         m_avm_write_o          => hr_core_write_o,
-         m_avm_read_o           => hr_core_read_o,
-         m_avm_address_o        => hr_core_address_o,
-         m_avm_writedata_o      => hr_core_writedata_o,
-         m_avm_byteenable_o     => hr_core_byteenable_o,
-         m_avm_burstcount_o     => hr_core_burstcount_o,
-         m_avm_readdata_i       => hr_core_readdata_i,
-         m_avm_readdatavalid_i  => hr_core_readdatavalid_i,
-         m_avm_waitrequest_i    => hr_core_waitrequest_i
-      ); -- i_avm_arbit
+      ); -- main2hr_avm_fifo
 
 end architecture synthesis;
 
