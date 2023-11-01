@@ -4,7 +4,7 @@
 
 ## Assume the core is running at the original (slightly faster) clock.
 ## This halves the number of set_false_path needed.
-set_case_analysis 0 [get_pins CORE/core_speed_reg[0]/Q]
+set_case_analysis 0 [get_pins CORE/hr_core_speed_reg[0]/Q]
 
 create_generated_clock -name main_clk [get_pins CORE/clk_gen/i_clk_c64_orig/CLKOUT0]
 
