@@ -36,7 +36,7 @@ entity clk is
       --           @TODO exact clock values for main and video here
       --
       -- 10 = NTSC @TODO
-      core_speed_i      : unsigned(1 downto 0); -- must be in qnice clock domain
+      core_speed_i      : unsigned(1 downto 0); -- asynchronous
 
       main_clk_o        : out std_logic;
       main_rst_o        : out std_logic
@@ -60,7 +60,7 @@ begin
 
    ---------------------------------------------------------------------------------------
    -- Generate as-close-as-possible-to-the-original version of the C64 clock
-   -- This has a frame rate of 50.124 Hz
+   -- This has a frame rate of 31527777/(312*63*32) = 50.124 Hz
    ---------------------------------------------------------------------------------------
 
    i_clk_c64_orig : MMCME2_ADV
@@ -113,7 +113,7 @@ begin
 
    ---------------------------------------------------------------------------------------
    -- Generate a slightly slower version of the C64 clock
-   -- This has a frame rate of 49.999 Hz
+   -- This has a frame rate of 31448993/(312*63*32) = 49.999 Hz
    -- It's important that this rate is slightly *slower* than 50 Hz.
    ---------------------------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ begin
          CLKFBOUT_MULT_F      => 60.500,     -- 672.222 MHz
          CLKFBOUT_PHASE       => 0.000,
          CLKFBOUT_USE_FINE_PS => FALSE,
-         CLKOUT0_DIVIDE_F     => 21.375,     -- 31.449 MHz
+         CLKOUT0_DIVIDE_F     => 21.375,     -- 31.448993 MHz
          CLKOUT0_PHASE        => 0.000,
          CLKOUT0_DUTY_CYCLE   => 0.500,
          CLKOUT0_USE_FINE_PS  => FALSE
