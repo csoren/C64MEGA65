@@ -84,7 +84,9 @@ begin
 
   MAIN: process (clki) is
 
-    -- contents of synchronous ROM table
+    -- Contents of synchronous ROM table.
+    -- See MMCM and PLL Dynamic Reconfiguration Application Note (XAPP888)
+    -- for details of register map.
     function cfg_tbl (addr : std_logic_vector) return std_logic_vector is
       -- bits 39..32 = cfg_daddr (MSB = 1 for last entry)
       -- bits 31..16 = cfg write data
@@ -95,98 +97,101 @@ begin
       -- values below pasted in from video_out_clk.xls
       if fref = 100.0 then
         case '0' & addr is
-          when x"00" => data := x"06" & x"1145" & x"1000";
-          when x"01" => data := x"07" & x"0000" & x"8000";
-          when x"02" => data := x"08" & x"1083" & x"1000";
-          when x"03" => data := x"09" & x"0080" & x"8000";
-          when x"04" => data := x"0A" & x"130d" & x"1000";
-          when x"05" => data := x"0B" & x"0080" & x"8000";
-          when x"06" => data := x"0C" & x"1145" & x"1000";
-          when x"07" => data := x"0D" & x"0000" & x"8000";
-          when x"08" => data := x"0E" & x"1145" & x"1000";
-          when x"09" => data := x"0F" & x"0000" & x"8000";
-          when x"0A" => data := x"10" & x"1145" & x"1000";
-          when x"0B" => data := x"11" & x"0000" & x"8000";
-          when x"0C" => data := x"12" & x"1145" & x"1000";
-          when x"0D" => data := x"13" & x"3000" & x"8000";
-          when x"0E" => data := x"14" & x"13CF" & x"1000";
-          when x"0F" => data := x"15" & x"4800" & x"8000";
-          when x"10" => data := x"16" & x"0083" & x"C000";
-          when x"11" => data := x"18" & x"002C" & x"FC00";
-          when x"12" => data := x"19" & x"7C01" & x"8000";
-          when x"13" => data := x"1A" & x"7DE9" & x"8000";
-          when x"14" => data := x"28" & x"FFFF" & x"0000";
-          when x"15" => data := x"4E" & x"0900" & x"66FF";
-          when x"16" => data := x"CF" & x"1000" & x"666F";
-          when x"20" => data := x"06" & x"1145" & x"1000";
-          when x"21" => data := x"07" & x"0000" & x"8000";
-          when x"22" => data := x"08" & x"10C4" & x"1000";
-          when x"23" => data := x"09" & x"0080" & x"8000";
-          when x"24" => data := x"0A" & x"1452" & x"1000";
-          when x"25" => data := x"0B" & x"0080" & x"8000";
-          when x"26" => data := x"0C" & x"1145" & x"1000";
-          when x"27" => data := x"0D" & x"0000" & x"8000";
-          when x"28" => data := x"0E" & x"1145" & x"1000";
-          when x"29" => data := x"0F" & x"0000" & x"8000";
-          when x"2A" => data := x"10" & x"1145" & x"1000";
-          when x"2B" => data := x"11" & x"0000" & x"8000";
-          when x"2C" => data := x"12" & x"1145" & x"1000";
-          when x"2D" => data := x"13" & x"2800" & x"8000";
-          when x"2E" => data := x"14" & x"15D7" & x"1000";
-          when x"2F" => data := x"15" & x"2800" & x"8000";
-          when x"30" => data := x"16" & x"0083" & x"C000";
-          when x"31" => data := x"18" & x"00FA" & x"FC00";
-          when x"32" => data := x"19" & x"7C01" & x"8000";
-          when x"33" => data := x"1A" & x"7DE9" & x"8000";
-          when x"34" => data := x"28" & x"FFFF" & x"0000";
-          when x"35" => data := x"4E" & x"1900" & x"66FF";
-          when x"36" => data := x"CF" & x"0100" & x"666F";
-          when x"40" => data := x"06" & x"1145" & x"1000";
-          when x"41" => data := x"07" & x"0000" & x"8000";
-          when x"42" => data := x"08" & x"1041" & x"1000";
-          when x"43" => data := x"09" & x"0000" & x"8000";
-          when x"44" => data := x"0A" & x"1145" & x"1000";
-          when x"45" => data := x"0B" & x"0000" & x"8000";
-          when x"46" => data := x"0C" & x"1145" & x"1000";
-          when x"47" => data := x"0D" & x"0000" & x"8000";
-          when x"48" => data := x"0E" & x"1145" & x"1000";
-          when x"49" => data := x"0F" & x"0000" & x"8000";
-          when x"4A" => data := x"10" & x"1145" & x"1000";
-          when x"4B" => data := x"11" & x"0000" & x"8000";
-          when x"4C" => data := x"12" & x"1145" & x"1000";
-          when x"4D" => data := x"13" & x"2400" & x"8000";
-          when x"4E" => data := x"14" & x"1491" & x"1000";
-          when x"4F" => data := x"15" & x"1800" & x"8000";
-          when x"50" => data := x"16" & x"0083" & x"C000";
-          when x"51" => data := x"18" & x"00FA" & x"FC00";
-          when x"52" => data := x"19" & x"7C01" & x"8000";
-          when x"53" => data := x"1A" & x"7DE9" & x"8000";
-          when x"54" => data := x"28" & x"FFFF" & x"0000";
-          when x"55" => data := x"4E" & x"0900" & x"66FF";
-          when x"56" => data := x"CF" & x"1000" & x"666F";
-          when x"60" => data := x"06" & x"1145" & x"1000";
-          when x"61" => data := x"07" & x"0000" & x"8000";
-          when x"62" => data := x"08" & x"1041" & x"1000";
-          when x"63" => data := x"09" & x"00C0" & x"8000";
-          when x"64" => data := x"0A" & x"1083" & x"1000";
-          when x"65" => data := x"0B" & x"0080" & x"8000";
-          when x"66" => data := x"0C" & x"1145" & x"1000";
-          when x"67" => data := x"0D" & x"0000" & x"8000";
-          when x"68" => data := x"0E" & x"1145" & x"1000";
-          when x"69" => data := x"0F" & x"0000" & x"8000";
-          when x"6A" => data := x"10" & x"1145" & x"1000";
-          when x"6B" => data := x"11" & x"0000" & x"8000";
-          when x"6C" => data := x"12" & x"1145" & x"1000";
-          when x"6D" => data := x"13" & x"2400" & x"8000";
-          when x"6E" => data := x"14" & x"1491" & x"1000";
-          when x"6F" => data := x"15" & x"1800" & x"8000";
-          when x"70" => data := x"16" & x"0083" & x"C000";
-          when x"71" => data := x"18" & x"00FA" & x"FC00";
-          when x"72" => data := x"19" & x"7C01" & x"8000";
-          when x"73" => data := x"1A" & x"7DE9" & x"8000";
-          when x"74" => data := x"28" & x"FFFF" & x"0000";
-          when x"75" => data := x"4E" & x"0900" & x"66FF";
-          when x"76" => data := x"CF" & x"1000" & x"666F";
+          when x"00" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"01" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"02" => data := x"08" & x"1083" & x"1000";  -- CLKOUT0 Register 1
+          when x"03" => data := x"09" & x"0080" & x"8000";  -- CLKOUT0 Register 2
+          when x"04" => data := x"0A" & x"130d" & x"1000";  -- CLKOUT1 Register 1
+          when x"05" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"06" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"07" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"08" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"09" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"0A" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"0B" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"0C" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"0D" => data := x"13" & x"3000" & x"8000";  -- CLKOUT6 Register 2
+          when x"0E" => data := x"14" & x"13CF" & x"1000";  -- CLKFBOUT Register 1
+          when x"0F" => data := x"15" & x"4800" & x"8000";  -- CLKFBOUT Register 2
+          when x"10" => data := x"16" & x"0083" & x"C000";  -- DIVCLK Register
+          when x"11" => data := x"18" & x"002C" & x"FC00";  -- Lock Register 1
+          when x"12" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"13" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"14" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"15" => data := x"4E" & x"0900" & x"66FF";  -- Filter Register 1
+          when x"16" => data := x"CF" & x"1000" & x"666F";  -- Filter Register 2
+
+          when x"20" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"21" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"22" => data := x"08" & x"10C4" & x"1000";  -- CLKOUT0 Register 1
+          when x"23" => data := x"09" & x"0080" & x"8000";  -- CLKOUT0 Register 2
+          when x"24" => data := x"0A" & x"1452" & x"1000";  -- CLKOUT1 Register 1
+          when x"25" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"26" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"27" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"28" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"29" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"2A" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"2B" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"2C" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"2D" => data := x"13" & x"2800" & x"8000";  -- CLKOUT6 Register 2
+          when x"2E" => data := x"14" & x"15D7" & x"1000";  -- CLKFBOUT Register 1
+          when x"2F" => data := x"15" & x"2800" & x"8000";  -- CLKFBOUT Register 2
+          when x"30" => data := x"16" & x"0083" & x"C000";  -- DIVCLK Register
+          when x"31" => data := x"18" & x"00FA" & x"FC00";  -- Lock Register 1
+          when x"32" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"33" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"34" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"35" => data := x"4E" & x"1900" & x"66FF";  -- Filter Register 1
+          when x"36" => data := x"CF" & x"0100" & x"666F";  -- Filter Register 2
+
+          when x"40" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"41" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"42" => data := x"08" & x"1041" & x"1000";  -- CLKOUT0 Register 1
+          when x"43" => data := x"09" & x"0000" & x"8000";  -- CLKOUT0 Register 2
+          when x"44" => data := x"0A" & x"1145" & x"1000";  -- CLKOUT1 Register 1
+          when x"45" => data := x"0B" & x"0000" & x"8000";  -- CLKOUT1 Register 2
+          when x"46" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"47" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"48" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"49" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"4A" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"4B" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"4C" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"4D" => data := x"13" & x"2400" & x"8000";  -- CLKOUT6 Register 2
+          when x"4E" => data := x"14" & x"1491" & x"1000";  -- CLKFBOUT Register 1
+          when x"4F" => data := x"15" & x"1800" & x"8000";  -- CLKFBOUT Register 2
+          when x"50" => data := x"16" & x"0083" & x"C000";  -- DIVCLK Register
+          when x"51" => data := x"18" & x"00FA" & x"FC00";  -- Lock Register 1
+          when x"52" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"53" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"54" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"55" => data := x"4E" & x"0900" & x"66FF";  -- Filter Register 1
+          when x"56" => data := x"CF" & x"1000" & x"666F";  -- Filter Register 2
+
+          when x"60" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"61" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"62" => data := x"08" & x"1041" & x"1000";  -- CLKOUT0 Register 1
+          when x"63" => data := x"09" & x"00C0" & x"8000";  -- CLKOUT0 Register 2
+          when x"64" => data := x"0A" & x"1083" & x"1000";  -- CLKOUT1 Register 1
+          when x"65" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"66" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"67" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"68" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"69" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"6A" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"6B" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"6C" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"6D" => data := x"13" & x"2400" & x"8000";  -- CLKOUT6 Register 2
+          when x"6E" => data := x"14" & x"1491" & x"1000";  -- CLKFBOUT Register 1
+          when x"6F" => data := x"15" & x"1800" & x"8000";  -- CLKFBOUT Register 2
+          when x"70" => data := x"16" & x"0083" & x"C000";  -- DIVCLK Register
+          when x"71" => data := x"18" & x"00FA" & x"FC00";  -- Lock Register 1
+          when x"72" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"73" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"74" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"75" => data := x"4E" & x"0900" & x"66FF";  -- Filter Register 1
+          when x"76" => data := x"CF" & x"1000" & x"666F";  -- Filter Register 2
           when others => data := (others => '0');
         end case;
       end if;
@@ -196,7 +201,7 @@ begin
   begin
     if rising_edge(clki) then
 
-      cfg_tbl_data <= cfg_tbl(cfg_tbl_addr);                                                                                       -- synchronous ROM
+      cfg_tbl_data <= cfg_tbl(cfg_tbl_addr);               -- synchronous ROM
 
       -- defaults
       cfg_den <= '0';
@@ -205,53 +210,53 @@ begin
       -- state machine
       case cfg_state is
         when IDLE =>
-          if '0' & sel /= sel_prev                                                                                                 -- frequency selection has changed (or initial startup)
-             or locked_s = '0'                                                                                                     -- lock lost
+          if '0' & sel /= sel_prev                         -- frequency selection has changed (or initial startup)
+             or locked_s = '0'                             -- lock lost
              then
             rsto_req  <= '1';
             cfg_rst   <= '1';
             cfg_state <= RESET;
           end if;
-        when RESET =>                                                                                                              -- put MMCM into reset
+        when RESET =>                                      -- put MMCM into reset
           sel_prev     <= '0' & sel;
           cfg_tbl_addr <= sel & "00000";
           cfg_state    <= TBL;
-        when TBL =>                                                                                                                -- get table entry from sychronous ROM
+        when TBL =>                                        -- get table entry from sychronous ROM
           cfg_state <= RD;
-        when RD =>                                                                                                                 -- read specified register
+        when RD =>                                         -- read specified register
           cfg_daddr <= cfg_tbl_data(38 downto 32);
           cfg_den   <= '1';
           cfg_state <= RD_WAIT;
-        when RD_WAIT =>                                                                                                            -- wait for read to complete
+        when RD_WAIT =>                                    -- wait for read to complete
           if cfg_drdy = '1' then
             cfg_di    <= (cfg_do and cfg_tbl_data(15 downto 0)) or (cfg_tbl_data(31 downto 16) and not cfg_tbl_data(15 downto 0));
             cfg_den   <= '1';
             cfg_dwe   <= '1';
             cfg_state <= WR;
           end if;
-        when WR =>                                                                                                                 -- write modified contents back to same register
+        when WR =>                                         -- write modified contents back to same register
           cfg_state <= WR_WAIT;
-        when WR_WAIT =>                                                                                                            -- wait for write to complete
+        when WR_WAIT =>                                    -- wait for write to complete
           if cfg_drdy = '1' then
-            if cfg_tbl_data(39) = '1' then                                                                                         -- last entry in table
+            if cfg_tbl_data(39) = '1' then                 -- last entry in table
               cfg_tbl_addr <= (others => '0');
               cfg_state    <= LOCK_WAIT;
-            else                                                                                                                   -- do next entry in table
+            else                                           -- do next entry in table
               cfg_tbl_addr(4 downto 0) <= std_logic_vector(unsigned(cfg_tbl_addr(4 downto 0)) + 1);
               cfg_state                <= TBL;
             end if;
           end if;
-        when LOCK_WAIT =>                                                                                                          -- wait for MMCM to lock
+        when LOCK_WAIT =>                                  -- wait for MMCM to lock
           cfg_rst <= '0';
-          if locked_s = '1' then                                                                                                   -- all done
+          if locked_s = '1' then                           -- all done
             cfg_state <= IDLE;
             rsto_req  <= '0';
           end if;
       end case;
 
-      if rsti = '1' then                                                                                                           -- full reset
+      if rsti = '1' then                                   -- full reset
 
-        sel_prev  <= (others => '1');                                                                                              -- force reconfig
+        sel_prev  <= (others => '1');                      -- force reconfig
         cfg_rst   <= '1';
         cfg_daddr <= (others => '0');
         cfg_den   <= '0';
@@ -404,3 +409,4 @@ begin
   clko <= clko_b;
 
 end architecture synth;
+
