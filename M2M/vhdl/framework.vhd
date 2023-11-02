@@ -968,6 +968,7 @@ begin
          G_FONT_DY               => FONT_DY
       )
       port map (
+         -- Input from Core
          video_clk_i             => video_clk_i,
          video_rst_i             => video_rst_i,
          video_ce_i              => video_ce_i,
@@ -1033,6 +1034,7 @@ begin
          hr_waitrequest_i        => hr_dig_waitrequest,
          hr_high_o               => hr_high_o,
          hr_low_o                => hr_low_o,
+         -- Output to MEGA65 board
          VGA_RED                 => vga_red_o,
          VGA_GREEN               => vga_green_o,
          VGA_BLUE                => vga_blue_o,
@@ -1041,6 +1043,10 @@ begin
          vdac_clk                => vdac_clk_o,
          vdac_sync_n             => vdac_sync_n_o,
          vdac_blank_n            => vdac_blank_n_o,
+         audio_clk_o             => audio_clk_o,
+         audio_reset_o           => audio_reset_o,
+         audio_left_o            => audio_left_o,
+         audio_right_o           => audio_right_o,
          hdmi_clk_i              => hdmi_clk,
          hdmi_rst_i              => hdmi_rst,
          tmds_clk_i              => tmds_clk,
@@ -1159,11 +1165,6 @@ begin
    hr_d_io    <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
    hr_rwds_in <= hr_rwds_io;
    hr_dq_in   <= hr_d_io;
-
-   audio_clk_o   <= audio_clk;
-   audio_reset_o <= audio_rst;
-   audio_left_o  <= signed(audio_left);
-   audio_right_o <= signed(audio_right);
 
 end architecture synthesis;
 
