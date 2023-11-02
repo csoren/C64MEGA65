@@ -29,15 +29,18 @@ workaround is not needed for the KungFu Flash any more
 
 ## Bugfixes: All boards
 
-* The long-reset" feature was broken in V5. (Fixed GitHub issue #79)
+* The "long-reset" feature was broken in V5.
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/79)
 
-* Fixed a crash in the file browser. (Fixed GitHub issue #95)
+* Fixed a crash in the file browser.
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/95)
 
 * In V5 we introduced a new feature: You can go one menu-level up (from a sub-
   menu to the main-menu) by pressing Run/Stop. Subsequently you can also close
   then the main menu via Run/Stop (additionally to via Help). But if you did
   so, the Run/Stop keypress that happens to close the OSM was propagated to
-  the C64. (Fixed GitHub issue #80)
+  the C64.
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/80)
 
 Version 5 - June 23, 2023
 =========================
