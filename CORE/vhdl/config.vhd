@@ -77,7 +77,7 @@ type WHS_RECORD_ARRAY_TYPE is array (0 to WHS_RECORDS - 1) of WHS_RECORD_TYPE;
 
 constant SCR_WELCOME : string :=
 
-   "\n Commodore 64 for MEGA65 Version 5.1A2\n\n" &
+   "\n Commodore 64 for MEGA65 Version 5.1A3\n\n" &
 
    " MiSTer port 2023 by MJoergen & sy2002\n" &   
    " Powered by MiSTer2MEGA65\n\n\n" &
@@ -97,7 +97,7 @@ constant SCR_WELCOME : string :=
 
 constant HELP_1 : string :=
 
-   "\n Commodore 64 for MEGA65 Version 5.1A2\n\n" &
+   "\n Commodore 64 for MEGA65 Version 5.1A3\n\n" &
    
    " MiSTer port 2023 by MJoergen & sy2002\n" &   
    " Powered by MiSTer2MEGA65\n\n" &
@@ -128,7 +128,7 @@ constant HELP_1 : string :=
    
 constant HELP_2 : string :=
 
-   "\n Commodore 64 for MEGA65 Version 5.1A2\n\n" &
+   "\n Commodore 64 for MEGA65 Version 5.1A3\n\n" &
 
    " When browsing the menu:\n\n" &
    
@@ -159,7 +159,7 @@ constant HELP_2 : string :=
 
 constant HELP_3 : string :=
 
-   "\n Commodore 64 for MEGA65 Version 5.1A2\n\n" &
+   "\n Commodore 64 for MEGA65 Version 5.1A3\n\n" &
    
    " SID:\n\n" &
 
