@@ -254,7 +254,6 @@ signal hdmi_rst               : std_logic;
 -- Reset Control
 ---------------------------------------------------------------------------------------------
 
-signal reset_n_dbnce          : std_logic;
 signal reset_core_n           : std_logic;
 signal reset_m2m_n            : std_logic;
 
@@ -405,20 +404,6 @@ begin
    qnice_clk_o <= qnice_clk;
    qnice_rst_o <= qnice_rst;
 
-   -- 20 ms stable time for the reset button
-   i_reset_debouncer : entity work.debounce
-      generic map (
-         initial     => '1',
-         clk_freq    => BOARD_CLK_SPEED,
-         stable_time => 20
-      )
-      port map (
-         clk     => clk_i,
-         reset_n => '1',
-         button  => reset_n_i,
-         result  => reset_n_dbnce
-      ); -- i_reset_debouncer
-
 
    ---------------------------------------------------------------------------------------------------------------
    -- Generate clocks and reset signals
@@ -468,7 +453,7 @@ begin
       )
       port map (
          CLK            => clk_i,
-         RESET_N        => reset_n_dbnce,
+         RESET_N        => reset_n_i,
          reset_m2m_n_o  => reset_m2m_n,
          reset_core_n_o => reset_core_n
       ); -- i_reset_manager
