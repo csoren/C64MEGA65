@@ -9,13 +9,13 @@ never-released-to-the-public R4 boards.
 ## New Features: R4/R5 boards only
 
 * Heavily improved quality of the analog audio output via the 3.1mm audio jack
-  thanks by utilizing MEGA65's new audio DAC.
+  thanks to utilizing MEGA65's new audio DAC. (R4 and R5)
 
 WIP The hardware of the MEGA65's Expansion Port (aka cartridge port) is now 100%
   compatible to the C64's hardware as it has bi-directional signals for RESET,
   IRQ and NMI. This allowed us to make the core compatible with even more
   cartridges. One example stands out is, that you do not need the "reset
-  workaround" for the Kung Fu Flash (KFF) any more.
+  workaround" for the Kung Fu Flash (KFF) any more. (R5 only)
 @TODO: Needs update of the cartridge documentation that for example the reset
 workaround is not needed for the KungFu Flash any more
 
@@ -35,12 +35,25 @@ workaround is not needed for the KungFu Flash any more
 * Fixed a crash in the file browser.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/95)
 
+* Stabilized the REU simulation. This fixes several known glitches plus it
+  ensures that the REU simulation will run more stable also on the newer
+  HyperRAM revisions that are built into some newer batches of R3A and that
+  will be built into R4 and R5:
+  - Treu Love demo: Fixed very rare REU/HyperRAM issues
+    (GitHub issue https://github.com/MJoergen/C64MEGA65/issues/55)
+  - Fixed the Attack of the PETSCII Robots glitch
+    (GitHub issue https://github.com/MJoergen/C64MEGA65/issues/86)
+
 * In V5 we introduced a new feature: You can go one menu-level up (from a sub-
   menu to the main-menu) by pressing Run/Stop. Subsequently you can also close
   then the main menu via Run/Stop (additionally to via Help). But if you did
   so, the Run/Stop keypress that happens to close the OSM was propagated to
   the C64.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/80)
+
+* The "Audio improvements" feature only worked with analog audio (3.5mm jack)
+  but not with digital audio via HDMI.
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/100)
 
 Version 5 - June 23, 2023
 =========================

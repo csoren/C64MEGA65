@@ -24,7 +24,7 @@ Differences in the C64 for MEGA65 core on different MEGA65 models
 |:------:|:-------------------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|:------:|:----
 | 1      | HDMI backpower issues           | [Learn more](../FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly), what wide range of problems and strange effects HDMI backpower issues are creating and how to avoid these issues.                                                                     | yes    | no     | no
 | 2      | DAC for analog 3.5mm audio jack | While on R3/R3A machines the analog audio that comes out from the 3.5mm audio jack is "OK" and sometimes is plagued by hissing and humming, the R4/R5 machines feature a high-quality audio digital to analog converter (DAC) that leads to a crystal clear output.    |        | DAC    | DAC
-| 3      | xyz
+| 3      | xyz @TODO RESET / Cartridge, only R5
 
 @TODO: INTERNAL LIST TO BE CLEARED BEFORE RELEASE
 -------------------------------------------------
