@@ -48,7 +48,7 @@ port (
    qnice_ascal_mode_o      : out std_logic_vector(1 downto 0);
    qnice_ascal_polyphase_o : out std_logic;
    qnice_ascal_triplebuf_o : out std_logic;
-   qnice_retro15kHz_o      : out std_logic;
+   qnice_retro15kHz_o      : out std_logic;                 -- 0 = normal frequency, 1 = retro 15 kHz frequency
    qnice_csync_o           : out std_logic;                 -- 0 = normal HS/VS, 1 = Composite Sync
 
    -- Flip joystick ports
