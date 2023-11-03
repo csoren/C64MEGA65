@@ -1,6 +1,6 @@
-## Commodore 64 for MEGA65 (C64MEGA65)
+## MiSTer2MEGA framework pin mapping
 ##
-## MEGA65 port done by MJoergen and sy2002 in 2023 and licensed under GPL v3
+## Done by MJoergen and sy2002 in 2023 and licensed under GPL v3
 
 ################################
 ## Pin to signal mapping
