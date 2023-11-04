@@ -35,14 +35,11 @@ workaround is not needed for the KungFu Flash any more
 * Fixed a crash in the file browser.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/95)
 
-* Stabilized the REU simulation. This fixes several known glitches plus it
-  ensures that the REU simulation will run more stable also on the newer
+* Stabilized the REU simulation. This fixes a known glitch plus it ensures
+  that the REU simulation will run more stable also on the newer
   HyperRAM revisions that are built into some newer batches of R3A and that
-  will be built into R4 and R5:
-  - Treu Love demo: Fixed very rare REU/HyperRAM issues
-    (GitHub issue https://github.com/MJoergen/C64MEGA65/issues/55)
-  - Fixed the Attack of the PETSCII Robots glitch
-    (GitHub issue https://github.com/MJoergen/C64MEGA65/issues/86)
+  will be built into R5: Treu Love demo: Fixed very rare REU/HyperRAM issues
+  (GitHub issue https://github.com/MJoergen/C64MEGA65/issues/55)
 
 * In V5 we introduced a new feature: You can go one menu-level up (from a sub-
   menu to the main-menu) by pressing Run/Stop. Subsequently you can also close
