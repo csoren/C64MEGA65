@@ -16,6 +16,22 @@
 --------------------------------------------------------------------------------
 
 -- Modified by MFJ in October 2023
+-- When programming the MMCM, the "locked" signal is de-asserted and the clock output is
+-- invalid and contains glitches. Usually, the system is held in reset until "locked"
+-- is asserted again. Instead, we here switch over to a "backup" clock of 50 MHz
+-- until the MMCM is ready. This switch-over is done using a glitch-free clock
+-- multiplexer, but since the latter is stateful, the switch-over has to be timed
+-- carefully, so that the active clock is always valid.
+
+-- To generate the entries in these tables:
+-- 1. Download the MMCM and PLL Dynamic Reconfiguration Application Note (XAPP888)
+--    reference files.
+-- 2. Use the Vivado Clock Wizard to generate the values of CLKFBOUT_MULT_F,
+--    DIVCLK_DIVIDE, CLKOUT0_DIVIDE_F, and CLKOUT1_DIVIDE. Note them down on a piece of paper.
+-- 3. Start Vivado, and run the xapp888 setup file: MMCME2_DRP/top_mmcme2.tcl
+-- 4. Use the spreadsheet https://github.com/amb5l/tyto2/blob/main/src/common/video/xilinx_7series/video_out_clock.xls
+--    type in the Clock Wizard values, and generate the tcl command.
+-- 5. In Vivado, run the tcl command. This outputs the values for the table below.
 
 library ieee;
   use ieee.std_logic_1164.all;
@@ -32,7 +48,15 @@ entity video_out_clock is
 
     rsti    : in    std_logic;                    -- input (reference) clock synchronous reset
     clki    : in    std_logic;                    -- input (reference) clock
-    sel     : in    std_logic_vector(1 downto 0); -- output clock select: 00 = 25.2, 01 = 27.0, 10 = 74.25, 11 = 148.5
+    sel     : in    std_logic_vector(2 downto 0); -- output clock select:
+          -- 000 =  25.200 MHz. E.g.  640x480 @ 60.00 Hz
+          -- 001 =  27.000 MHz. E.g.  720x480 @ 59.94 Hz
+          -- 010 =  74.250 MHz. E.g. 1280x720 @ 60.00 Hz
+          -- 011 = 148.500 MHz.
+          -- 100 =  25.175 MHz. E.g.  640x480 @ 59.94 Hz
+          -- 101 =  27.027 MHz. E.g.  720x480 @ 60.00 Hz
+          -- 110 =  74.176 MHz. E.g. 1280x720 @ 59.94 Hz
+          -- 111 = undefined
     rsto    : out   std_logic;                    -- output clock synchronous reset
     clko    : out   std_logic;                    -- pixel clock
     clko_x5 : out   std_logic                     -- serialiser clock (5x pixel clock)
@@ -42,7 +66,7 @@ end entity video_out_clock;
 
 architecture synth of video_out_clock is
 
-  signal sel_s        : std_logic_vector(1 downto 0);  -- sel, synchronised to clki
+  signal sel_s        : std_logic_vector(2 downto 0);  -- sel, synchronised to clki
 
   signal rsto_req     : std_logic;                     -- rsto request, synchronous to clki
 
@@ -50,16 +74,19 @@ architecture synth of video_out_clock is
   signal locked       : std_logic;                     -- MMCM locked output
   signal locked_s     : std_logic;                     -- above, synchronised to clki
 
-  signal sel_prev     : std_logic_vector(2 downto 0);  -- to detect changes
+  signal sel_prev     : std_logic_vector(3 downto 0);  -- to detect changes
   signal clk_fb       : std_logic;                     -- feedback clock
   signal clku_fb      : std_logic;                     -- unbuffered feedback clock
   signal clko_u       : std_logic;                     -- unbuffered pixel clock
   signal clko_b       : std_logic;                     -- buffered pixel clock
   signal clko_u_x5    : std_logic;                     -- unbuffered serializer clock
 
-  signal cfg_tbl_addr : std_logic_vector(6 downto 0);  -- 4 x 32 entries
+  signal clki_div     : std_logic;                     -- Input clock divided by 2
+
+  signal cfg_tbl_addr : std_logic_vector(7 downto 0);  -- 8 x 32 entries
   signal cfg_tbl_data : std_logic_vector(39 downto 0); -- 8 bit address + 16 bit write data + 16 bit read mask
 
+  signal cfg_cnt      : std_logic_vector(1 downto 0);  -- Delay reset
   signal cfg_rst      : std_logic;                     -- DRP reset
   signal cfg_daddr    : std_logic_vector(6 downto 0);  -- DRP register address
   signal cfg_den      : std_logic;                     -- DRP enable (pulse)
@@ -70,6 +97,7 @@ architecture synth of video_out_clock is
 
   type   cfg_state_t is (                              -- state machine states
     idle,                                              -- waiting for fsel change
+    reset_wait,                                        -- put MMCM into reset
     reset,                                             -- put MMCM into reset
     tbl,                                               -- get first/next table value
     rd,                                                -- start read
@@ -79,6 +107,8 @@ architecture synth of video_out_clock is
     lock_wait                                          -- wait for reconfig to complete
   );
   signal cfg_state    : cfg_state_t;
+  signal clk_mux      : std_logic;
+
 
 begin
 
@@ -97,6 +127,12 @@ begin
       -- values below pasted in from video_out_clk.xls
       if fref = 100.0 then
         case '0' & addr is
+          -- Desired frequency = 25.200 MHz
+          -- CLKFBOUT_MULT_F   = 31.500
+          -- DIVCLK_DIVIDE     = 5
+          -- CLKOUT0_DIVIDE_F  = 5.000
+          -- CLKOUT1_DIVIDE    = 25
+          -- Actual frequency  = 25.200 MHz
           when x"00" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
           when x"01" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
           when x"02" => data := x"08" & x"1083" & x"1000";  -- CLKOUT0 Register 1
@@ -121,6 +157,12 @@ begin
           when x"15" => data := x"4E" & x"0900" & x"66FF";  -- Filter Register 1
           when x"16" => data := x"CF" & x"1000" & x"666F";  -- Filter Register 2
 
+          -- Desired frequency = 27.000 MHz
+          -- CLKFBOUT_MULT_F   = 47.250
+          -- DIVCLK_DIVIDE     = 5
+          -- CLKOUT0_DIVIDE_F  = 7.000
+          -- CLKOUT1_DIVIDE    = 35
+          -- Actual frequency  = 74.250 MHz
           when x"20" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
           when x"21" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
           when x"22" => data := x"08" & x"10C4" & x"1000";  -- CLKOUT0 Register 1
@@ -145,6 +187,12 @@ begin
           when x"35" => data := x"4E" & x"1900" & x"66FF";  -- Filter Register 1
           when x"36" => data := x"CF" & x"0100" & x"666F";  -- Filter Register 2
 
+          -- Desired frequency = 74.250 MHz
+          -- CLKFBOUT_MULT_F   = 37.125
+          -- DIVCLK_DIVIDE     = 5
+          -- CLKOUT0_DIVIDE_F  = 2.000
+          -- CLKOUT1_DIVIDE    = 10
+          -- Actual frequency  = 74.250 MHz
           when x"40" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
           when x"41" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
           when x"42" => data := x"08" & x"1041" & x"1000";  -- CLKOUT0 Register 1
@@ -169,6 +217,12 @@ begin
           when x"55" => data := x"4E" & x"0900" & x"66FF";  -- Filter Register 1
           when x"56" => data := x"CF" & x"1000" & x"666F";  -- Filter Register 2
 
+          -- Desired frequency = 148.500 MHz
+          -- CLKFBOUT_MULT_F   = 37.125
+          -- DIVCLK_DIVIDE     = 5
+          -- CLKOUT0_DIVIDE_F  = 1.000
+          -- CLKOUT1_DIVIDE    = 5
+          -- Actual frequency  = 148.500 MHz
           when x"60" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
           when x"61" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
           when x"62" => data := x"08" & x"1041" & x"1000";  -- CLKOUT0 Register 1
@@ -192,6 +246,127 @@ begin
           when x"74" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
           when x"75" => data := x"4E" & x"0900" & x"66FF";  -- Filter Register 1
           when x"76" => data := x"CF" & x"1000" & x"666F";  -- Filter Register 2
+
+          -- Desired frequency = 25.175 MHz
+          -- CLKFBOUT_MULT_F   = 17.625
+          -- DIVCLK_DIVIDE     = 2
+          -- CLKOUT0_DIVIDE_F  = 7.000
+          -- CLKOUT1_DIVIDE    = 35
+          -- Actual frequency  = 25.179 MHz
+          when x"80" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"81" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"82" => data := x"08" & x"10C4" & x"1000";  -- CLKOUT0 Register 1
+          when x"83" => data := x"09" & x"00C0" & x"8000";  -- CLKOUT0 Register 2
+          when x"84" => data := x"0A" & x"1452" & x"1000";  -- CLKOUT1 Register 1
+          when x"85" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"86" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"87" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"88" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"89" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"8A" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"8B" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"8C" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"8D" => data := x"13" & x"3000" & x"8000";  -- CLKOUT6 Register 2
+          when x"8E" => data := x"14" & x"1208" & x"1000";  -- CLKFBOUT Register 1
+          when x"8F" => data := x"15" & x"5800" & x"8000";  -- CLKFBOUT Register 2
+          when x"90" => data := x"16" & x"0041" & x"C000";  -- DIVCLK Register
+          when x"91" => data := x"18" & x"013F" & x"FC00";  -- Lock Register 1
+          when x"92" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"93" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"94" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"95" => data := x"4E" & x"9900" & x"66FF";  -- Filter Register 1
+          when x"96" => data := x"CF" & x"1100" & x"666F";  -- Filter Register 2
+
+          -- Desired frequency = 27.027 MHz
+          -- CLKFBOUT_MULT_F   = 21.625
+          -- DIVCLK_DIVIDE     = 2
+          -- CLKOUT0_DIVIDE_F  = 8.000
+          -- CLKOUT1_DIVIDE    = 40
+          -- Actual frequency  = 27.031 MHz
+          when x"A0" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"A1" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"A2" => data := x"08" & x"1104" & x"1000";  -- CLKOUT0 Register 1
+          when x"A3" => data := x"09" & x"00C0" & x"8000";  -- CLKOUT0 Register 2
+          when x"A4" => data := x"0A" & x"1514" & x"1000";  -- CLKOUT1 Register 1
+          when x"A5" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"A6" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"A7" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"A8" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"A9" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"AA" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"AB" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"AC" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"AD" => data := x"13" & x"3000" & x"8000";  -- CLKOUT6 Register 2
+          when x"AE" => data := x"14" & x"128A" & x"1000";  -- CLKFBOUT Register 1
+          when x"AF" => data := x"15" & x"5800" & x"8000";  -- CLKFBOUT Register 2
+          when x"B0" => data := x"16" & x"0041" & x"C000";  -- DIVCLK Register
+          when x"B1" => data := x"18" & x"00DB" & x"FC00";  -- Lock Register 1
+          when x"B2" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"B3" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"B4" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"B5" => data := x"4E" & x"9000" & x"66FF";  -- Filter Register 1
+          when x"B6" => data := x"CF" & x"0100" & x"666F";  -- Filter Register 2
+
+          -- Desired frequency = 74.176 MHz
+          -- CLKFBOUT_MULT_F   = 22.250
+          -- DIVCLK_DIVIDE     = 3
+          -- CLKOUT0_DIVIDE_F  = 2.000
+          -- CLKOUT1_DIVIDE    = 10
+          -- Actual frequency  = 74.167 MHz
+          when x"C0" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"C1" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"C2" => data := x"08" & x"1041" & x"1000";  -- CLKOUT0 Register 1
+          when x"C3" => data := x"09" & x"00C0" & x"8000";  -- CLKOUT0 Register 2
+          when x"C4" => data := x"0A" & x"1145" & x"1000";  -- CLKOUT1 Register 1
+          when x"C5" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"C6" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"C7" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"C8" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"C9" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"CA" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"CB" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"CC" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"CD" => data := x"13" & x"0C00" & x"8000";  -- CLKOUT6 Register 2
+          when x"CE" => data := x"14" & x"128A" & x"1000";  -- CLKFBOUT Register 1
+          when x"CF" => data := x"15" & x"2C00" & x"8000";  -- CLKFBOUT Register 2
+          when x"D0" => data := x"16" & x"0042" & x"C000";  -- DIVCLK Register
+          when x"D1" => data := x"18" & x"00C2" & x"FC00";  -- Lock Register 1
+          when x"D2" => data := x"19" & x"7C01" & x"8000";  -- Lock Register 2
+          when x"D3" => data := x"1A" & x"7DE9" & x"8000";  -- Lock Register 3
+          when x"D4" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"D5" => data := x"4E" & x"1100" & x"66FF";  -- Filter Register 1
+          when x"D6" => data := x"CF" & x"9000" & x"666F";  -- Filter Register 2
+
+          -- Desired frequency = 40.000 MHz
+          -- CLKFBOUT_MULT_F   = 10
+          -- DIVCLK_DIVIDE     = 1
+          -- CLKOUT0_DIVIDE_F  = 5.000
+          -- CLKOUT1_DIVIDE    = 25
+          -- Actual frequency  = 40.000 MHz
+          when x"E0" => data := x"06" & x"1145" & x"1000";  -- CLKOUT5 Register 1
+          when x"E1" => data := x"07" & x"0000" & x"8000";  -- CLKOUT5 Register 2
+          when x"E2" => data := x"08" & x"1083" & x"1000";  -- CLKOUT0 Register 1
+          when x"E3" => data := x"09" & x"0080" & x"8000";  -- CLKOUT0 Register 2
+          when x"E4" => data := x"0A" & x"130D" & x"1000";  -- CLKOUT1 Register 1
+          when x"E5" => data := x"0B" & x"0080" & x"8000";  -- CLKOUT1 Register 2
+          when x"E6" => data := x"0C" & x"1145" & x"1000";  -- CLKOUT2 Register 1
+          when x"E7" => data := x"0D" & x"0000" & x"8000";  -- CLKOUT2 Register 2
+          when x"E8" => data := x"0E" & x"1145" & x"1000";  -- CLKOUT3 Register 1
+          when x"E9" => data := x"0F" & x"0000" & x"8000";  -- CLKOUT3 Register 2
+          when x"EA" => data := x"10" & x"1145" & x"1000";  -- CLKOUT4 Register 1
+          when x"EB" => data := x"11" & x"0000" & x"8000";  -- CLKOUT4 Register 2
+          when x"EC" => data := x"12" & x"1145" & x"1000";  -- CLKOUT6 Register 1
+          when x"ED" => data := x"13" & x"0000" & x"8000";  -- CLKOUT6 Register 2
+          when x"EE" => data := x"14" & x"1145" & x"1000";  -- CLKFBOUT Register 1
+          when x"EF" => data := x"15" & x"0000" & x"8000";  -- CLKFBOUT Register 2
+          when x"F0" => data := x"16" & x"1041" & x"C000";  -- DIVCLK Register
+          when x"F1" => data := x"18" & x"01E8" & x"FC00";  -- Lock Register 1
+          when x"F2" => data := x"19" & x"7001" & x"8000";  -- Lock Register 2
+          when x"F3" => data := x"1A" & x"71E9" & x"8000";  -- Lock Register 3
+          when x"F4" => data := x"28" & x"FFFF" & x"0000";  -- Power Register
+          when x"F5" => data := x"4E" & x"9900" & x"66FF";  -- Filter Register 1
+          when x"F6" => data := x"CF" & x"1100" & x"666F";  -- Filter Register 2
+
           when others => data := (others => '0');
         end case;
       end if;
@@ -213,6 +388,14 @@ begin
           if '0' & sel /= sel_prev                         -- frequency selection has changed (or initial startup)
              or locked_s = '0'                             -- lock lost
              then
+            clk_mux   <= '0';                              -- Switch to alternate clock
+            cfg_cnt   <= "11";
+            cfg_state <= RESET_WAIT;
+          end if;
+        when RESET_WAIT =>                                 -- Wait for clock switching to take effect
+          if cfg_cnt /= "00" then
+            cfg_cnt <= std_logic_vector(unsigned(cfg_cnt) - 1);
+          else
             rsto_req  <= '1';
             cfg_rst   <= '1';
             cfg_state <= RESET;
@@ -251,6 +434,7 @@ begin
           if locked_s = '1' then                           -- all done
             cfg_state <= IDLE;
             rsto_req  <= '0';
+            clk_mux   <= '1';                              -- Switch to new clock
           end if;
       end case;
 
@@ -275,16 +459,18 @@ begin
 
   SYNC1 : entity work.cdc_stable
     generic map (
-      G_DATA_SIZE => 3
+      G_DATA_SIZE => 4
     )
     port map (
       dst_clk_i     => clki,
       src_data_i(0) => locked,
       src_data_i(1) => sel(0),
       src_data_i(2) => sel(1),
+      src_data_i(3) => sel(2),
       dst_data_o(0) => locked_s,
       dst_data_o(1) => sel_s(0),
-      dst_data_o(2) => sel_s(1)
+      dst_data_o(2) => sel_s(1),
+      dst_data_o(3) => sel_s(2)
     );
 
   SYNC2 : entity work.cdc_stable
@@ -394,10 +580,21 @@ begin
       o => clko_x5
     );
 
-  U_BUFG_1: component bufg
+  p_clki_div : process (clki)
+  begin
+     if rising_edge(clki) then
+        clki_div <= not clki_div;
+     end if;
+  end process p_clki_div;
+
+  -- Force clock to '0' when MMCM is not locked. This avoids
+  -- any glitches during reconfiguration
+  U_BUFG_1: component bufgmux_ctrl
     port map (
-      i => clko_u,
-      o => clko_b
+      s  => clk_mux,
+      i0 => clki_div,
+      i1 => clko_u,
+      o  => clko_b
     );
 
   U_BUFG_F: component bufg
