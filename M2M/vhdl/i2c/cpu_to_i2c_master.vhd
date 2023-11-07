@@ -59,6 +59,9 @@ begin
   cpu_proc : process (clk_i)
   begin
     if falling_edge(clk_i) then
+      if response_i(2) = '1' then
+        nack <= '1';
+      end if;
       cpu_rd_data_o <= (others => '0');
       ram_wr        <= '0';
       ram_rd        <= ram_rd(0) & '0';
