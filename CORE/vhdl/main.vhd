@@ -14,6 +14,7 @@ use ieee.numeric_std_unsigned.all;
 
 library work;
 use work.vdrives_pkg.all;
+use work.globals.all;
 
 entity main is
    generic (
@@ -212,16 +213,28 @@ entity main is
       crt_bank_hi_o          : out std_logic_vector( 6 downto 0);
 
 		-- Access custom Kernal: C64's Basic and DOS (in QNICE clock domain via c64_clk_sd_i)
-      c64rom_we_i            : in std_logic;
-      c64rom_addr_i          : in std_logic_vector(13 downto 0);
-      c64rom_data_i          : in std_logic_vector(7 downto 0);
+      c64rom_we_i            : in  std_logic;
+      c64rom_addr_i          : in  std_logic_vector(13 downto 0);
+      c64rom_data_i          : in  std_logic_vector(7 downto 0);
       c64rom_data_o          : out std_logic_vector(7 downto 0);
 
       -- Access custom DOS for the simulated C1541 (in QNICE clock domain via c64_clk_sd_i)
-      c1541rom_we_i          : in std_logic;
-      c1541rom_addr_i        : in std_logic_vector(15 downto 0);
-      c1541rom_data_i        : in std_logic_vector(7 downto 0);
-      c1541rom_data_o        : out std_logic_vector(7 downto 0)
+      c1541rom_we_i          : in  std_logic;
+      c1541rom_addr_i        : in  std_logic_vector(15 downto 0);
+      c1541rom_data_i        : in  std_logic_vector(7 downto 0);
+      c1541rom_data_o        : out std_logic_vector(7 downto 0);
+
+      -- Contents of RTC (see user_io.cpp in Main_MiSTer):
+      -- Bits  7 -  0 : Seconds    (BCD format, 0x00-0x60)
+      -- Bits 15 -  8 : Minutes    (BCD format, 0x00-0x59)
+      -- Bits 23 - 16 : Hours      (BCD format, 0x00-0x23)
+      -- Bits 31 - 24 : DayOfMonth (BCD format, 0x01-0x31)
+      -- Bits 39 - 32 : Month      (BCD format, 0x01-0x12)
+      -- Bits 47 - 40 : Year       (BCD format, 0x00-0x99)
+      -- Bits 55 - 48 : DayOfWeek  (0x00-0x06)
+      -- Bits 63 - 56 : 0x40
+      -- Bit       64 : Toggle flag
+      rtc_i                  : in  std_logic_vector(64 downto 0)
    );
 end entity main;
 
@@ -393,6 +406,11 @@ architecture synthesis of main is
    signal map_readdatavalid    : std_logic;
    signal map_waitrequest      : std_logic;
 
+   signal cass_write           : std_logic;
+   signal cass_motor           : std_logic;
+   signal cass_rtc             : std_logic;
+   signal rtcF83_sda           : std_logic;
+
    -- Verilog file from MiSTer core
    component reu
       port (
@@ -422,6 +440,22 @@ architecture synthesis of main is
          irq         : out std_logic
       );
    end component reu;
+
+   component rtcF83 is
+      generic (
+         CLOCK_RATE : integer;
+         HAS_RAM    : integer
+      );
+      port (
+         clk   : in  std_logic;
+         ce    : in  std_logic;
+         reset : in  std_logic;
+         RTC   : in  std_logic_vector(64 downto 0);
+         scl_i : in  std_logic;
+         sda_i : in  std_logic;
+         sda_o : out std_logic
+      );
+   end component rtcF83;
 
 begin
    -- prevent data corruption by not allowing a soft reset to happen while the cache is still dirty
@@ -648,9 +682,9 @@ begin
          iec_data_o  => c64_iec_data_o,
 
          -- Cassette drive
-         cass_motor  => open,
-         cass_write  => open,
-         cass_sense  => '1',              -- low active
+         cass_write  => cass_write,       -- output
+         cass_motor  => cass_motor,       -- output
+         cass_sense  => cass_rtc,         -- input
          cass_read   => '1',              -- default is '1' according to MiSTer's c1530.vhd
 
          -- Access custom Kernal: C64's Basic and DOS
@@ -1359,6 +1393,24 @@ begin
          m_avm_readdata_i      => avm_readdata_i,
          m_avm_readdatavalid_i => avm_readdatavalid_i
       ); -- i_avm_cache
+
+   -- Instantiate the PCF8583 RTC I2C emulator
+   i_rtcF83 : component rtcF83
+      generic map (
+         CLOCK_RATE => CORE_CLK_SPEED,
+         HAS_RAM    => 0
+      )
+      port map (
+         clk   => clk_main_i,
+         ce    => '1',
+         reset => reset_hard_i,
+         RTC   => RTC_i,
+         scl_i => cass_write,
+         sda_i => cass_motor,
+         sda_o => rtcF83_sda
+      ); -- i_rtcF83
+
+    cass_rtc <= not (rtcF83_sda and cass_motor);
 
 end architecture synthesis;
 

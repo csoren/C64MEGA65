@@ -468,8 +468,6 @@ begin
    f_step_o      <= '0';
    f_wdata_o     <= '0';
    f_wgate_o     <= '0';
-   fpga_sda_io   <= 'Z';
-   fpga_scl_io   <= 'Z';
    grove_sda_io  <= 'Z';
    grove_scl_io  <= 'Z';
    led_o         <= '0'; -- Off
@@ -643,7 +641,10 @@ begin
       qnice_ramrom_data_in_i  => qnice_ramrom_data_in,
       qnice_ramrom_ce_o       => qnice_ramrom_ce,
       qnice_ramrom_we_o       => qnice_ramrom_we,
-      qnice_ramrom_wait_i     => qnice_ramrom_wait
+      qnice_ramrom_wait_i     => qnice_ramrom_wait,
+
+      fpga_sda_io             => fpga_sda_io,
+      fpga_scl_io             => fpga_scl_io
    ); -- i_framework
 
 

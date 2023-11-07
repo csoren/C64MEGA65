@@ -563,6 +563,9 @@ begin
          -- 2: Simulate a cartridge by using a cartridge from from the SD card (.crt file)
          c64_exp_port_mode_i    => c64_exp_port_mode,
 
+         -- Current date/time from RTC
+         rtc_i                  => main_qnice_gp_reg_i(64 downto 0),
+
          ---------------------------
          -- Commodore 64 I/O ports
          ---------------------------
