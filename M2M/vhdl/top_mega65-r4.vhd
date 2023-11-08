@@ -533,6 +533,9 @@ begin
    -----------------------------------------------------------------------------------------
 
    i_framework : entity work.framework
+   generic map (
+      G_BOARD => "MEGA65_R4"
+   )
    port map (
       -- Connect to I/O ports
       clk_i                   => clk_i,

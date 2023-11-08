@@ -20,6 +20,9 @@ library xpm;
 use xpm.vcomponents.all;
 
 entity framework is
+generic (
+   G_BOARD : string                                         -- Which platform are we running on.
+);
 port (
    clk_i                   : in    std_logic;                  -- 100 MHz clock
    reset_n_i               : in    std_logic;
@@ -237,6 +240,7 @@ constant C_SYS_VGA            : std_logic_vector(15 downto 0) := x"0010";
 constant C_SYS_HDMI           : std_logic_vector(15 downto 0) := x"0011";
 constant C_SYS_CRTSANDROMS    : std_logic_vector(15 downto 0) := x"0020";
 constant C_SYS_CORE           : std_logic_vector(15 downto 0) := x"0030";
+constant C_SYS_BOARD          : std_logic_vector(15 downto 0) := x"0040";
 
 ---------------------------------------------------------------------------------------------
 -- Clocks and active high reset signals for each clock domain
@@ -414,6 +418,16 @@ signal fpga_scl_tri           : std_logic;
 signal fpga_sda_tri           : std_logic;
 signal fpga_scl_out           : std_logic;
 signal fpga_sda_out           : std_logic;
+
+-- return ASCII value of given string at the position defined by strpos
+function str2data(str : string; strpos : integer) return std_logic_vector is
+begin
+   if strpos <= str'length then
+      return std_logic_vector(to_unsigned(character'pos(str(strpos)), 16));
+   else
+      return (others => '0'); -- zero terminated strings
+   end if;
+end;
 
 begin
 
@@ -817,6 +831,10 @@ begin
 
                         when others => null;
                      end case;
+
+                  -- Info about the board
+                  when C_SYS_BOARD =>
+                     qnice_ramrom_data_in <= str2data(G_BOARD, to_integer(unsigned(qnice_ramrom_addr_o(11 downto 0))));
 
                   when others => null;
                end case;
