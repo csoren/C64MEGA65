@@ -356,19 +356,27 @@ started application might not work as intended.
 
 Workaround: Power-cycle the MEGA65 but avoid the "HDMI back powering problem".
 
-## 17) Which features are on the roadmap?
+## 17) How can I work with GEOS?
+
+GEOS works very well on the MEGA65 using Version 5 of the core. AmokPhaze101 wrote
+a great step-by-step documentation:
+
+1. Download GEOS [using this download link](https://github.com/MJoergen/C64MEGA65/raw/master/doc/assets/geos.zip)
+2. Work with AmokPhaze101's tutorial: [View and download PDF](https://github.com/MJoergen/C64MEGA65/blob/master/doc/GEOS_WITH_THE_C64_CORE.pdf)
+
+## 18) Which features are on the roadmap?
 
 [Here](ROADMAP.md) is the roadmap for future versions. Additionally, there are also 
 [feature requests](https://github.com/MJoergen/C64MEGA65/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
 that we might consider for future releases.
 
-## 18) Where can I post and discuss my feature request?
+## 19) Where can I post and discuss my feature request?
 
 [Engage with us on GitHub](https://github.com/MJoergen/C64MEGA65/issues) or in the
 [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200) channel
 on Discord to discuss feature requests and the future of the C64 for MEGA65 core.
 
-## 19) Are there cores other than the C64 available or in development?
+## 20) Are there cores other than the C64 available or in development?
 
 Yes. Please visit this website, it contains a list of MEGA65 cores that
 will be constantly updated:
@@ -380,7 +388,7 @@ projects such as MiSTer: The website is also sharing additional information
 about how to get started with doing this and about the
 [MiSTer2MEGA65 framework](https://github.com/sy2002/MiSTer2MEGA65).
 
-## 20) I am a total newby and want to learn FPGA development and making or porting cores
+## 21) I am a total newby and want to learn FPGA development and making or porting cores
 
 If you own a MEGA65, then
 [this short article](https://files.mega65.org?ar=898d573b-d30d-4438-8893-09455bd16400)
