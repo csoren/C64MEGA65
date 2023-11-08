@@ -204,6 +204,10 @@ port (
    qnice_ramrom_we_o       : out   std_logic;
    qnice_ramrom_wait_i     : in    std_logic;
 
+   -- PMOD I2C device
+   grove_sda_io            : inout std_logic;
+   grove_scl_io            : inout std_logic;
+
    -- On-board I2C devices
    fpga_sda_io             : inout std_logic;
    fpga_scl_io             : inout std_logic
@@ -414,10 +418,8 @@ signal hr_dq_oe               : std_logic;   -- Output enable for DQ
 signal qnice_pps              : std_logic;
 signal qnice_hdmi_clk_freq    : std_logic_vector(27 downto 0);
 
-signal fpga_scl_tri           : std_logic;
-signal fpga_sda_tri           : std_logic;
-signal fpga_scl_out           : std_logic;
-signal fpga_sda_out           : std_logic;
+signal scl_out                : std_logic_vector(7 downto 0);
+signal sda_out                : std_logic_vector(7 downto 0);
 
 -- return ASCII value of given string at the position defined by strpos
 function str2data(str : string; strpos : integer) return std_logic_vector is
@@ -1249,17 +1251,17 @@ begin
       cpu_addr_i    => qnice_ramrom_addr_o(7 downto 0),
       cpu_wr_data_i => qnice_ramrom_data_out_o,
       cpu_rd_data_o => qnice_i2c_rd_data,
-      scl_in_i      => fpga_scl_io,
-      sda_in_i      => fpga_sda_io,
-      scl_tri_o     => fpga_scl_tri,
-      sda_tri_o     => fpga_sda_tri,
-      scl_out_o     => fpga_scl_out,
-      sda_out_o     => fpga_sda_out
+      scl_in_i      => "111111" & grove_scl_io & fpga_scl_io,
+      sda_in_i      => "111111" & grove_sda_io & fpga_sda_io,
+      scl_out_o     => scl_out,
+      sda_out_o     => sda_out
    ); -- i2c_controller_inst
 
    -- Open collector, i.e. either drive pin low, or let it float (tri-state)
-   fpga_sda_io <= '0' when fpga_sda_tri = '0' and fpga_sda_out = '0' else 'Z';
-   fpga_scl_io <= '0' when fpga_scl_tri = '0' and fpga_scl_out = '0' else 'Z';
+   fpga_sda_io  <= '0' when sda_out(0) = '0' else 'Z';
+   fpga_scl_io  <= '0' when scl_out(0) = '0' else 'Z';
+   grove_sda_io <= '0' when sda_out(1) = '0' else 'Z';
+   grove_scl_io <= '0' when scl_out(1) = '0' else 'Z';
 
 end architecture synthesis;
 

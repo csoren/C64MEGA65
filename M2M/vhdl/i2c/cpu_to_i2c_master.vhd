@@ -16,6 +16,7 @@ entity cpu_to_i2c_master is
     -- I2C master signals
     enable_o      : out std_logic;
     start_o       : out std_logic;
+    i2c_bus_o     : out natural range 0 to 7;
     i2c_addr_o    : out std_logic_vector(7 downto 0);
     num_bytes_o   : out unsigned(3 downto 0);
     tx_data_o     : out std_logic_vector(15 downto 0);
@@ -72,14 +73,16 @@ begin
       start          <= start(2 downto 0) & start(0);
 
       if cpu_wr_en = '1' and cpu_addr_i = REG_I2C_CONFIG then
-        i2c_addr_o <= cpu_wr_data_i( 7 downto 0);
-        num_bytes  <= cpu_wr_data_i(11 downto 8);
+        i2c_addr_o <= cpu_wr_data_i( 7 downto  0);
+        num_bytes  <= cpu_wr_data_i(11 downto  8);
+        i2c_bus_o  <= to_integer(unsigned(cpu_wr_data_i(15 downto 13)));
         start(0)   <= '1';
       end if;
       if cpu_rd_en = '1' then
         if cpu_addr_i = REG_I2C_CONFIG then
-          cpu_rd_data_o(7 downto 0)  <= i2c_addr_o;
-          cpu_rd_data_o(11 downto 8) <= num_bytes;
+          cpu_rd_data_o( 7 downto  0) <= i2c_addr_o;
+          cpu_rd_data_o(11 downto  8) <= num_bytes;
+          cpu_rd_data_o(15 downto 13) <= std_logic_vector(to_unsigned(i2c_bus_o, 3));
         elsif cpu_addr_i = REG_I2C_STATUS then
           cpu_rd_data_o(3 downto 0) <= response_i(3) & nack & response_i(1 downto 0);
           nack <= '0';

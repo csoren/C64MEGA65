@@ -8,8 +8,9 @@ use ieee.numeric_std.all;
 -- Address 0xF1        : Status
 -- Config.0            : 0 = write, 1 = read
 -- Config.7-1          : Slave address
--- Config.14-8         : Number of bytes to transfer
--- Config.15           : Unused
+-- Config.11-8         : Number of bytes to transfer
+-- Config.12           : Unused
+-- Config.15-13        : I2C bus
 -- Status.0            : Idle
 -- Status.1            : Busy
 -- Status.2            : Nack (clear on read)
@@ -38,12 +39,10 @@ entity i2c_controller is
     cpu_wr_data_i : in  std_logic_vector(15 downto 0);
     cpu_rd_data_o : out std_logic_vector(15 downto 0);
     -- I2C signals
-    scl_in_i      : in  std_logic;
-    sda_in_i      : in  std_logic;
-    scl_tri_o     : out std_logic;
-    sda_tri_o     : out std_logic;
-    scl_out_o     : out std_logic;
-    sda_out_o     : out std_logic
+    scl_in_i      : in  std_logic_vector(7 downto 0);
+    sda_in_i      : in  std_logic_vector(7 downto 0);
+    scl_out_o     : out std_logic_vector(7 downto 0);
+    sda_out_o     : out std_logic_vector(7 downto 0)
   );
 end entity i2c_controller;
 
@@ -51,6 +50,7 @@ architecture synthesis of i2c_controller is
 
   signal enable    : std_logic;
   signal start     : std_logic;
+  signal i2c_bus   : natural range 0 to 7;
   signal i2c_addr  : std_logic_vector( 7 downto 0);    -- Slave address, R/nWR
   signal num_bytes : unsigned( 3 downto 0);            -- Number of bytes to send
   signal tx_data   : std_logic_vector(15 downto 0);
@@ -73,6 +73,7 @@ begin
       cpu_rd_data_o  => cpu_rd_data_o,
       enable_o       => enable,
       start_o        => start,
+      i2c_bus_o      => i2c_bus,
       i2c_addr_o     => i2c_addr,
       num_bytes_o    => num_bytes,
       tx_data_o      => tx_data,
@@ -98,12 +99,10 @@ begin
       rx_vld_o       => rx_vld,
       rx_data_o      => rx_data,
       response_o     => response,
-      scl_in_i       => scl_in_i,
-      sda_in_i       => sda_in_i,
-      scl_tri_o      => scl_tri_o,
-      sda_tri_o      => sda_tri_o,
-      scl_out_o      => scl_out_o,
-      sda_out_o      => sda_out_o
+      scl_in_i       => scl_in_i(i2c_bus),
+      sda_in_i       => sda_in_i(i2c_bus),
+      scl_out_o      => scl_out_o(i2c_bus),
+      sda_out_o      => sda_out_o(i2c_bus)
     ); -- i2c_master_inst
 
 end architecture synthesis;

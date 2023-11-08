@@ -24,8 +24,6 @@ entity i2c_master is
     -- Interface to device
     scl_in_i          : in  std_logic;
     sda_in_i          : in  std_logic;
-    scl_tri_o         : out std_logic;
-    sda_tri_o         : out std_logic;
     scl_out_o         : out std_logic;
     sda_out_o         : out std_logic
   );
@@ -35,6 +33,10 @@ architecture synthesis of i2c_master is
 
   type state_t is (I2C_IDLE, I2C_REP_START, I2C_START, I2C_WR_NEG_EDGE, I2C_WR_POS_EDGE,
                    I2C_RD_NEG_EDGE, I2C_RD_POS_EDGE, I2C_STOP_1, I2C_STOP_2);
+  signal sda_out      : std_logic;
+  signal scl_out      : std_logic;
+  signal sda_tri      : std_logic;
+  signal scl_tri      : std_logic;
 
   signal sda_in_s     : std_logic;
   signal scl_in_s     : std_logic;
@@ -55,7 +57,10 @@ architecture synthesis of i2c_master is
 
 begin
 
-  scl_tri_o <= response_o(0) or not enable_i;
+  sda_out_o <= sda_out or sda_tri;
+  scl_out_o <= scl_out or scl_tri;
+
+  scl_tri <= response_o(0) or not enable_i;
 
   input_proc : process (clk_i)
   begin
@@ -97,46 +102,46 @@ begin
     if rising_edge(clk_i) then
       if enable_i = '0' then
         sda_out_s  <= '1';
-        scl_out_o  <= '1';
-        sda_tri_o  <= '1';
+        scl_out    <= '1';
+        sda_tri    <= '1';
         response_o <= "0001";
         state      <= I2C_IDLE;
       end if;
 
       if clr_tri = '1' then
-        sda_tri_o <= '0';
+        sda_tri <= '0';
       end if;
       clr_tri <= '0';
-      sda_out_o <= sda_out_s;   -- Increase SDA hold time by 10 ns
+      sda_out <= sda_out_s;   -- Increase SDA hold time by 10 ns
 
-      tx_rdy_o  <= '0';
-      rx_vld_o  <= '0';
+      tx_rdy_o      <= '0';
+      rx_vld_o      <= '0';
       response_o(2) <= '0';     -- Clear NACK;
 
       if clk_en = '1' then
-        if scl_out_o = '1' and scl_in_s = '0' then   -- Slave wait
+        if scl_out = '1' and scl_in_s = '0' then   -- Slave wait
           response_o(3) <= '1';
         else
           response_o(3) <= '0';
           response_o(0) <= '0';                -- clear idle flag
           case state is
             when I2C_IDLE =>
-              sda_tri_o   <= '1';
-              scl_out_o   <= '1';
-              sda_out_s   <= '1';
+              sda_tri   <= '1';
+              scl_out   <= '1';
+              sda_out_s <= '1';
               if start_i = '1' then
-                state     <= I2C_START;
+                state   <= I2C_START;
               end if;
               response_o(1) <= '0';            -- Clear busy flag set
               response_o(0) <= '1';            -- set idle flag
 
             when I2C_REP_START =>
-              scl_out_o <= '1';
+              scl_out <= '1';
               state     <= I2C_START;
 
             when I2C_START =>
               clr_tri   <= '1';
-              scl_out_o <= '1';
+              scl_out   <= '1';
               sda_out_s <= '0';                    -- Start condition
               response_o(1) <= '1';                -- Set busy flag set
               nack      <= '0';
@@ -149,14 +154,14 @@ begin
               rx_data_o <= (others => '0');
 
             when I2C_WR_NEG_EDGE =>                  -- Send Byte
-              scl_out_o <= '0';
+              scl_out   <= '0';
               sda_out_s <= tx_reg(7);
               tx_reg    <= tx_reg(6 downto 0) & '1';
               state     <= I2C_WR_POS_EDGE;
               if (bit_cnt = 1) then
-                sda_tri_o <= '1';                    -- ACK bit
+                sda_tri <= '1';                    -- ACK bit
               else
-                clr_tri   <= '1';
+                clr_tri <= '1';
               end if;
               if (bit_cnt > 0) then
                 bit_cnt <= bit_cnt - 1;
@@ -168,7 +173,7 @@ begin
                   if rd_cmd = '1' then               -- Goto Read section
                     odd_byte  <= '0';
                     sda_out_s <= '1';
-                    sda_tri_o <= '1';
+                    sda_tri   <= '1';
                     clr_tri   <= '0';
                     state     <= I2C_RD_POS_EDGE;
                   else
@@ -191,12 +196,12 @@ begin
               end if;
 
             when I2C_WR_POS_EDGE =>
-              scl_out_o <= '1';
-              state     <= I2C_WR_NEG_EDGE;
+              scl_out <= '1';
+              state   <= I2C_WR_NEG_EDGE;
               if bit_cnt = 0 then                    -- Prepare next byte
                 nack   <= sda_in_s;                  -- ACK/NACK
                 if odd_byte = '1' then
-                  tx_reg <= tx_data_i(7 downto 0);
+                  tx_reg   <= tx_data_i(7 downto 0);
                   tx_rdy_o <= '1';
                 else
                   tx_reg <= tx_data_i(15 downto 8);
@@ -208,9 +213,9 @@ begin
               end if;
 
             when I2C_RD_NEG_EDGE =>
-              scl_out_o <= '0';
+              scl_out   <= '0';
               sda_out_s <= '1';
-              sda_tri_o <= '1';
+              sda_tri   <= '1';
               state     <= I2C_RD_POS_EDGE;          -- Default state
               if bit_cnt = 1 then                    -- ACK/NACK
                 clr_tri <= '1';
@@ -245,13 +250,13 @@ begin
               end if;
 
             when I2C_RD_POS_EDGE =>                  -- Read
-              rx_reg    <= rx_reg(6 downto 0) & sda_in_s;
-              scl_out_o <= '1';
-              state     <= I2C_RD_NEG_EDGE;
+              rx_reg  <= rx_reg(6 downto 0) & sda_in_s;
+              scl_out <= '1';
+              state   <= I2C_RD_NEG_EDGE;
 
             when I2C_STOP_1 =>                       -- Stop
-              scl_out_o <= '1';
-              state     <= I2C_STOP_2;
+              scl_out <= '1';
+              state   <= I2C_STOP_2;
 
             when I2C_STOP_2 =>
               sda_out_s  <= '1';
@@ -267,10 +272,10 @@ begin
       end if;
 
       if rst_i = '1' then
-        sda_out_s <= '1';
-        scl_out_o <= '1';
-        state     <= I2C_IDLE;
-        nack      <= '0';
+        sda_out_s  <= '1';
+        scl_out    <= '1';
+        state      <= I2C_IDLE;
+        nack       <= '0';
         response_o <= (others => '0');
       end if;
     end if;
