@@ -155,8 +155,8 @@ begin
         cpu_we_o      <= '0';
         cpu_addr_o    <= (others => '0');
         cpu_wr_data_o <= (others => '0');
-        action_idx  <= 0;
-        next_action <= '0';
+        action_idx    <= 0;
+        next_action   <= '0';
         rtc           <= "0" & X"4000000101000000";
         state         <= RESET_ST;
       end if;
