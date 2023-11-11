@@ -55,7 +55,7 @@ architecture synthesis of rtc_reader is
     5 => (WRITE_CMD, X"F0", X"07A3"),   -- Receive seven bytes from RTC
     6 => (WAIT_CMD,  X"F1", X"0000"),   -- Wait until I2C command is accepted
     7 => (WAIT_CMD,  X"F1", X"0001"),   -- Wait until I2C is idle
-    8 => (SHIFT_CMD, X"00", X"0007")    -- Read seven bytes from buffer
+    8 => (SHIFT_CMD, X"00", X"0004")    -- Read seven bytes from buffer
    );
   constant C_ACTION_LIST : action_list_t := C_ACTION_LIST_R4; -- TBD
   constant C_ACTION_NUM : natural := C_ACTION_LIST'length;
@@ -78,9 +78,6 @@ begin
     if rising_edge(clk_i) then
       if cpu_wait_i = '0' then
         cpu_ce_o      <= '0';
-        cpu_we_o      <= '0';
-        cpu_addr_o    <= (others => '0');
-        cpu_wr_data_o <= (others => '0');
       end if;
 
       next_action <= '0';
@@ -129,8 +126,9 @@ begin
                 cpu_addr_o    <= action.addr;
                 cpu_wr_data_o <= (others => '0');
                 if cpu_ce_o = '1' and cpu_wait_i = '0' then
-                  rtc(55 downto 0) <= cpu_rd_data_i(7 downto 0) & rtc(55 downto 8);
+                  rtc(63 downto 0) <= cpu_rd_data_i(7 downto 0) & cpu_rd_data_i(15 downto 8) & rtc(63 downto 16);
                   action.data <= action.data - 1;
+                  action.addr <= action.addr + 1;
                   cpu_addr_o  <= cpu_addr_o + 1;
                   if action.data = 1 then
                     next_action <= '1';
