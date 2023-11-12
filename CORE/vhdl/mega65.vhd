@@ -532,8 +532,12 @@ begin
       )
       port map (
          clk_main_i             => main_clk_o,
+         
+         -- see RESET SEMANTICS in main.vhd
+         -- reset_soft_i minimum pulse length is 32 clock cycles
          reset_soft_i           => main_reset_core_i or main_reset_core,
          reset_hard_i           => main_reset_m2m_i or main_reset_from_prgloader,
+         
          pause_i                => main_pause_core_i,
          trigger_run_i          => main_prg_trigger_run,
 
@@ -995,7 +999,7 @@ begin
       qnice_wait_o         => qnice_crt_qnice_wait,
       main_clk_i           => main_clk_o,
       main_rst_i           => main_reset_m2m_i,
-      main_reset_core_o    => main_reset_core,
+      main_reset_core_o    => main_reset_core,        -- see RESET SEMANTICS in main.vhd, min. pulse length is 32 clock cycles
       main_loading_o       => main_crt_loading,
       main_id_o            => main_crt_id,
       main_exrom_o         => main_crt_exrom,

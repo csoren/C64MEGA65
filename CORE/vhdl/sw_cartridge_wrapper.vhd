@@ -441,7 +441,10 @@ begin
          if main_reset_core(65) = '1' and main_bank_wait_o = '1' then
             main_reset_core <= (others => '1');
          end if;
+
+         -- see comment RESET SEMANTICS in main.vhd: minimum reset pulse length is 32 cycles
          main_reset_core_o <= main_reset_core(65);
+
          if main_rst_i = '1' then
             main_reset_core <= (others => '1');
          end if;

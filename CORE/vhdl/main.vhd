@@ -23,9 +23,14 @@ entity main is
    );
    port (
       clk_main_i             : in  std_logic;
-      reset_soft_i           : in  std_logic;              -- Pulse once for a soft reset
-      reset_hard_i           : in  std_logic;              -- Pulse once for a hard reset
-      pause_i                : in  std_logic;              -- Pull high to pause the core
+
+      -- Read the RESET SEMANTICS comment below
+      -- A pulse of reset_soft_i needs to be 32 clock cycles long at a minimum      
+      reset_soft_i           : in  std_logic;
+      reset_hard_i           : in  std_logic;
+
+      -- Pull high to pause the core      
+      pause_i                : in  std_logic;
 
       -- Trigger the sequence RUN<Return> to autostart PRG files
       trigger_run_i          : in  std_logic;
@@ -317,12 +322,40 @@ architecture synthesis of main is
    -- clock enable to derive the C64's pixel clock from the core's main clock : divide by 4
    signal video_ce             : std_logic_vector(1 downto 0);
 
-   -- Hard reset handling:
-   -- Do not use hard_reset_n anywhere in main.vhd other than in cpu_data_in. Use reset_core_n instead.
-   constant C_HARD_RST_DELAY   : natural   := 100_000; -- roundabout 1/30 of a second
-   signal hard_rst_counter     : natural   := 0;
+   -- RESET SEMANTICS
+   --
+   -- The C64 core implements core specific semantics: A standard reset of the core is a soft reset and
+   -- will not interfere with any "reset protections". This also means that a soft reset will start
+   -- soft- and hardware cartridges. A hard reset on the other hand does circumvent "reset protections"
+   -- and will therefore also exit games which prevent you from exitting them via reset and you can
+   -- also exit from simulated cartridges using a hard reset.
+   --
+   -- When pulsing reset_soft_i from the outside (mega65.vhd), then you need to ensure that this
+   -- pulse is at least 32 clock cycles long. Currently (see mega65.vhd) there are two sources that
+   -- trigger reset_soft_i: The M2M reset manager and sw_cartridge_wrapper. Both are ensuring that
+   -- the rest pulse is at least 32 clock cycles long.   
+   --
+   -- CAUTION: NEVER DIRECTLY USE THE INPUT SIGNALS
+   --       reset_soft_i and
+   --       reset_hard_i
+   -- IN MAIN.VHD AS YOU WILL RISK DATA CORRUPTION!
+   -- Exceptions are the processes "hard_reset" and "handle_cartridge_triggered_resets",
+   -- which "know what they are doing".
+   --
+   -- The go-to signal for all standard reset situations within main.vhd:
+   --       reset_core_n
+   -- To prevent data corruption, there is a protected version of reset_soft_i called reset_core_n.
+   -- Data corruption can for example occur, when a user presses the reset button while a simulated
+   -- disk drive is still writing to the disk image on the SD card. Therefore reset_core_n is
+   -- protected by using the signal prevent_reset.
+   --
+   -- hard_reset_n IS NOT MEANT TO BE USED IN MAIN.VHD
+   -- with the exception of the "cpu_data_in" the reset input of "i_cartridge".    
    signal reset_core_n         : std_logic := '1';
    signal hard_reset_n         : std_logic := '1';
+
+   constant C_HARD_RST_DELAY   : natural   := 100_000; -- roundabout 1/30 of a second
+   signal hard_rst_counter     : natural   := 0;
    signal hard_reset_n_d       : std_logic := '1';
    signal cold_start_done      : std_logic := '0';
 
@@ -882,7 +915,8 @@ begin
       if rising_edge(clk_main_i) then
          core_phi2_prev <= core_phi2;
 
-         -- We cannot use reset_core_n here because as soon as cart_reset_counter is > 0 reset_core_n goes low
+         -- In contrast to what is written above in the comment RESET SEMANTICS, we cannot use
+         -- reset_core_n here because as soon as cart_reset_counter is > 0 reset_core_n goes low
          -- and then cart_reset_counter would be reset back to 0 prematurely
          if reset_soft_i or reset_hard_i then
             cart_reset_counter <= 0;
@@ -960,10 +994,14 @@ begin
    --------------------------------------------------------------------------------------------------
 
    -- This component handles the CPU writes to $DExx and $DFxx for the bank switching.
+   -- IMPORTANT: The component sets the correct exrom_o and game_o while cart_loading_i='1'.
+   -- During a reset signal via "rst_i" exrom_o, game_o and other stateful signals are reset to the
+   -- neutral state. Due to the fact, that sw_cartridge_wrapper uses a soft reset to make sure the
+   -- C64 starts the cartridge, we must not reset i_cartridge on soft reset. 
    i_cartridge : entity work.cartridge
       port map (
          clk_i          => clk_main_i,
-         rst_i          => not reset_core_n,
+         rst_i          => not hard_reset_n, -- See "IMPORTANT" in above comment
          cart_loading_i => cartridge_loading_i,
          cart_id_i      => cartridge_id_i,
          cart_exrom_i   => cartridge_exrom_i,
@@ -1346,7 +1384,7 @@ begin
       )
       port map (
          clk_i               => clk_main_i,
-         rst_i               => reset_soft_i,
+         rst_i               => not reset_core_n,
          reu_ext_cycle_i     => sim_ext_cycle,
          reu_ext_cycle_o     => sim_reu_cycle,
          reu_addr_i          => sim_reu_addr,
@@ -1373,7 +1411,7 @@ begin
       )
       port map (
          clk_i                 => clk_main_i,
-         rst_i                 => reset_soft_i,
+         rst_i                 => not reset_core_n,
          s_avm_waitrequest_o   => map_waitrequest,
          s_avm_write_i         => map_write,
          s_avm_read_i          => map_read,
