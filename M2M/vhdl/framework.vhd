@@ -236,6 +236,7 @@ constant C_DEV_OSM_CONFIG     : std_logic_vector(15 downto 0) := x"0002";
 constant C_DEV_ASCAL_PPHASE   : std_logic_vector(15 downto 0) := x"0003";
 constant C_DEV_HYPERRAM       : std_logic_vector(15 downto 0) := x"0004";
 constant C_DEV_I2C            : std_logic_vector(15 downto 0) := x"0005";
+constant C_DEV_RTC            : std_logic_vector(15 downto 0) := x"0006";
 constant C_DEV_SYS_INFO       : std_logic_vector(15 downto 0) := x"00FF";
 
 -- SysInfo record numbers
@@ -374,6 +375,26 @@ signal qnice_i2c_ce           : std_logic;
 signal qnice_i2c_we           : std_logic;
 signal qnice_i2c_rd_data      : std_logic_vector(15 downto 0);
 
+signal qnice_rtc_wait         : std_logic;
+signal qnice_rtc_ce           : std_logic;
+signal qnice_rtc_we           : std_logic;
+signal qnice_rtc_rd_data      : std_logic_vector(15 downto 0);
+
+signal qnice_rtc              : std_logic_vector(64 downto 0);
+signal qnice_rtc_i2c_wait     : std_logic;
+signal qnice_rtc_i2c_ce       : std_logic;
+signal qnice_rtc_i2c_we       : std_logic;
+signal qnice_rtc_i2c_addr     : std_logic_vector( 7 downto 0);
+signal qnice_rtc_i2c_wr_data  : std_logic_vector(15 downto 0);
+signal qnice_rtc_i2c_rd_data  : std_logic_vector(15 downto 0);
+
+signal qnice_i2c_rtc_wait     : std_logic;
+signal qnice_i2c_rtc_ce       : std_logic;
+signal qnice_i2c_rtc_we       : std_logic;
+signal qnice_i2c_rtc_addr     : std_logic_vector( 7 downto 0);
+signal qnice_i2c_rtc_wr_data  : std_logic_vector(15 downto 0);
+signal qnice_i2c_rtc_rd_data  : std_logic_vector(15 downto 0);
+
 ---------------------------------------------------------------------------------------------
 -- HyperRAM
 ---------------------------------------------------------------------------------------------
@@ -422,14 +443,14 @@ signal scl_out                : std_logic_vector(7 downto 0);
 signal sda_out                : std_logic_vector(7 downto 0);
 
 -- return ASCII value of given string at the position defined by strpos
-function str2data(str : string; strpos : integer) return std_logic_vector is
+pure function str2data(str : string; strpos : integer) return std_logic_vector is
 begin
    if strpos <= str'length then
       return std_logic_vector(to_unsigned(character'pos(str(strpos)), 16));
    else
       return (others => '0'); -- zero terminated strings
    end if;
-end;
+end function str2data;
 
 begin
 
@@ -731,6 +752,13 @@ begin
                qnice_i2c_we               <= qnice_ramrom_we_o;
                qnice_ramrom_data_in       <= qnice_i2c_rd_data;
                qnice_ramrom_wait          <= qnice_i2c_wait;
+
+            -- RTC devices access
+            when C_DEV_RTC =>
+               qnice_rtc_ce               <= qnice_ramrom_ce_o;
+               qnice_rtc_we               <= qnice_ramrom_we_o;
+               qnice_ramrom_data_in       <= qnice_rtc_rd_data;
+               qnice_ramrom_wait          <= qnice_rtc_wait;
 
             -- Read-only System Info (constants are defined in sysdef.asm)
             when C_DEV_SYS_INFO =>
@@ -1238,6 +1266,49 @@ begin
    -- I2C controller
    ---------------------------------------------------------------------------------------------------------------
 
+   rtc_inst : entity work.rtc
+   port map (
+      clk_i         => qnice_clk,
+      rst_i         => qnice_rst,
+      cpu_wait_o    => qnice_rtc_wait,
+      cpu_ce_i      => qnice_rtc_ce,
+      cpu_we_i      => qnice_rtc_we,
+      cpu_addr_i    => qnice_ramrom_addr_o(7 downto 0),
+      cpu_wr_data_i => qnice_ramrom_data_out_o,
+      cpu_rd_data_o => qnice_rtc_rd_data,
+      rtc_o         => qnice_rtc,
+      cpu_wait_i    => qnice_i2c_wait,
+      cpu_ce_o      => qnice_rtc_i2c_ce,
+      cpu_we_o      => qnice_rtc_i2c_we,
+      cpu_addr_o    => qnice_rtc_i2c_addr,
+      cpu_wr_data_o => qnice_rtc_i2c_wr_data,
+      cpu_rd_data_i => qnice_i2c_rd_data
+   ); -- rtc_inst
+
+   qnice_arbit_inst : entity work.qnice_arbit
+     port map (
+       clk_i        => qnice_clk,
+       rst_i        => qnice_rst,
+       s0_wait_o    => qnice_i2c_wait,
+       s0_ce_i      => qnice_i2c_ce,
+       s0_we_i      => qnice_i2c_we,
+       s0_addr_i    => qnice_ramrom_addr_o(7 downto 0),
+       s0_wr_data_i => qnice_ramrom_data_out_o,
+       s0_rd_data_o => qnice_i2c_rd_data,
+       s1_wait_o    => qnice_rtc_i2c_wait,
+       s1_ce_i      => qnice_rtc_i2c_ce,
+       s1_we_i      => qnice_rtc_i2c_we,
+       s1_addr_i    => qnice_rtc_i2c_addr,
+       s1_wr_data_i => qnice_rtc_i2c_wr_data,
+       s1_rd_data_o => qnice_rtc_i2c_rd_data,
+       m_wait_i     => qnice_i2c_rtc_wait,
+       m_ce_o       => qnice_i2c_rtc_ce,
+       m_we_o       => qnice_i2c_rtc_we,
+       m_addr_o     => qnice_i2c_rtc_addr,
+       m_wr_data_o  => qnice_i2c_rtc_wr_data,
+       m_rd_data_i  => qnice_i2c_rtc_rd_data
+     ); -- qnice_arbit_inst
+
    i2c_controller_inst : entity work.i2c_controller
    generic map (
       G_I2C_CLK_DIV => 250   -- SCL=100kHz @50MHz
@@ -1245,12 +1316,12 @@ begin
    port map (
       clk_i         => qnice_clk,
       rst_i         => qnice_rst,
-      cpu_wait_o    => qnice_i2c_wait,
-      cpu_ce_i      => qnice_i2c_ce,
-      cpu_we_i      => qnice_i2c_we,
-      cpu_addr_i    => qnice_ramrom_addr_o(7 downto 0),
-      cpu_wr_data_i => qnice_ramrom_data_out_o,
-      cpu_rd_data_o => qnice_i2c_rd_data,
+      cpu_wait_o    => qnice_i2c_rtc_wait,
+      cpu_ce_i      => qnice_i2c_rtc_ce,
+      cpu_we_i      => qnice_i2c_rtc_we,
+      cpu_addr_i    => qnice_i2c_rtc_addr,
+      cpu_wr_data_i => qnice_i2c_rtc_wr_data,
+      cpu_rd_data_o => qnice_i2c_rtc_rd_data,
       scl_in_i      => "111111" & grove_scl_io & fpga_scl_io,
       sda_in_i      => "111111" & grove_sda_io & fpga_sda_io,
       scl_out_o     => scl_out,
