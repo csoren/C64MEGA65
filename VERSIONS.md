@@ -1,10 +1,11 @@
 Version 5.1 - MONTH, DAY, YEAR
 ==============================
 
-The main purpose of this release is to support the new <@TODO"2024 batches" or "post November 2023"? Release date?> of the
+The main purpose of this release is to support the new 2024 batches of the
 MEGA65 (aka "R5") which sports enhanced hardware and better compatibility for
-Commodore 64 cartridges. Additionally the core now also supports the
-never-released-to-the-public R4 boards.
+Commodore 64 cartridges. It also delivers an improved sound-over-HDMI
+compatibility and fixes some bugs for all boards, such as the
+"long-reset bug".
 
 ## New Features: R4/R5 boards only
 
@@ -22,6 +23,15 @@ workaround is not needed for the KungFu Flash any more
 ## New Features: All boards
 
 * You can now close the "About & Help" screens also by pressing Run/Stop.
+
+## Improved HDMI Compatibility: All boards
+
+* Some monitors (e.g. the Philips S-line 275S1AE) did not output audio when
+  displaying HDMI. The problem was related to a parity error in the IEC60958
+  channel which is fixed now.
+
+WIP Fixed random micro cuts of sound that occured on on some HDMI displays.
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/13)
 
 ## Bugfixes: R4/R5 boards only
 
@@ -51,6 +61,9 @@ workaround is not needed for the KungFu Flash any more
 * The "Audio improvements" feature only worked with analog audio (3.5mm jack)
   but not with digital audio via HDMI.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/100)
+
+* MEGA65's internal floppy drive kepts spinning when a floppy was inserted.
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/110)
 
 Version 5 - June 23, 2023
 =========================
