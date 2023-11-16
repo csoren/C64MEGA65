@@ -381,19 +381,6 @@ signal qnice_rtc_we           : std_logic;
 signal qnice_rtc_rd_data      : std_logic_vector(15 downto 0);
 
 signal qnice_rtc              : std_logic_vector(64 downto 0);
-signal qnice_rtc_i2c_wait     : std_logic;
-signal qnice_rtc_i2c_ce       : std_logic;
-signal qnice_rtc_i2c_we       : std_logic;
-signal qnice_rtc_i2c_addr     : std_logic_vector( 7 downto 0);
-signal qnice_rtc_i2c_wr_data  : std_logic_vector(15 downto 0);
-signal qnice_rtc_i2c_rd_data  : std_logic_vector(15 downto 0);
-
-signal qnice_i2c_rtc_wait     : std_logic;
-signal qnice_i2c_rtc_ce       : std_logic;
-signal qnice_i2c_rtc_we       : std_logic;
-signal qnice_i2c_rtc_addr     : std_logic_vector( 7 downto 0);
-signal qnice_i2c_rtc_wr_data  : std_logic_vector(15 downto 0);
-signal qnice_i2c_rtc_rd_data  : std_logic_vector(15 downto 0);
 
 ---------------------------------------------------------------------------------------------
 -- HyperRAM
@@ -1266,67 +1253,31 @@ begin
    -- I2C controller
    ---------------------------------------------------------------------------------------------------------------
 
-   rtc_inst : entity work.rtc
-   port map (
-      clk_i         => qnice_clk,
-      rst_i         => qnice_rst,
-      cpu_wait_o    => qnice_rtc_wait,
-      cpu_ce_i      => qnice_rtc_ce,
-      cpu_we_i      => qnice_rtc_we,
-      cpu_addr_i    => qnice_ramrom_addr_o(7 downto 0),
-      cpu_wr_data_i => qnice_ramrom_data_out_o,
-      cpu_rd_data_o => qnice_rtc_rd_data,
-      rtc_o         => qnice_rtc,
-      cpu_wait_i    => qnice_i2c_wait,
-      cpu_ce_o      => qnice_rtc_i2c_ce,
-      cpu_we_o      => qnice_rtc_i2c_we,
-      cpu_addr_o    => qnice_rtc_i2c_addr,
-      cpu_wr_data_o => qnice_rtc_i2c_wr_data,
-      cpu_rd_data_i => qnice_i2c_rd_data
-   ); -- rtc_inst
-
-   qnice_arbit_inst : entity work.qnice_arbit
-     port map (
-       clk_i        => qnice_clk,
-       rst_i        => qnice_rst,
-       s0_wait_o    => qnice_i2c_wait,
-       s0_ce_i      => qnice_i2c_ce,
-       s0_we_i      => qnice_i2c_we,
-       s0_addr_i    => qnice_ramrom_addr_o(7 downto 0),
-       s0_wr_data_i => qnice_ramrom_data_out_o,
-       s0_rd_data_o => qnice_i2c_rd_data,
-       s1_wait_o    => qnice_rtc_i2c_wait,
-       s1_ce_i      => qnice_rtc_i2c_ce,
-       s1_we_i      => qnice_rtc_i2c_we,
-       s1_addr_i    => qnice_rtc_i2c_addr,
-       s1_wr_data_i => qnice_rtc_i2c_wr_data,
-       s1_rd_data_o => qnice_rtc_i2c_rd_data,
-       m_wait_i     => qnice_i2c_rtc_wait,
-       m_ce_o       => qnice_i2c_rtc_ce,
-       m_we_o       => qnice_i2c_rtc_we,
-       m_addr_o     => qnice_i2c_rtc_addr,
-       m_wr_data_o  => qnice_i2c_rtc_wr_data,
-       m_rd_data_i  => qnice_i2c_rtc_rd_data
-     ); -- qnice_arbit_inst
-
-   i2c_controller_inst : entity work.i2c_controller
+   i_rtc_i2c : entity work.rtc_i2c
    generic map (
       G_I2C_CLK_DIV => 250   -- SCL=100kHz @50MHz
    )
    port map (
       clk_i         => qnice_clk,
       rst_i         => qnice_rst,
-      cpu_wait_o    => qnice_i2c_rtc_wait,
-      cpu_ce_i      => qnice_i2c_rtc_ce,
-      cpu_we_i      => qnice_i2c_rtc_we,
-      cpu_addr_i    => qnice_i2c_rtc_addr,
-      cpu_wr_data_i => qnice_i2c_rtc_wr_data,
-      cpu_rd_data_o => qnice_i2c_rtc_rd_data,
+      rtc_o         => qnice_rtc,
+      rtc_wait_o    => qnice_rtc_wait,
+      rtc_ce_i      => qnice_rtc_ce,
+      rtc_we_i      => qnice_rtc_we,
+      rtc_addr_i    => qnice_ramrom_addr_o(7 downto 0),
+      rtc_wr_data_i => qnice_ramrom_data_out_o,
+      rtc_rd_data_o => qnice_rtc_rd_data,
+      i2c_wait_o    => qnice_i2c_wait,
+      i2c_ce_i      => qnice_i2c_ce,
+      i2c_we_i      => qnice_i2c_we,
+      i2c_addr_i    => qnice_ramrom_addr_o(7 downto 0),
+      i2c_wr_data_i => qnice_ramrom_data_out_o,
+      i2c_rd_data_o => qnice_i2c_rd_data,
       scl_in_i      => "111111" & grove_scl_io & fpga_scl_io,
       sda_in_i      => "111111" & grove_sda_io & fpga_sda_io,
       scl_out_o     => scl_out,
       sda_out_o     => sda_out
-   ); -- i2c_controller_inst
+   ); -- i_rtc_i2c
 
    -- Open collector, i.e. either drive pin low, or let it float (tri-state)
    fpga_sda_io  <= '0' when sda_out(0) = '0' else 'Z';
