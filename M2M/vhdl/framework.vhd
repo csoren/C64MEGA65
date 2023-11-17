@@ -246,6 +246,7 @@ constant C_SYS_HDMI           : std_logic_vector(15 downto 0) := x"0011";
 constant C_SYS_CRTSANDROMS    : std_logic_vector(15 downto 0) := x"0020";
 constant C_SYS_CORE           : std_logic_vector(15 downto 0) := x"0030";
 constant C_SYS_BOARD          : std_logic_vector(15 downto 0) := x"0040";
+constant C_SYS_HYPERRAM       : std_logic_vector(15 downto 0) := x"0041";
 
 ---------------------------------------------------------------------------------------------
 -- Clocks and active high reset signals for each clock domain
@@ -361,26 +362,34 @@ signal qnice_avm_write         : std_logic;
 signal qnice_avm_read          : std_logic;
 signal qnice_avm_address       : std_logic_vector(31 downto 0);
 signal qnice_avm_writedata     : std_logic_vector(15 downto 0);
-signal qnice_avm_byteenable    : std_logic_vector(1 downto 0);
-signal qnice_avm_burstcount    : std_logic_vector(7 downto 0);
+signal qnice_avm_byteenable    : std_logic_vector( 1 downto 0);
+signal qnice_avm_burstcount    : std_logic_vector( 7 downto 0);
 signal qnice_avm_readdata      : std_logic_vector(15 downto 0);
 signal qnice_avm_readdatavalid : std_logic;
 signal qnice_avm_waitrequest   : std_logic;
 
-signal qnice_pps              : std_logic;
-signal qnice_hdmi_clk_freq    : std_logic_vector(27 downto 0);
+signal qnice_pps               : std_logic;
+signal qnice_hdmi_clk_freq     : std_logic_vector(27 downto 0);
 
-signal qnice_i2c_wait         : std_logic;
-signal qnice_i2c_ce           : std_logic;
-signal qnice_i2c_we           : std_logic;
-signal qnice_i2c_rd_data      : std_logic_vector(15 downto 0);
+signal qnice_i2c_wait          : std_logic;
+signal qnice_i2c_ce            : std_logic;
+signal qnice_i2c_we            : std_logic;
+signal qnice_i2c_rd_data       : std_logic_vector(15 downto 0);
 
-signal qnice_rtc_wait         : std_logic;
-signal qnice_rtc_ce           : std_logic;
-signal qnice_rtc_we           : std_logic;
-signal qnice_rtc_rd_data      : std_logic_vector(15 downto 0);
+signal qnice_rtc_wait          : std_logic;
+signal qnice_rtc_ce            : std_logic;
+signal qnice_rtc_we            : std_logic;
+signal qnice_rtc_rd_data       : std_logic_vector(15 downto 0);
 
-signal qnice_rtc              : std_logic_vector(64 downto 0);
+signal qnice_rtc               : std_logic_vector(64 downto 0);
+
+-- Statistics
+signal qnice_hr_count_long     : std_logic_vector(31 downto 0);
+signal qnice_hr_count_short    : std_logic_vector(31 downto 0);
+signal qnice_hr_count_long_d   : std_logic_vector(31 downto 0);
+signal qnice_hr_count_short_d  : std_logic_vector(31 downto 0);
+signal qnice_hr_count_long_dd  : std_logic_vector(31 downto 0);
+signal qnice_hr_count_short_dd : std_logic_vector(31 downto 0);
 
 ---------------------------------------------------------------------------------------------
 -- HyperRAM
@@ -417,6 +426,10 @@ signal hr_burstcount          : std_logic_vector(7 downto 0);
 signal hr_readdata            : std_logic_vector(15 downto 0);
 signal hr_readdatavalid       : std_logic;
 signal hr_waitrequest         : std_logic;
+
+-- Statistics
+signal hr_count_long          : unsigned(31 downto 0);
+signal hr_count_short         : unsigned(31 downto 0);
 
 -- Physical layer
 signal hr_rwds_in             : std_logic;
@@ -870,6 +883,23 @@ begin
                   when C_SYS_BOARD =>
                      qnice_ramrom_data_in <= str2data(G_BOARD, to_integer(unsigned(qnice_ramrom_addr_o(11 downto 0))));
 
+                  when C_SYS_HYPERRAM =>
+                     case qnice_ramrom_addr_o(11 downto 0) is
+                        when X"000" => qnice_ramrom_data_in <= qnice_hr_count_long_dd(15 downto 0);
+                        when X"001" => qnice_ramrom_data_in <= qnice_hr_count_long_dd(31 downto 16);
+                        when X"002" => qnice_ramrom_data_in <= qnice_hr_count_short_dd(15 downto 0);
+                        when X"003" => qnice_ramrom_data_in <= qnice_hr_count_short_dd(31 downto 16);
+                        when X"004" => qnice_ramrom_data_in <= qnice_hr_count_long_d(15 downto 0);
+                        when X"005" => qnice_ramrom_data_in <= qnice_hr_count_long_d(31 downto 16);
+                        when X"006" => qnice_ramrom_data_in <= qnice_hr_count_short_d(15 downto 0);
+                        when X"007" => qnice_ramrom_data_in <= qnice_hr_count_short_d(31 downto 16);
+                        when X"008" => qnice_ramrom_data_in <= qnice_hr_count_long(15 downto 0);
+                        when X"009" => qnice_ramrom_data_in <= qnice_hr_count_long(31 downto 16);
+                        when X"00A" => qnice_ramrom_data_in <= qnice_hr_count_short(15 downto 0);
+                        when X"00B" => qnice_ramrom_data_in <= qnice_hr_count_short(31 downto 16);
+                        when others => null;
+                     end case;
+
                   when others => null;
                end case;
             when others => null;
@@ -908,6 +938,19 @@ begin
          m_avm_readdatavalid_i => qnice_avm_readdatavalid,
          m_avm_waitrequest_i   => qnice_avm_waitrequest
       ); -- i_qnice2hyperram
+
+   p_hr_stats : process (qnice_clk)
+   begin
+      if rising_edge(qnice_clk) then
+         if qnice_pps = '1' then
+            qnice_hr_count_long_d  <= qnice_hr_count_long;
+            qnice_hr_count_short_d <= qnice_hr_count_short;
+
+            qnice_hr_count_long_dd  <= std_logic_vector(unsigned(qnice_hr_count_long) - unsigned(qnice_hr_count_long_d));
+            qnice_hr_count_short_dd <= std_logic_vector(unsigned(qnice_hr_count_short) - unsigned(qnice_hr_count_short_d));
+         end if;
+      end if;
+   end process p_hr_stats;
 
    -- Generate the paddle readings (mouse not supported, yet)
    -- Works with 50 MHz, which happens to be the QNICE clock domain
@@ -1011,6 +1054,20 @@ begin
          dest_out(541 downto 534)   => main_pot2_x_o,
          dest_out(549 downto 542)   => main_pot2_y_o
       ); -- i_qnice2main
+
+   -- Clock domain crossing: HR to QNICE
+   i_hr2qnice: entity work.cdc_stable
+      generic map (
+         G_DATA_SIZE => 64
+      )
+      port map (
+         src_clk_i                => hr_clk_x1,
+         src_data_i(31 downto  0) => std_logic_vector(hr_count_long),
+         src_data_i(63 downto 32) => std_logic_vector(hr_count_short),
+         dst_clk_i                => qnice_clk,
+         dst_data_o(31 downto  0) => qnice_hr_count_long,
+         dst_data_o(63 downto 32) => qnice_hr_count_short
+      ); -- i_hr2qnice
 
    -- Clock domain crossing: CORE to QNICE
    i_main2qnice: xpm_cdc_array_single
@@ -1249,6 +1306,8 @@ begin
          avm_readdata_o      => hr_readdata,
          avm_readdatavalid_o => hr_readdatavalid,
          avm_waitrequest_o   => hr_waitrequest,
+         count_long_o        => hr_count_long,
+         count_short_o       => hr_count_short,
          hr_resetn_o         => hr_reset_o,
          hr_csn_o            => hr_cs0_o,
          hr_ck_o             => hr_clk_p_o,
