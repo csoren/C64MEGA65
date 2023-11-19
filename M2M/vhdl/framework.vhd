@@ -846,7 +846,7 @@ begin
    i_av_pipeline : entity work.av_pipeline
       generic map (
          G_VIDEO_MODE_VECTOR     => VIDEO_MODE_VECTOR,
-         G_AUDIO_CLOCK_RATE      => 30_000_000,
+         G_AUDIO_CLOCK_RATE      => 12_288_000,
          G_VGA_DX                => VGA_DX,
          G_VGA_DY                => VGA_DY,
          G_FONT_FILE             => FONT_FILE,
