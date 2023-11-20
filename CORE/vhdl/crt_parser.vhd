@@ -25,6 +25,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.numeric_std_unsigned.all;
 
+use work.qnice_csr_pkg.all;
+
 entity crt_parser is
    port (
       clk_i               : in  std_logic;
@@ -64,11 +66,6 @@ entity crt_parser is
 end entity crt_parser;
 
 architecture synthesis of crt_parser is
-
-   constant C_STAT_IDLE            : std_logic_vector(3 downto 0) := "0000";
-   constant C_STAT_PARSING         : std_logic_vector(3 downto 0) := "0001";
-   constant C_STAT_READY           : std_logic_vector(3 downto 0) := "0010"; -- Successfully parsed CRT file
-   constant C_STAT_ERROR           : std_logic_vector(3 downto 0) := "0011"; -- Error parsing CRT file
 
    constant C_ERROR_NONE           : std_logic_vector(3 downto 0) := "0000";
    constant C_ERROR_NO_CRT_HDR     : std_logic_vector(3 downto 0) := "0001"; -- Missing CRT header
@@ -184,11 +181,11 @@ begin
                      avm_address_o    <= req_address_i;
                      avm_read_o       <= '1';
                      avm_burstcount_o <= X"10";
-                     resp_status_o    <= C_STAT_PARSING;
+                     resp_status_o    <= C_CSR_RESP_PARSING;
                      end_address      <= req_address_i + req_length_i(22 downto 1);
                      state            <= WAIT_FOR_CRT_HEADER_00_ST;
                   else
-                     resp_status_o  <= C_STAT_ERROR;
+                     resp_status_o  <= C_CSR_RESP_ERROR;
                      resp_error_o   <= C_ERROR_NO_CRT_HDR;
                      resp_address_o <= (others => '0');
                      state          <= ERROR_ST;
@@ -200,7 +197,7 @@ begin
                   if wide_readdata = str2slv("C64 CARTRIDGE   ") then
                      state <= WAIT_FOR_CRT_HEADER_10_ST;
                   else
-                     resp_status_o  <= C_STAT_ERROR;
+                     resp_status_o  <= C_CSR_RESP_ERROR;
                      resp_error_o   <= C_ERROR_WRONG_CRT_HDR;
                      resp_address_o(22 downto 1) <= avm_address_o - req_address;
                      state          <= ERROR_ST;
@@ -226,7 +223,7 @@ begin
                      avm_burstcount_o <= X"08";
                      state            <= WAIT_FOR_CHIP_HEADER_ST;
                   else
-                     resp_status_o  <= C_STAT_ERROR;
+                     resp_status_o  <= C_CSR_RESP_ERROR;
                      resp_error_o   <= C_ERROR_NO_CHIP_HDR;
                      resp_address_o(22 downto 1) <= avm_address_o - req_address;
                      state          <= ERROR_ST;
@@ -251,23 +248,23 @@ begin
 
                      image_size_v := bswap(wide_readdata(R_CHIP_IMAGE_SIZE));
                      if end_address = avm_address_o + X"08" + image_size_v(15 downto 1) then
-                        resp_status_o    <= C_STAT_READY;
+                        resp_status_o    <= C_CSR_RESP_READY;
                         state            <= READY_ST;
                      elsif end_address >= avm_address_o + X"08" + image_size_v(15 downto 1) + X"08" then
                         -- Oh, there's more ...
                         avm_address_o    <= avm_address_o + X"08" + image_size_v(15 downto 1);
                         avm_read_o       <= '1';
                         avm_burstcount_o <= X"08";
-                        resp_status_o    <= C_STAT_PARSING;
+                        resp_status_o    <= C_CSR_RESP_PARSING;
                         state            <= WAIT_FOR_CHIP_HEADER_ST;
                      else
-                        resp_status_o  <= C_STAT_ERROR;
+                        resp_status_o  <= C_CSR_RESP_ERROR;
                         resp_error_o   <= C_ERROR_TRUNCATED_CHIP;
                         resp_address_o(22 downto 1) <= avm_address_o - req_address;
                         state          <= ERROR_ST;
                      end if;
                   else
-                     resp_status_o  <= C_STAT_ERROR;
+                     resp_status_o  <= C_CSR_RESP_ERROR;
                      resp_error_o   <= C_ERROR_WRONG_CHIP_HDR;
                      resp_address_o(22 downto 1) <= avm_address_o - req_address;
                      state          <= ERROR_ST;
@@ -277,7 +274,7 @@ begin
             when ERROR_ST | READY_ST =>
                cart_loading_o    <= '0';
                if req_start_i = '0' then
-                  resp_status_o  <= C_STAT_IDLE;
+                  resp_status_o  <= C_CSR_RESP_IDLE;
                   resp_error_o   <= C_ERROR_NONE;
                   resp_address_o <= (others => '0');
                   state          <= IDLE_ST;
@@ -300,7 +297,7 @@ begin
             cart_exrom_o      <= (others => '1');
             cart_game_o       <= (others => '1');
             cart_loading_o    <= '0';
-            resp_status_o     <= C_STAT_IDLE;
+            resp_status_o     <= C_CSR_RESP_IDLE;
             resp_error_o      <= C_ERROR_NONE;
             resp_address_o    <= (others => '0');
             state             <= IDLE_ST;

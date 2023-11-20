@@ -161,7 +161,6 @@ begin
          qnice_we_i                => qnice_we_i,
          qnice_data_o              => qnice_data_o,
          qnice_wait_o              => qnice_wait_o,
-         qnice_req_status_o        => qnice_req_status,
          qnice_req_length_o        => qnice_req_length,
          qnice_req_valid_o         => qnice_req_valid,
          qnice_resp_status_i       => qnice_resp_status,
@@ -185,7 +184,8 @@ begin
 
    i_cdc_qnice2hr : entity work.cdc_stable
       generic map (
-         G_DATA_SIZE => 24
+         G_REGISTER_SRC => true,
+         G_DATA_SIZE    => 24
       )
       port map (
          src_clk_i                => qnice_clk_i,
