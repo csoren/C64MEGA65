@@ -235,7 +235,7 @@ constant SEL_GENERAL       : std_logic_vector(15 downto 0) := x"0110";  -- !!! D
 
 -- START YOUR CONFIGURATION BELOW THIS LINE
 
--- at a minimum, keep the reset line active for this amount of "QNICE loops" (see gencfg.asm)
+-- at a minimum, keep the reset line active for this amount of "QNICE loops" (see gencfg.asm).
 -- "0" means: deactivate this feature
 constant RESET_COUNTER     : natural := 100;
 

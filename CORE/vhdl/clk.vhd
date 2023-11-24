@@ -8,6 +8,23 @@
 --            Additionally (PAL only) we use a 0.25% slower system clock for the HDMI flicker-fix
 --      NTSC: @TODO
 --
+-- Note about Flicker-Free: The method used here is to seamlessly (i.e. without glitch)
+-- switch automatically between two very close clock speeds. The switching is done based
+-- on the feedback from the HDMI ascal'er and is done in mega65.vhd.
+--
+-- However, there is an alternative method possible, where only a single clock is used and
+-- furthermore removes the dependency on the HDMI ascaler. Instead, it uses the "fine
+-- phase shift" capability of the MMCM. This makes it possible to dynamically "bend" the
+-- clock frequency, but only by a small amount. The calculations are as follows: Starting
+-- from the MMCM "i_clk_c64_slow" the actual frequency is 31.44899285 MHz, whereas the
+-- desired frequency is 31.449600 MHz.  Since the actual clock is too slow, we need to
+-- "insert" extra clock cycles. We do this by occasionally shortening a clock cycle by a
+-- small amount.  The number of clock cycles before we "insert" a complete extra clock
+-- cycle is: 31.449600 / (31.449600 - 31.44899285) = 51799.  Given the configuration
+-- values of the MMCM there is a total of 56*21.375 = 1197 units of "fine phase shift" in
+-- each clock cycle.  Therefore, we need to remove one unit of phase shift every
+-- 51799/1197 = 43.27 clock cycles.
+--
 -- Powered by MiSTer2MEGA65
 -- MEGA65 port done by MJoergen and sy2002 in 2023 and licensed under GPL v3
 -------------------------------------------------------------------------------------------------------------
