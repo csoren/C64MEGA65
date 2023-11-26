@@ -30,7 +30,7 @@ workaround is not needed for the KungFu Flash any more
   displaying HDMI. The problem was related to a parity error in the IEC60958
   channel which is fixed now.
 
-WIP Fixed random micro cuts of sound that occured on on some HDMI displays.
+* Fixed random micro cuts of sound that occured on on some HDMI displays.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/13)
 
 ## Bugfixes: R4/R5 boards only
