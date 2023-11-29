@@ -165,6 +165,7 @@ port (
    main_pot1_y_i           : in  std_logic_vector(7 downto 0);
    main_pot2_x_i           : in  std_logic_vector(7 downto 0);
    main_pot2_y_i           : in  std_logic_vector(7 downto 0);
+   main_rtc_i              : in  std_logic_vector(64 downto 0);
 
    -- CBM-488/IEC serial port
    iec_reset_n_o           : out std_logic;
@@ -568,7 +569,7 @@ begin
          c64_exp_port_mode_i    => c64_exp_port_mode,
 
          -- Current date/time from RTC
-         rtc_i                  => main_qnice_gp_reg_i(64 downto 0),
+         rtc_i                  => main_rtc_i,
 
          ---------------------------
          -- Commodore 64 I/O ports

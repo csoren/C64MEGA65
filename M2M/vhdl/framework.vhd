@@ -156,6 +156,8 @@ port (
    main_pot1_y_o           : out   std_logic_vector(7 downto 0);
    main_pot2_x_o           : out   std_logic_vector(7 downto 0);
    main_pot2_y_o           : out   std_logic_vector(7 downto 0);
+   main_rtc_o              : out   std_logic_vector(64 downto 0);
+
 
    -- Audio
    audio_clk_o             : out   std_logic;
@@ -770,7 +772,7 @@ begin
    -- Clock domain crossing: QNICE to CORE
    i_qnice2main: xpm_cdc_array_single
       generic map (
-         WIDTH => 550
+         WIDTH => 615
       )
       port map (
          src_clk                    => qnice_clk,
@@ -786,6 +788,7 @@ begin
          src_in(533 downto 526)     => std_logic_vector(qnice_pot1_y_n),
          src_in(541 downto 534)     => std_logic_vector(qnice_pot2_x_n),
          src_in(549 downto 542)     => std_logic_vector(qnice_pot2_y_n),
+         src_in(614 downto 550)     => qnice_rtc,
          dest_clk                   => main_clk_i,
          dest_out(0)                => main_qnice_reset_o,
          dest_out(1)                => main_qnice_pause_o,
@@ -798,7 +801,8 @@ begin
          dest_out(525 downto 518)   => main_pot1_x_o,
          dest_out(533 downto 526)   => main_pot1_y_o,
          dest_out(541 downto 534)   => main_pot2_x_o,
-         dest_out(549 downto 542)   => main_pot2_y_o
+         dest_out(549 downto 542)   => main_pot2_y_o,
+         dest_out(614 downto 550)   => main_rtc_o
       ); -- i_qnice2main
 
    -- Clock domain crossing: QNICE to HR
