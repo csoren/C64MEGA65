@@ -12,7 +12,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A1 | 10/20/23 | f1bf2f5 | First version that is able to generate an R3 and R4 bitstream using the refactored M2M framework
 | WIP-V5.1-A2 | 10/21/23 | 5975fe7 | Dedicated test build for AmokPhaze101 for doing M2M regression tests to find refactoring-induced bugs
 | WIP-V5.1-A3 | 11/02/23 | c099921 | Reconfigurable (and completely refactored) MMCM video clock, refactored reset, ASCAL reduced burst length that might fix some rare REU bugs
-| WIP-V5.1-A4 | 11/26/23 | <not yet released> | HyperRAM stable on R3 and R4, fixed .crt regression, improved HDMI's audio compatibility, fixed spinning floppy drive
+| WIP-V5.1-A4 | 11/29/23 | fdd6ec0 | HyperRAM stable on R3, R4, and R5, fixed .crt regression, improved HDMI's audio compatibility, fixed spinning floppy drive
 
 ## Version 5
 
