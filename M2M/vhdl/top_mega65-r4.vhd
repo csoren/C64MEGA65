@@ -415,6 +415,9 @@ architecture synthesis of mega65_r4 is
    signal qnice_ramrom_we        : std_logic;
    signal qnice_ramrom_wait      : std_logic;
 
+   signal i2c_sda                : std_logic := 'H';
+   signal i2c_scl                : std_logic := 'H';
+
 begin
 
    -- Driver for the audio DAC (AK4432VT).
@@ -693,6 +696,8 @@ begin
       qnice_ramrom_we_o       => qnice_ramrom_we,
       qnice_ramrom_wait_i     => qnice_ramrom_wait,
 
+      i2c_sda_io              => i2c_sda,
+      i2c_scl_io              => i2c_scl,
       fpga_sda_io             => fpga_sda_io,
       fpga_scl_io             => fpga_scl_io,
       grove_sda_io            => grove_sda_io,

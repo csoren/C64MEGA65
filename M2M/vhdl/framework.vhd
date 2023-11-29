@@ -204,11 +204,22 @@ port (
    qnice_ramrom_we_o       : out   std_logic;
    qnice_ramrom_wait_i     : in    std_logic;
 
+   -- I2C bus
+   -- U32 = PCA9655EMTTXG. Address 0x40. I/O expander.
+   -- U12 = MP8869SGL-Z.   Address 0x61. DC/DC Converter.
+   -- U14 = MP8869SGL-Z.   Address 0x67. DC/DC Converter.
+   i2c_scl_io              : inout std_logic;
+   i2c_sda_io              : inout std_logic;
+
    -- PMOD I2C device
+   -- Connected to J18
    grove_sda_io            : inout std_logic;
    grove_scl_io            : inout std_logic;
 
-   -- On-board I2C devices
+   -- I2C bus for on-board peripherals
+   -- U36. 24AA025E48T. Address 0x50. 2K Serial EEPROM.
+   -- U38. RV-3032-C7.  Address 0x51. Real-Time Clock Module.
+   -- U39. 24LC128.     Address 0x56. 128K CMOS Serial EEPROM.
    fpga_sda_io             : inout std_logic;
    fpga_scl_io             : inout std_logic
 );
@@ -1005,8 +1016,8 @@ begin
       i2c_addr_i    => qnice_ramrom_addr_o(7 downto 0),
       i2c_wr_data_i => qnice_ramrom_data_out_o,
       i2c_rd_data_o => qnice_i2c_rd_data,
-      scl_in_i      => "111111" & grove_scl_io & fpga_scl_io,
-      sda_in_i      => "111111" & grove_sda_io & fpga_sda_io,
+      scl_in_i      => "11111" & i2c_scl_io & grove_scl_io & fpga_scl_io,
+      sda_in_i      => "11111" & i2c_sda_io & grove_sda_io & fpga_sda_io,
       scl_out_o     => scl_out,
       sda_out_o     => sda_out
    ); -- i_rtc_i2c
@@ -1016,6 +1027,8 @@ begin
    fpga_scl_io  <= '0' when scl_out(0) = '0' else 'Z';
    grove_sda_io <= '0' when sda_out(1) = '0' else 'Z';
    grove_scl_io <= '0' when scl_out(1) = '0' else 'Z';
+   i2c_sda_io   <= '0' when sda_out(2) = '0' else 'Z';
+   i2c_scl_io   <= '0' when scl_out(2) = '0' else 'Z';
 
 end architecture synthesis;
 

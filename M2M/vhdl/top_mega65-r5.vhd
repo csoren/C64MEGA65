@@ -735,6 +735,8 @@ begin
       qnice_ramrom_we_o       => qnice_ramrom_we,
       qnice_ramrom_wait_i     => qnice_ramrom_wait,
 
+      i2c_scl_io              => i2c_scl_io,
+      i2c_sda_io              => i2c_sda_io,
       fpga_sda_io             => fpga_sda_io,
       fpga_scl_io             => fpga_scl_io,
       grove_sda_io            => grove_sda_io,
