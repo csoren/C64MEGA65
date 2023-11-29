@@ -235,8 +235,8 @@ constant VIDEO_MODE_VECTOR    : video_modes_vector(0 to 6) := (
 
 signal qnice_clk              : std_logic;               -- QNICE main clock @ 50 MHz
 signal hr_clk_x1              : std_logic;               -- HyperRAM @ 100 MHz
-signal hr_clk_x2              : std_logic;               -- HyperRAM @ 200 MHz
-signal hr_clk_x2_del          : std_logic;               -- HyperRAM @ 200 MHz phase delayed
+signal hr_clk_x1_del          : std_logic;               -- HyperRAM @ 100 MHz phase delayed
+signal hr_delay_refclk        : std_logic;               -- HyperRAM @ 200 MHz
 signal audio_clk              : std_logic;               -- Audio clock @ 60 MHz
 signal tmds_clk               : std_logic;               -- HDMI pixel clock at 5x speed for TMDS @ 371.25 MHz
 signal hdmi_clk               : std_logic;               -- HDMI pixel clock at normal speed @ 74.25 MHz
@@ -399,26 +399,13 @@ signal hr_count_short         : unsigned(31 downto 0);
 -- Physical layer
 signal hr_rwds_in             : std_logic;
 signal hr_rwds_out            : std_logic;
-signal hr_rwds_oe             : std_logic;   -- Output enable for RWDS
+signal hr_rwds_oe_n           : std_logic;   -- Output enable for RWDS
 signal hr_dq_in               : std_logic_vector(7 downto 0);
 signal hr_dq_out              : std_logic_vector(7 downto 0);
-signal hr_dq_oe               : std_logic;   -- Output enable for DQ
+signal hr_dq_oe_n             : std_logic;   -- Output enable for DQ
 
 signal scl_out                : std_logic_vector(7 downto 0);
 signal sda_out                : std_logic_vector(7 downto 0);
-
-pure function hyperram_phase(str : string) return real is
-begin
-   if str = "MEGA65_R3" then
-      return 162.0;
-   elsif str = "MEGA65_R4" then
-      return 207.0;
-   elsif str = "MEGA65_R5" then
-      return 207.0;
-   else
-      return 180.0; -- Unknown board type -> return reasonable default value
-   end if;
-end function hyperram_phase;
 
 begin
 
@@ -429,21 +416,21 @@ begin
    i_clk_m2m : entity work.clk_m2m
       generic map (
          G_HYPERRAM_FREQ_MHZ => 100,
-         G_HYPERRAM_PHASE    => hyperram_phase(G_BOARD)
+         G_HYPERRAM_PHASE    => 90.0
       )
       port map (
-         sys_clk_i       => clk_i,
-         sys_rstn_i      => reset_m2m_n,        -- reset everything
-         core_rstn_i     => reset_core_n,       -- reset only the core (means the HyperRAM needs to be reset, too)
-         qnice_clk_o     => qnice_clk,
-         qnice_rst_o     => qnice_rst,
-         hr_clk_x1_o     => hr_clk_x1,
-         hr_clk_x2_o     => hr_clk_x2,
-         hr_clk_x2_del_o => hr_clk_x2_del,
-         hr_rst_o        => hr_rst,
-         audio_clk_o     => audio_clk,
-         audio_rst_o     => audio_rst,
-         sys_pps_o       => sys_pps
+         sys_clk_i         => clk_i,
+         sys_rstn_i        => reset_m2m_n,        -- reset everything
+         core_rstn_i       => reset_core_n,       -- reset only the core (means the HyperRAM needs to be reset, too)
+         qnice_clk_o       => qnice_clk,
+         qnice_rst_o       => qnice_rst,
+         hr_clk_x1_o       => hr_clk_x1,
+         hr_clk_x1_del_o   => hr_clk_x1_del,
+         hr_delay_refclk_o => hr_delay_refclk,
+         hr_rst_o          => hr_rst,
+         audio_clk_o       => audio_clk,
+         audio_rst_o       => audio_rst,
+         sys_pps_o         => sys_pps
       ); -- i_clk_m2m
 
    qnice_clk_sel <= VIDEO_MODE_VECTOR(qnice_video_mode_i).CLK_SEL;
@@ -950,8 +937,8 @@ begin
    i_hyperram : entity work.hyperram
       port map (
          clk_x1_i            => hr_clk_x1,
-         clk_x2_i            => hr_clk_x2,
-         clk_x2_del_i        => hr_clk_x2_del,
+         clk_x1_del_i        => hr_clk_x1_del,
+         delay_refclk_i      => hr_delay_refclk,
          rst_i               => hr_rst,
          avm_write_i         => hr_write,
          avm_read_i          => hr_read,
@@ -969,17 +956,18 @@ begin
          hr_ck_o             => hr_clk_p_o,
          hr_rwds_in_i        => hr_rwds_in,
          hr_rwds_out_o       => hr_rwds_out,
-         hr_rwds_oe_o        => hr_rwds_oe,
+         hr_rwds_oe_n_o      => hr_rwds_oe_n,
          hr_dq_in_i          => hr_dq_in,
          hr_dq_out_o         => hr_dq_out,
-         hr_dq_oe_o          => hr_dq_oe
+         hr_dq_oe_n_o        => hr_dq_oe_n
       ); -- i_hyperram
 
    -- Tri-state buffers for HyperRAM
-   hr_rwds_io <= hr_rwds_out when hr_rwds_oe = '1' else 'Z';
-   hr_d_io    <= hr_dq_out   when hr_dq_oe   = '1' else (others => 'Z');
+   hr_rwds_io <= hr_rwds_out when hr_rwds_oe_n = '0' else 'Z';
+   hr_d_io    <= hr_dq_out   when hr_dq_oe_n   = '0' else (others => 'Z');
    hr_rwds_in <= hr_rwds_io;
    hr_dq_in   <= hr_d_io;
+
 
    ---------------------------------------------------------------------------------------------------------------
    -- I2C controller

@@ -25,41 +25,41 @@ entity clk_m2m is
       G_HYPERRAM_PHASE    : real      -- Must be a multiple of 45/5 = 9
    );
    port (
-      sys_clk_i       : in  std_logic;   -- expects 100 MHz
-      sys_rstn_i      : in  std_logic;   -- Asynchronous, asserted low
-      core_rstn_i     : in  std_logic;   -- Reset only the core, asserted low
+      sys_clk_i         : in  std_logic;   -- expects 100 MHz
+      sys_rstn_i        : in  std_logic;   -- Asynchronous, asserted low
+      core_rstn_i       : in  std_logic;   -- Reset only the core, asserted low
 
-      qnice_clk_o     : out std_logic;   -- QNICE's 50 MHz main clock
-      qnice_rst_o     : out std_logic;   -- QNICE's reset, synchronized
+      qnice_clk_o       : out std_logic;   -- QNICE's 50 MHz main clock
+      qnice_rst_o       : out std_logic;   -- QNICE's reset, synchronized
 
-      hr_clk_x1_o     : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz
-      hr_clk_x2_o     : out std_logic;   -- MEGA65 HyperRAM @ 200 MHz
-      hr_clk_x2_del_o : out std_logic;   -- MEGA65 HyperRAM @ 200 MHz phase delayed
-      hr_rst_o        : out std_logic;   -- MEGA65 HyperRAM reset, synchronized
+      hr_clk_x1_o       : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz
+      hr_clk_x1_del_o   : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz phase delayed
+      hr_delay_refclk_o : out std_logic;   -- MEGA65 HyperRAM @ 200 MHz
+      hr_rst_o          : out std_logic;   -- MEGA65 HyperRAM reset, synchronized
 
-      audio_clk_o     : out std_logic;   -- Audio's 12.288 MHz clock
-      audio_rst_o     : out std_logic;   -- Audio's reset, synchronized
+      audio_clk_o       : out std_logic;   -- Audio's 12.288 MHz clock
+      audio_rst_o       : out std_logic;   -- Audio's reset, synchronized
 
-      sys_pps_o       : out std_logic    -- One pulse per second (in sys_clk domain)
+      sys_pps_o         : out std_logic    -- One pulse per second (in sys_clk domain)
    );
 end entity clk_m2m;
 
 architecture rtl of clk_m2m is
 
-signal audio_fb_mmcm      : std_logic;
-signal qnice_fb_mmcm      : std_logic;
-signal qnice_clk_mmcm     : std_logic;
-signal hr_clk_x1_mmcm     : std_logic;
-signal hr_clk_x2_mmcm     : std_logic;
-signal hr_clk_x2_del_mmcm : std_logic;
-signal audio_clk_mmcm     : std_logic;
+signal audio_fb_mmcm        : std_logic;
+signal qnice_fb_mmcm        : std_logic;
+signal qnice_clk_mmcm       : std_logic;
+signal hr_clk_x1_mmcm       : std_logic;
+signal hr_clk_x1_del_mmcm   : std_logic;
+signal hr_delay_refclk_mmcm : std_logic;
+signal audio_clk_mmcm       : std_logic;
 
-signal sys_clk_9975_bg    : std_logic;
+signal sys_clk_9975_bg      : std_logic;
 
-signal qnice_locked       : std_logic;
-signal audio_locked       : std_logic;
+signal qnice_locked         : std_logic;
+signal audio_locked         : std_logic;
 
-signal sys_counter        : natural range 0 to 99_999_999;
+signal sys_counter          : natural range 0 to 99_999_999;
 
 begin
 
@@ -85,9 +85,9 @@ begin
          CLKOUT2_DIVIDE       => 6,          -- HyperRAM @ 200 MHz
          CLKOUT2_DUTY_CYCLE   => 0.500,
          CLKOUT2_PHASE        => 0.000,
-         CLKOUT3_DIVIDE       => 6,          -- HyperRAM @ 200 MHz phase delayed
+         CLKOUT3_DIVIDE       => 12,         -- HyperRAM @ 100 MHz phase delayed
          CLKOUT3_DUTY_CYCLE   => 0.500,
-         CLKOUT3_PHASE        => 180.000,
+         CLKOUT3_PHASE        => G_HYPERRAM_PHASE,
          DIVCLK_DIVIDE        => 1,
          REF_JITTER1          => 0.010,
          STARTUP_WAIT         => "FALSE"
@@ -98,8 +98,8 @@ begin
          CLKIN1              => sys_clk_i,
          CLKOUT0             => qnice_clk_mmcm,
          CLKOUT1             => hr_clk_x1_mmcm,
-         CLKOUT2             => hr_clk_x2_mmcm,
-         CLKOUT3             => hr_clk_x2_del_mmcm,
+         CLKOUT2             => hr_delay_refclk_mmcm,
+         CLKOUT3             => hr_clk_x1_del_mmcm,
          LOCKED              => qnice_locked,
          PWRDWN              => '0',
          RST                 => '0'
@@ -144,16 +144,16 @@ begin
          O => hr_clk_x1_o
       );
 
-   hr_clk_x2_bufg : BUFG
+   hr_clk_x1_del_bufg : BUFG
       port map (
-         I => hr_clk_x2_mmcm,
-         O => hr_clk_x2_o
+         I => hr_clk_x1_del_mmcm,
+         O => hr_clk_x1_del_o
       );
 
-   hr_clk_x2_del_bufg : BUFG
+   hr_delay_refclk_bufg : BUFG
       port map (
-         I => hr_clk_x2_del_mmcm,
-         O => hr_clk_x2_del_o
+         I => hr_delay_refclk_mmcm,
+         O => hr_delay_refclk_o
       );
 
    audio_clk_bufg : BUFG
