@@ -47,7 +47,7 @@ architecture synthesis of rtc_reader is
   -- I2C bus      = 2 (I2C)
   -- I2C address  = 0x61 and 0x67
   -- I2C register = 0x01
-  -- RTC:
+  -- RTC (RV-3032-C7):
   -- I2C bus      = 0 (FPGA)
   -- I2C address  = 0x51
   -- I2C register = 0x00
@@ -65,8 +65,8 @@ architecture synthesis of rtc_reader is
 
     -- This reads from the RTC
     9 => (WAIT_CMD,  X"F1", X"0001"),   -- Wait until I2C is idle
-   10 => (WRITE_CMD, X"00", X"0000"),   -- Prepare to write to RTC
-   11 => (WRITE_CMD, X"F0", X"01A2"),   -- Send one byte, 0x00, to RTC
+   10 => (WRITE_CMD, X"00", X"0100"),   -- Prepare to write to RTC
+   11 => (WRITE_CMD, X"F0", X"01A2"),   -- Send one byte, 0x01, to RTC
    12 => (WAIT_CMD,  X"F1", X"0000"),   -- Wait until I2C command is accepted
    13 => (WAIT_CMD,  X"F1", X"0001"),   -- Wait until I2C is idle
    14 => (WRITE_CMD, X"F0", X"07A3"),   -- Receive seven bytes from RTC
@@ -88,7 +88,9 @@ architecture synthesis of rtc_reader is
 begin
 
   busy_o <= '0' when state = IDLE_ST else '1';
-  rtc_o  <= rtc;
+
+  --        Toggle & 0x40       Weekday             Year-Month-Date Hours-Minutes-Seconds
+  rtc_o  <= rtc(64 downto 56) & rtc(31 downto 24) & rtc(55 downto 32) & rtc(23 downto 0);
 
   fsm_proc : process (clk_i)
   begin
