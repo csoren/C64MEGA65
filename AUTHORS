@@ -27,6 +27,10 @@ to the MEGA65's PCB and its circuitry.
 Special thanks to sho3string for helping us to understand retro cathode ray tube monitors
 and for writing the dedicated documentation doc/retrotubes.md
 
+Special thanks to Adam Barnes for not only creating the most awesome Open Source HDMI core on the
+planet (see below) but also for patiently sharing his wisdom and tirelessly supporting us in improving
+our HyperRAM controller
+
 C64MEGA65:
 ----------
 
