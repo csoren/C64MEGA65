@@ -43,9 +43,9 @@ file. Only use `*.bit` files if you know what you are doing.
 
 | MEGA65 Variant |   Years   | File name             | Comment
 |:--------------:|:---------:|:---------------------:|-------------------------
-| R3/R3A         | @TODO     | C64MEGA65-V5.1-R3.cor | R3 is the "DevKit" (100 were built) and R3A are batches 1 and 2. If you bought your MEGA65 between @TODO then you are very likely to have an R3 or R3A machine.
-| R4             | @TODO     | C64MEGA65-V5.1-R4.cor | Development board on our way to the R5. Only @TODO of them were manufactured (board only, no complete machines)
-| R5             | @TODO     | C64MEGA65-V5.1-R5.cor | @TODO
+| R3/R3A         | 2019-2023 | C64MEGA65-V5.1-R3.cor | R3 is the "DevKit" (100 were built) and R3A are batches 1 and 2. If you received your MEGA65 between before 2024 then you are very likely to have an R3 or R3A machine.
+| R4             | 2023      | C64MEGA65-V5.1-R4.cor | Development board on our way to the R5. Only a bunch of them were manufactured (board only, no complete machines).
+| R5             | 2024+     | C64MEGA65-V5.1-R5.cor | The latest and greatest incarnation of our beloved MEGA65. If you received your MEGA65 in 2024 or later than you have an R5 machine.
 
 ## Learn more
 
