@@ -25,6 +25,17 @@
 -- each clock cycle.  Therefore, we need to remove one unit of phase shift every
 -- 51799/1197 = 43.27 clock cycles.
 --
+-- An even better alternative is to cascade two MMCM's: To get from 100 MHz to 31.4496 MHz
+-- we need a factor of 0.31449600. Written as a fraction that is 4914/15625 = 2*3^3*7*13 / 5^6.
+-- We can factor this fraction into two factors: 2*3*13/5^3 = 0.624 and 3^2*7/5^3 = 0.504.
+-- These two factors can we implemented as follows:
+-- 0.504 : CLKFBOUT_MULT_F = 47.25, DIVCLK_DIVIDE = 5, CLKOUT0_DIVIDE_F = 18.75
+-- 0.624 : CLKFBOUT_MULT_F = 19.50, DIVCLK_DIVIDE = 1, CLKOUT0_DIVIDE_F = 31.25
+-- Note: It's necessary that the first MMCM is 0.504, to keep f_VCO of the second MMCM
+-- within the range of 600 - 1200 MHz.
+-- With the above approach we get the exact clock frequency required, and therefore no
+-- longer need any dynamic shifting of phase.
+--
 -- Powered by MiSTer2MEGA65
 -- MEGA65 port done by MJoergen and sy2002 in 2023 and licensed under GPL v3
 -------------------------------------------------------------------------------------------------------------
