@@ -19,6 +19,7 @@ use ieee.numeric_std.all;
 
 entity hyperram is
    generic (
+      G_HYPERRAM_FREQ_MHZ : natural;
       G_ERRATA_ISSI_D_FIX : boolean := true
    );
    port (
@@ -57,7 +58,7 @@ end entity hyperram;
 
 architecture synthesis of hyperram is
 
-   constant C_LATENCY : integer := 4;
+   constant C_LATENCY : integer := (G_HYPERRAM_FREQ_MHZ+24) / 25; -- 40 ns or above
 
    signal errata_write         : std_logic;
    signal errata_read          : std_logic;
@@ -147,6 +148,7 @@ begin
 
    i_hyperram_config : entity work.hyperram_config
       generic map (
+         G_HYPERRAM_FREQ_MHZ => G_HYPERRAM_FREQ_MHZ,
          G_LATENCY => C_LATENCY
       )
       port map (

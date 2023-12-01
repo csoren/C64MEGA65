@@ -950,6 +950,10 @@ begin
    ---------------------------------------------------------------------------------------------------------------
 
    i_hyperram : entity work.hyperram
+      generic map (
+         G_HYPERRAM_FREQ_MHZ => 100,
+         G_ERRATA_ISSI_D_FIX => true
+      )
       port map (
          clk_x1_i            => hr_clk_x1,
          clk_x1_del_i        => hr_clk_x1_del,
