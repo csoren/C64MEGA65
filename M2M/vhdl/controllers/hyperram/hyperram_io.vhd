@@ -1,3 +1,9 @@
+-- This is the HyperRAM I/O connections
+-- The additional clock clk_x1_del_i is used to drive the CK output.
+-- The additional clock delay_refclk_i is used to drive IDELAY_CTRL.
+--
+-- Created by Michael Jørgensen in 2023 (mjoergen.github.io/HyperRAM).
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -13,8 +19,8 @@ use xpm.vcomponents.all;
 entity hyperram_io is
    port (
       clk_x1_i            : in  std_logic;
-      delay_refclk_i      : in  std_logic; -- 200 MHz
       clk_x1_del_i        : in  std_logic; -- phase shifted.
+      delay_refclk_i      : in  std_logic; -- 200 MHz
       rst_i               : in  std_logic;
 
       -- Connect to HyperRAM controller
