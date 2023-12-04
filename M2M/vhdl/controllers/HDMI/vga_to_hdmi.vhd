@@ -310,7 +310,7 @@ begin
 
     begin
         if pcm_rst = '1' then
-
+            iec_req     <= '0';
             iec_count   <= 0;
             iec_sync    <= '0';
             iec_l       <= (others => '0');
@@ -373,41 +373,7 @@ begin
 
     -- clock domain crossing
 
-    CDC_IEC: xpm_cdc_handshake
-        generic map (
-            DEST_EXT_HSK   => 0,
-            DEST_SYNC_FF   => 4,
-            INIT_SYNC_FF   => 0,
-            SIM_ASSERT_CHK => 1,
-            SRC_SYNC_FF    => 4,
-            WIDTH          => 57
-        )
-        port map (
-            src_clk  => pcm_clk,
-            src_in   => iec_sync &
-                        iec_rp & iec_rc & iec_ru & iec_rv & iec_r &
-                        iec_lp & iec_lc & iec_lu & iec_lv & iec_l,
-            src_send => iec_req,
-            src_rcv  => iec_ack,
-            dest_clk => vga_clk,
-            dest_req => vga_iec_en,
-            dest_ack => '0', -- unused
-            dest_out => vga_iec_data
-    );
-
-    vga_iec_l    <= vga_iec_data(23 downto 0);
-    vga_iec_lv   <= vga_iec_data(24);
-    vga_iec_lu   <= vga_iec_data(25);
-    vga_iec_lc   <= vga_iec_data(26);
-    vga_iec_lp   <= vga_iec_data(27);
-    vga_iec_r    <= vga_iec_data(51 downto 28);
-    vga_iec_rv   <= vga_iec_data(52);
-    vga_iec_ru   <= vga_iec_data(53);
-    vga_iec_rc   <= vga_iec_data(54);
-    vga_iec_rp   <= vga_iec_data(55);
-    vga_iec_sync <= vga_iec_data(56);
-
-    CDC_ACR : xpm_cdc_pulse
+    SYNC1 : xpm_cdc_pulse
       generic map (
             DEST_SYNC_FF   => 4,
             INIT_SYNC_FF   => 1,
@@ -424,13 +390,53 @@ begin
         dest_pulse => vga_acr
         );
     
-    SYNC : xpm_cdc_array_single
+    SYNC3: xpm_cdc_handshake
         generic map (
+            WIDTH          => 57,
+            DEST_EXT_HSK   => 0,
+            DEST_SYNC_FF   => 4,
+            INIT_SYNC_FF   => 0,
+            SIM_ASSERT_CHK => 1,
+            SRC_SYNC_FF    => 4
+        )
+        port map (
+            src_clk                => pcm_clk,
+            src_in(56)             => iec_sync,
+            src_in(55)             => iec_rp,
+            src_in(54)             => iec_rc,
+            src_in(53)             => iec_ru,
+            src_in(52)             => iec_rv,
+            src_in(51 downto 28)   => iec_r,
+            src_in(27)             => iec_lp,
+            src_in(26)             => iec_lc,
+            src_in(25)             => iec_lu,
+            src_in(24)             => iec_lv,
+            src_in(23 downto 0)    => iec_l,
+            src_send               => iec_req,
+            src_rcv                => iec_ack,
+            dest_clk               => vga_clk,
+            dest_req               => vga_iec_en,
+            dest_ack               => '0', -- unused
+            dest_out(56)           => vga_iec_sync,
+            dest_out(55)           => vga_iec_rp,
+            dest_out(54)           => vga_iec_rc,
+            dest_out(53)           => vga_iec_ru,
+            dest_out(52)           => vga_iec_rv,
+            dest_out(51 downto 28) => vga_iec_r,
+            dest_out(27)           => vga_iec_lp,
+            dest_out(26)           => vga_iec_lc,
+            dest_out(25)           => vga_iec_lu,
+            dest_out(24)           => vga_iec_lv,
+            dest_out(23 downto 0)  => vga_iec_l
+    );
+
+    SYNC4 : xpm_cdc_array_single
+        generic map (
+            WIDTH           => 54,
             DEST_SYNC_FF    => 2,
             INIT_SYNC_FF    => 1,
             SIM_ASSERT_CHK  => 1,
-            SRC_INPUT_REG   => 0,
-            WIDTH           => 54
+            SRC_INPUT_REG   => 0
         )
         port map (
             src_clk                => '0',
