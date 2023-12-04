@@ -657,12 +657,13 @@ begin
       end if;
       hb(3)                <= hb_3;
       pb(3)(0 to 5)        <= pb_3(0 to 5);
-      pb(3)(0)             <= 1 + not (                                                     -- checksum
-                                       sum_3 +
-                                       pb(3)(2) +
-                                       pb(3)(4) +
-                                       pb(3)(5)(3 downto 0)
-                                     );
+      pb(3)(0) <= -- checksum
+          1 + not (
+              sum_3 +
+              pb(3)(2) +
+              pb(3)(4) +
+              pb(3)(5)(3 downto 0)
+          );
       pb(3)(2)(5 downto 4) <= unsigned(aspect_s);
       -- pb(3)(2)(3) <= '1';
       -- pb(3)(2)(1 downto 0) <= unsigned(aspect_s);
