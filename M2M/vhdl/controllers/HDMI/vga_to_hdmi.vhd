@@ -62,12 +62,12 @@ end entity vga_to_hdmi;
 
 architecture synth of vga_to_hdmi is
 
-  constant subpackets    : integer := 4;                           -- per packet
-  constant packet_types  : integer := 4;                           -- types of data packet supported in this design
+  constant SUBPACKETS    : integer := 4;                           -- per packet
+  constant PACKET_TYPES  : integer := 4;                           -- types of data packet supported in this design
 
-  constant ctl_null      : std_logic_vector(3 downto 0) := "0000";
-  constant ctl_pre_video : std_logic_vector(3 downto 0) := "0001"; -- video period preamble
-  constant ctl_pre_data  : std_logic_vector(3 downto 0) := "0101"; -- data period preamble
+  constant CTL_NULL      : std_logic_vector(3 downto 0) := "0000";
+  constant CTL_PRE_VIDEO : std_logic_vector(3 downto 0) := "0001"; -- video period preamble
+  constant CTL_PRE_DATA  : std_logic_vector(3 downto 0) := "0101"; -- data period preamble
 
   ----------------------------------------------------------------------
   -- audio/ACR related
@@ -75,7 +75,7 @@ architecture synth of vga_to_hdmi is
   signal   pcm_n_s       : std_logic_vector(19 downto 0);          -- pcm_n   } synchronised
   signal   pcm_cts_s     : std_logic_vector(19 downto 0);          -- pcm_cts }
   signal   pcm_cs_v      : std_logic_vector(0 to 39);              -- IEC60958 channel status as a vector
-  signal   pcm_count     : integer range 0 to subpackets-1;        -- used to assemble 4x samples into sample packet
+  signal   pcm_count     : integer range 0 to SUBPACKETS-1;        -- used to assemble 4x samples into sample packet
 
   signal   iec_req       : std_logic;                              -- PCM to IEC sample request
   signal   iec_count     : integer range 0 to 191;                 -- IEC60958 frame #
@@ -143,22 +143,22 @@ architecture synth of vga_to_hdmi is
   -- encoding related
 
   type     u8 is array(natural range <>) of unsigned(7 downto 0);
-  type     hb_array_t is array(0 to packet_types-1) of u8(0 to 2);
-  type     pb_array_t is array(0 to packet_types-1) of u8(0 to 27);
+  type     hb_array_t is array(0 to PACKET_TYPES-1) of u8(0 to 2);
+  type     pb_array_t is array(0 to PACKET_TYPES-1) of u8(0 to 27);
   type     sb_array_t is array(0 to 3) of u8(0 to 6);
   type     period_t is (
-    control,
-    video_pre,
-    video_gb,
-    video,
-    data_pre,
-    data_gb_leading,
-    data_island,
-    data_gb_trailing
+    CONTROL,
+    VIDEO_PRE,
+    VIDEO_GB,
+    VIDEO,
+    DATA_PRE,
+    DATA_GB_LEADING,
+    DATA_ISLAND,
+    DATA_GB_TRAILING
   );
 
-  signal   data_req      : std_logic_vector(0 to packet_types-1);  -- } data packet handshaking
-  signal   data_ack      : std_logic_vector(0 to packet_types-1);  -- }
+  signal   data_req      : std_logic_vector(0 to PACKET_TYPES-1);  -- } data packet handshaking
+  signal   data_ack      : std_logic_vector(0 to PACKET_TYPES-1);  -- }
 
   signal   hb_a          : u8(0 to 2);                             -- header bytes of audio sample packet in progress
   signal   pb_a          : u8(0 to 27);                            -- packet bytes of audio sample packet in progress
@@ -197,7 +197,7 @@ architecture synth of vga_to_hdmi is
   signal   s3_bch4       : std_logic;                              -- BCH block 4 bit
   signal   s3_bch_e      : std_logic_vector(s2_bch_e'range);       -- BCH blocks 0-3 even bit
   signal   s3_bch_o      : std_logic_vector(s2_bch_o'range);       -- BCH blocks 0-3 odd bit
-  signal   s3_bch_ecc    : slv_7_0_t(0 to subpackets);             -- ECC values for header (0) and 4 subpackets (1..4)
+  signal   s3_bch_ecc    : slv_7_0_t(0 to SUBPACKETS);             -- ECC values for header (0) and 4 subpackets (1..4)
   signal   s3_vs         : std_logic;                              -- vertical sync (pipelined from previous stage)
   signal   s3_hs         : std_logic;                              -- horizontal sync (pipelined from previous stage)
   signal   s3_de         : std_logic;                              -- data (pixel) enable (pipelined from previous stage)
@@ -465,7 +465,7 @@ begin
   VGA: process (vga_rst, vga_clk) is
 
     variable buf_rdata  : std_logic_vector(26 downto 0);
-    variable p          : integer range 0 to packet_types-1;
+    variable p          : integer range 0 to PACKET_TYPES-1;
     variable s1_hb_byte : integer range 0 to 3;
     variable s1_hb_bit  : integer range 0 to 7;
     variable s1_sb_byte : integer range 0 to 7;
@@ -536,7 +536,7 @@ begin
       s1_de       <= '0';
       s1_p        <= (others => (others => '0'));
       s1_enc      <= ENC_DVI;
-      s1_ctl      <= ctl_null;
+      s1_ctl      <= CTL_NULL;
       s2_data     <= '0';
       s2_pcount   <= (others => '0');
       s2_bch4     <= '0';
@@ -547,7 +547,7 @@ begin
       s2_de       <= '0';
       s2_p        <= (others => (others => '0'));
       s2_enc      <= ENC_DVI;
-      s2_ctl      <= ctl_null;
+      s2_ctl      <= CTL_NULL;
       s3_data     <= '0';
       s3_pcount   <= (others => '0');
       s3_bch4     <= '0';
@@ -559,13 +559,13 @@ begin
       s3_de       <= '0';
       s3_p        <= (others => (others => '0'));
       s3_enc      <= ENC_DVI;
-      s3_ctl      <= ctl_null;
+      s3_ctl      <= CTL_NULL;
       s4_vs       <= '0';
       s4_hs       <= '0';
       s4_de       <= '0';
       s4_p        <= (others => (others => '0'));
       s4_enc      <= ENC_DVI;
-      s4_ctl      <= ctl_null;
+      s4_ctl      <= CTL_NULL;
       s4_d        <= (others => (others => '0'));
 
     elsif rising_edge(vga_clk) then
@@ -670,7 +670,7 @@ begin
       pb(3)(5)(0)    <= pix_rep_s;
       pb(3)(6 to 27) <= pb_3(6 to 27);
 
-      for i in 0 to packet_types-1 loop
+      for i in 0 to PACKET_TYPES-1 loop
         if data_ack(i) = '1' then
           data_req(i) <= '0';
         end if;
@@ -692,7 +692,7 @@ begin
         when CONTROL =>
           if buf_de = '0' then
             if vga_de = '1' and blank_count = 10 then                                       -- counting down to video
-              s1_period <= VIDEO_PRE; s1_enc <= ENC_DVI; s1_ctl <= ctl_pre_video;
+              s1_period <= VIDEO_PRE; s1_enc <= ENC_DVI; s1_ctl <= CTL_PRE_VIDEO;
               s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
             elsif unsigned(s1_pcount) >= 11 and blank_count >= 66 then
               -- we have satisfied 12 clock minimum for a control period;
@@ -707,9 +707,9 @@ begin
               -- 2        video guardband
               -- total: 66
               if data_req /= "0000" then
-                s1_period <= DATA_PRE; s1_enc <= ENC_DVI; s1_ctl <= ctl_pre_data;
+                s1_period <= DATA_PRE; s1_enc <= ENC_DVI; s1_ctl <= CTL_PRE_DATA;
                 s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
-                for i in 0 to packet_types-1 loop                                           -- prioritize
+                for i in 0 to PACKET_TYPES-1 loop                                           -- prioritize
                   p := i;
                   exit when data_req(p) = '1';
                 end loop;
@@ -725,31 +725,31 @@ begin
 
         when VIDEO_PRE =>
           if s1_pcount(2 downto 0) = "111" then
-            s1_period <= VIDEO_GB; s1_enc <= ENC_GB_VIDEO; s1_ctl <= ctl_null;
+            s1_period <= VIDEO_GB; s1_enc <= ENC_GB_VIDEO; s1_ctl <= CTL_NULL;
             s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
           end if;
 
         when VIDEO_GB =>
           if s1_pcount(0) = '1' then
-            s1_period <= VIDEO; s1_enc <= ENC_DVI; s1_ctl <= ctl_null;
+            s1_period <= VIDEO; s1_enc <= ENC_DVI; s1_ctl <= CTL_NULL;
             s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
           end if;
 
         when VIDEO =>
           if buf_de = '0' then
-            s1_period <= CONTROL; s1_enc <= ENC_DVI; s1_ctl <= ctl_null;
+            s1_period <= CONTROL; s1_enc <= ENC_DVI; s1_ctl <= CTL_NULL;
             s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
           end if;
 
         when DATA_PRE =>
           if s1_pcount(2 downto 0) = "111" then
-            s1_period <= DATA_GB_LEADING; s1_enc <= ENC_GB_DATA; s1_ctl <= ctl_null;
+            s1_period <= DATA_GB_LEADING; s1_enc <= ENC_GB_DATA; s1_ctl <= CTL_NULL;
             s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
           end if;
 
         when DATA_GB_LEADING =>
           if s1_pcount(0) = '1' then
-            s1_period <= DATA_ISLAND; s1_enc <= ENC_DATA; s1_ctl <= ctl_null;
+            s1_period <= DATA_ISLAND; s1_enc <= ENC_DATA; s1_ctl <= CTL_NULL;
             s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
           end if;
 
@@ -761,7 +761,7 @@ begin
                then                                                                         -- do another data packet
               s1_pcount <= (others => '0');
               s1_dcount <= s1_dcount+1;
-              for i in 0 to packet_types-1 loop                                             -- prioritize
+              for i in 0 to PACKET_TYPES-1 loop                                             -- prioritize
                 p := i;
                 exit when data_req(p) = '1';
               end loop;
@@ -772,14 +772,14 @@ begin
               s1_sb(2)    <= pb(p)(14 to 20);
               s1_sb(3)    <= pb(p)(21 to 27);
             else                                                                            -- wrap up
-              s1_period <= DATA_GB_TRAILING; s1_enc <= ENC_GB_DATA; s1_ctl <= ctl_null;
+              s1_period <= DATA_GB_TRAILING; s1_enc <= ENC_GB_DATA; s1_ctl <= CTL_NULL;
               s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
             end if;
           end if;
 
         when DATA_GB_TRAILING =>
           if s1_pcount(0) = '1' then
-            s1_period <= CONTROL; s1_enc <= ENC_DVI; s1_ctl <= ctl_null;
+            s1_period <= CONTROL; s1_enc <= ENC_DVI; s1_ctl <= CTL_NULL;
             s1_pcount <= (others => '0'); s1_dcount <= (others => '0');
           end if;
 
