@@ -87,6 +87,7 @@ architecture synth of vga_to_hdmi is
     signal pcm_cs_v         : std_logic_vector(0 to 39);       -- IEC60958 channel status as a vector
     signal pcm_count        : integer range 0 to SUBPACKETS-1; -- used to assemble 4x samples into sample packet
 
+    signal iec_req          : std_logic;                       -- PCM to IEC sample request
     signal iec_count        : integer range 0 to 191;          -- IEC60958 frame #
     signal iec_sync         : std_logic;                       -- IEC60958 b preamble (sync)
     signal iec_l            : std_logic_vector(23 downto 0);   -- IEC60958 left channel sample
@@ -99,7 +100,6 @@ architecture synth of vga_to_hdmi is
     signal iec_ru           : std_logic;                       -- IEC60958 right user data
     signal iec_rc           : std_logic;                       -- IEC60958 right channel status
     signal iec_rp           : std_logic;                       -- IEC60958 right channel status
-    signal iec_req          : std_logic;                       -- } CDC macro handshaking
     signal iec_ack          : std_logic;                       -- }
 
     signal vga_iec_en       : std_logic;                       -- enable for the following...
@@ -236,7 +236,8 @@ architecture synth of vga_to_hdmi is
 
     -- packet type 2: audio infoframe packet
     constant hb_2 : u8(0 to 2) := ( x"84", x"01", x"0A" );
-    constant pb_2 : u8(0 to 27) := (
+    constant pb_2 : u8(0 to 27) :=
+    (
             0  => x"70", -- checksum 84+01+0A+01+CKS = 00
             1  => x"01", -- 00000001  CT(3:0),RSVD,CC(2:0)
             2  => x"00", -- 00000000  F(27:25),SF(2:0),SS(1:0)
@@ -253,7 +254,8 @@ architecture synth of vga_to_hdmi is
 
     -- type 3: AVI infoframe packet
     constant hb_3 : u8(0 to 2) := ( x"82", x"02", x"0D" );
-    constant pb_3 : u8(0 to 27) := (
+    constant pb_3 : u8(0 to 27) :=
+    (
             0 => x"00",     -- *NOT CONSTANT* checksum
             1 => x"02",     -- RSVD,Y(1:0),A0,B(1:0),S(1:0)
             2 => x"00",     -- *PART CONSTANT* C(1:0),M(1:0),R(3:0)
@@ -353,10 +355,8 @@ begin
     pcm_cs_v(33 to 35) <= "100";      -- sample word length is 16 bits
     pcm_cs_v(36 to 39) <= "0000";     -- original sample frequency not indicated
 
-    process(pcm_rst,pcm_clk)
-
+  PCM: process (pcm_rst, pcm_clk) is
         variable cs, cs_l, cs_r : std_logic;
-
         function xor_v(v : std_logic_vector) return std_logic is
             variable i : integer;
             variable r : std_logic;
@@ -383,7 +383,6 @@ begin
             iec_ru      <= '0';
             iec_rc      <= '0';
             iec_rp      <= '0';
-
         elsif rising_edge(pcm_clk) then
 
             -- Inform sink of the correct audio sample rate
@@ -429,9 +428,8 @@ begin
             elsif iec_ack = '1' then
                 iec_req <= '0';
             end if;
-
         end if;
-    end process;
+  end process PCM;
 
     -- clock domain crossing
 
@@ -520,7 +518,7 @@ begin
     vga_vs_p <= vga_vs xnor vs_pol_s;
     vga_hs_p <= vga_hs xnor hs_pol_s;
 
-    process(vga_rst,vga_clk)
+  VGA: process (vga_rst, vga_clk) is
 
         variable buf_rdata  : std_logic_vector(26 downto 0);
         variable p          : integer range 0 to PACKET_TYPES-1;
@@ -546,6 +544,7 @@ begin
             r(7) := d xor q(0);
             return r;
         end function bch_ecc_1;
+
         function bch_ecc_2( -- 2 bits per clock
             q : std_logic_vector(7 downto 0);
             d : std_logic_vector(1 downto 0)
@@ -756,6 +755,8 @@ begin
             end loop;
 
             -- HDMI encoding pipeline stage 1
+            -- NOTE: we do not currently meet the requirement for
+            --  extended control periods by design...
 
             if s1_pcount /= "11111" then
                 s1_pcount <= s1_pcount+1;
@@ -967,7 +968,7 @@ begin
 
         end if;
 
-     end process;
+  end process VGA;
 
     -- final encoder and serialiser stage
 
@@ -976,8 +977,9 @@ begin
     s4_c(1) <= s4_ctl(1 downto 0);
     s4_c(2) <= s4_ctl(3 downto 2);
 
-    GEN_TMDS: for i in 0 to 2 generate
+  gen_tmds: for i in 0 to 2 generate
     begin
+
         ENCODER: entity work.hdmi_tx_encoder
             generic map (
                 channel => i
@@ -992,6 +994,7 @@ begin
                 enc     => s4_enc,
                 q       => tmds(i)
             );
-    end generate GEN_TMDS;
+
+  end generate gen_tmds;
 
 end architecture synth;
