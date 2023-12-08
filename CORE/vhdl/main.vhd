@@ -245,6 +245,10 @@ end entity main;
 
 architecture synthesis of main is
 
+   constant C_EXP_PORT_HARDWARE : natural := 0;
+   constant C_EXP_PORT_REU      : natural := 1;
+   constant C_EXP_PORT_SIMCRT   : natural := 2;
+
    -- Generic MiSTer C64 signals
    signal c64_pause            : std_logic;
    signal c64_drive_led        : std_logic;
@@ -567,11 +571,11 @@ begin
          c64_ram_data <= x"00";
 
       -- Access the hardware cartridge
-      elsif c64_exp_port_mode_i = 0 and (cart_roml_n = '0' or cart_romh_n = '0') then
+      elsif c64_exp_port_mode_i = C_EXP_PORT_HARDWARE and (cart_roml_n = '0' or cart_romh_n = '0') then
          c64_ram_data <= data_from_cart;
 
       -- Access the simulated cartridge
-      elsif c64_exp_port_mode_i = 2 and (cart_roml_n = '0' or cart_romh_n = '0' or core_ioe = '1' or core_iof = '1') then
+      elsif c64_exp_port_mode_i = C_EXP_PORT_SIMCRT and (cart_roml_n = '0' or cart_romh_n = '0' or core_ioe = '1' or core_iof = '1') then
          c64_ram_data <= unsigned(crt_lo_ram_data_i(15 downto 8)) when cart_roml_n = '0' and crt_addr_bus_o(0) = '1' else
                          unsigned(crt_lo_ram_data_i( 7 downto 0)) when cart_roml_n = '0' and crt_addr_bus_o(0) = '0' else
                          unsigned(crt_hi_ram_data_i(15 downto 8)) when cart_romh_n = '0' and crt_addr_bus_o(0) = '1' else
@@ -787,7 +791,7 @@ begin
       cart_io2_n           <= not core_iof;
 
       -- Mode = Use hardware slot
-      if c64_exp_port_mode_i = 0 then
+      if c64_exp_port_mode_i = C_EXP_PORT_HARDWARE then
 
          cart_en_o       <= '1'; -- Enable port
          -- Expansion Port control signals
@@ -860,7 +864,7 @@ begin
       case c64_exp_port_mode_i is
 
          -- Use hardware slot
-         when 0 =>
+         when C_EXP_PORT_HARDWARE =>
             core_game_n    <= cart_game_n;
             core_exrom_n   <= cart_exrom_n;
             core_irq_n     <= cart_irq_n;
@@ -869,14 +873,14 @@ begin
             core_io_data   <= data_from_cart;
 
          -- Simulate 1750 REU 512KB
-         when 1 =>
+         when C_EXP_PORT_REU =>
             core_io_ext    <= reu_oe;
             core_io_data   <= reu_dout;
             core_dma       <= reu_dma_req;
             reu_iof        <= core_iof;
 
          -- Simulated cartridge using data from .crt file
-         when 2 =>
+         when C_EXP_PORT_SIMCRT =>
             core_game_n    <= crt_game;
             core_exrom_n   <= crt_exrom;
             core_dma       <= cartridge_loading_i or crt_bank_wait_i;
@@ -960,7 +964,7 @@ begin
    --------------------------------------------------------------------------------------------------
 
    -- REU configuration: "00":None, "01":512k, "10":2M, "11":16M
-   reu_cfg <= "01" when c64_exp_port_mode_i = 1 else "00";
+   reu_cfg <= "01" when c64_exp_port_mode_i = C_EXP_PORT_REU else "00";
 
    i_reu : reu
       port map (
