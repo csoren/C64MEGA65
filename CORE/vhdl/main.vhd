@@ -750,7 +750,7 @@ begin
       cart_ctrl_oe_o       <= '0';
       cart_addr_oe_o       <= '0';
       cart_data_oe_o       <= '0';
-      cart_en_o            <= '0'; -- Disable port
+      cart_en_o            <= '1'; -- Enable port. This is needed to enable joystick port B.
 
       cart_reset_oe_o      <= '0';
       cart_game_oe_o       <= '0';
