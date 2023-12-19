@@ -1,3 +1,12 @@
+----------------------------------------------------------------------------------
+-- MiSTer2MEGA65 Framework
+--
+-- QNICE interface to I2C devices
+-- Copied from https://github.com/MJoergen/i2c
+--
+-- MiSTer2MEGA65 done by sy2002 and MJoergen in 2023 and licensed under GPL v3
+----------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -35,7 +44,7 @@ entity i2c_controller is
     cpu_wait_o    : out std_logic;
     cpu_ce_i      : in  std_logic;
     cpu_we_i      : in  std_logic;
-    cpu_addr_i    : in  std_logic_vector(7 downto 0);
+    cpu_addr_i    : in  std_logic_vector(27 downto 0);
     cpu_wr_data_i : in  std_logic_vector(15 downto 0);
     cpu_rd_data_o : out std_logic_vector(15 downto 0);
     -- I2C signals

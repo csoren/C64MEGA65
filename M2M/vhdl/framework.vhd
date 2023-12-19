@@ -992,7 +992,7 @@ begin
    -- I2C controller
    ---------------------------------------------------------------------------------------------------------------
 
-   i_rtc_i2c : entity work.rtc_i2c
+   i_rtc_wrapper : entity work.rtc_wrapper
    generic map (
       G_BOARD       => G_BOARD,
       G_I2C_CLK_DIV => 250   -- SCL=100kHz @50MHz
@@ -1010,14 +1010,14 @@ begin
       i2c_wait_o    => qnice_i2c_wait,
       i2c_ce_i      => qnice_i2c_ce,
       i2c_we_i      => qnice_i2c_we,
-      i2c_addr_i    => qnice_ramrom_addr_o(7 downto 0),
+      i2c_addr_i    => qnice_ramrom_addr_o,
       i2c_wr_data_i => qnice_ramrom_data_out_o,
       i2c_rd_data_o => qnice_i2c_rd_data,
       scl_in_i      => "11111" & i2c_scl_io & grove_scl_io & fpga_scl_io,
       sda_in_i      => "11111" & i2c_sda_io & grove_sda_io & fpga_sda_io,
       scl_out_o     => scl_out,
       sda_out_o     => sda_out
-   ); -- i_rtc_i2c
+   ); -- i_rtc_wrapper
 
    -- Open collector, i.e. either drive pin low, or let it float (tri-state)
    fpga_sda_io  <= '0' when sda_out(0) = '0' else 'Z';
