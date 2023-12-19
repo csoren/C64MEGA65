@@ -206,6 +206,15 @@ port (
    qnice_ramrom_we_o       : out   std_logic;
    qnice_ramrom_wait_i     : in    std_logic;
 
+   hdmi_scl_io             : inout std_logic;
+   hdmi_sda_io             : inout std_logic;
+
+   vga_scl_io              : inout std_logic;
+   vga_sda_io              : inout std_logic;
+
+   audio_scl_io            : inout std_logic;
+   audio_sda_io            : inout std_logic;
+
    -- I2C bus
    -- U32 = PCA9655EMTTXG. Address 0x40. I/O expander.
    -- U12 = MP8869SGL-Z.   Address 0x61. DC/DC Converter.
@@ -1013,19 +1022,25 @@ begin
       i2c_addr_i    => qnice_ramrom_addr_o,
       i2c_wr_data_i => qnice_ramrom_data_out_o,
       i2c_rd_data_o => qnice_i2c_rd_data,
-      scl_in_i      => "11111" & i2c_scl_io & grove_scl_io & fpga_scl_io,
-      sda_in_i      => "11111" & i2c_sda_io & grove_sda_io & fpga_sda_io,
+      scl_in_i      => "11" & audio_scl_io & vga_scl_io & hdmi_scl_io & i2c_scl_io & grove_scl_io & fpga_scl_io,
+      sda_in_i      => "11" & audio_sda_io & vga_sda_io & hdmi_sda_io & i2c_sda_io & grove_sda_io & fpga_sda_io,
       scl_out_o     => scl_out,
       sda_out_o     => sda_out
    ); -- i_rtc_wrapper
 
    -- Open collector, i.e. either drive pin low, or let it float (tri-state)
-   fpga_sda_io  <= '0' when sda_out(0) = '0' else 'Z';
-   fpga_scl_io  <= '0' when scl_out(0) = '0' else 'Z';
-   grove_sda_io <= '0' when sda_out(1) = '0' else 'Z';
-   grove_scl_io <= '0' when scl_out(1) = '0' else 'Z';
-   i2c_sda_io   <= '0' when sda_out(2) = '0' else 'Z';
-   i2c_scl_io   <= '0' when scl_out(2) = '0' else 'Z';
+   fpga_sda_io  <= '0' when sda_out(0) = '0' else 'H';
+   fpga_scl_io  <= '0' when scl_out(0) = '0' else 'H';
+   grove_sda_io <= '0' when sda_out(1) = '0' else 'H';
+   grove_scl_io <= '0' when scl_out(1) = '0' else 'H';
+   i2c_sda_io   <= '0' when sda_out(2) = '0' else 'H';
+   i2c_scl_io   <= '0' when scl_out(2) = '0' else 'H';
+   hdmi_sda_io  <= '0' when sda_out(3) = '0' else 'H';
+   hdmi_scl_io  <= '0' when scl_out(3) = '0' else 'H';
+   vga_sda_io   <= '0' when sda_out(4) = '0' else 'H';
+   vga_scl_io   <= '0' when scl_out(4) = '0' else 'H';
+   audio_sda_io <= '0' when sda_out(5) = '0' else 'H';
+   audio_scl_io <= '0' when scl_out(5) = '0' else 'H';
 
 end architecture synthesis;
 
