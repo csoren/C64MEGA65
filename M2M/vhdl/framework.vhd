@@ -1029,18 +1029,18 @@ begin
    ); -- i_rtc_wrapper
 
    -- Open collector, i.e. either drive pin low, or let it float (tri-state)
-   fpga_sda_io  <= '0' when sda_out(0) = '0' else 'H';
-   fpga_scl_io  <= '0' when scl_out(0) = '0' else 'H';
-   grove_sda_io <= '0' when sda_out(1) = '0' else 'H';
-   grove_scl_io <= '0' when scl_out(1) = '0' else 'H';
-   i2c_sda_io   <= '0' when sda_out(2) = '0' else 'H';
-   i2c_scl_io   <= '0' when scl_out(2) = '0' else 'H';
-   hdmi_sda_io  <= '0' when sda_out(3) = '0' else 'H';
-   hdmi_scl_io  <= '0' when scl_out(3) = '0' else 'H';
-   vga_sda_io   <= '0' when sda_out(4) = '0' else 'H';
-   vga_scl_io   <= '0' when scl_out(4) = '0' else 'H';
-   audio_sda_io <= '0' when sda_out(5) = '0' else 'H';
-   audio_scl_io <= '0' when scl_out(5) = '0' else 'H';
+   fpga_sda_io  <= '0' when sda_out(0) = '0' else 'Z';
+   fpga_scl_io  <= '0' when scl_out(0) = '0' else 'Z';
+   grove_sda_io <= '0' when sda_out(1) = '0' else 'Z';
+   grove_scl_io <= '0' when scl_out(1) = '0' else 'Z';
+   i2c_sda_io   <= '0' when sda_out(2) = '0' else 'Z';
+   i2c_scl_io   <= '0' when scl_out(2) = '0' else 'Z';
+   hdmi_sda_io  <= '0' when sda_out(3) = '0' else 'Z';
+   hdmi_scl_io  <= '0' when scl_out(3) = '0' else 'Z';
+   vga_sda_io   <= '0' when sda_out(4) = '0' else 'Z';
+   vga_scl_io   <= '0' when scl_out(4) = '0' else 'Z';
+   audio_sda_io <= '0' when sda_out(5) = '0' else 'Z';
+   audio_scl_io <= '0' when scl_out(5) = '0' else 'Z';
 
 end architecture synthesis;
 
