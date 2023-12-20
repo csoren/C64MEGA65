@@ -141,6 +141,7 @@ begin
 
             -- In this state, core is ready
             when WAIT_OK_ST =>
+               qnice_wait_o <= '0';
                if qnice_req_status = C_CSR_REQ_OK then
                   delay <= C_COMM_DELAY;
                   state <= TRIGGER_RUN_ST;
