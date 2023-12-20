@@ -11,8 +11,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.numeric_std_unsigned.all;
 
-library work;        
+library work;
 use work.globals.all;
+use work.qnice_csr_pkg.all;
 
 entity prg_loader is
 port (
@@ -29,86 +30,75 @@ port (
    c64ram_addr_o     : out std_logic_vector(15 downto 0);
    c64ram_data_i     : in std_logic_vector(7 downto 0);
    c64ram_data_o     : out std_logic_vector(7 downto 0);
-   
+
    core_reset_o      : out std_logic;  -- reset the core when the PRG loading starts
    core_triggerrun_o : out std_logic   -- trigger program auto starts after loading finished
 );
-end prg_loader;
+end entity prg_loader;
 
 architecture beh of prg_loader is
 
-   -- Status reporting from QNICE
-   constant C_CRT_ST_IDLE         : std_logic_vector(15 downto 0) := X"0000";
-   constant C_CRT_ST_LDNG         : std_logic_vector(15 downto 0) := X"0001";
-   constant C_CRT_ST_ERR          : std_logic_vector(15 downto 0) := X"0002";
-   constant C_CRT_ST_OK           : std_logic_vector(15 downto 0) := X"0003";
-
-   -- Status reporting to QNICE   
-   constant C_STAT_IDLE         : std_logic_vector(3 downto 0) := "0000";
-   constant C_STAT_PARSING      : std_logic_vector(3 downto 0) := "0001";
-   constant C_STAT_READY        : std_logic_vector(3 downto 0) := "0010"; -- Successfully parsed CRT file
-   constant C_STAT_ERROR        : std_logic_vector(3 downto 0) := "0011"; -- Error parsing CRT file
-   
-   -- Control & status register
-   constant C_CRT_CASREG          : unsigned(15 downto 0) := X"FFFF";
-   constant C_CRT_STATUS          : unsigned(11 downto 0) := X"000";
-   constant C_CRT_FS_LO           : unsigned(11 downto 0) := X"001";
-   constant C_CRT_FS_HI           : unsigned(11 downto 0) := X"002";
-   constant C_CRT_PARSEST         : unsigned(11 downto 0) := X"010";
-   constant C_CRT_PARSEE1         : unsigned(11 downto 0) := X"011";
-   constant C_CRT_ADDR_LO         : unsigned(11 downto 0) := X"012";
-   constant C_CRT_ADDR_HI         : unsigned(11 downto 0) := X"013";
-   constant C_CRT_ERR_START       : unsigned(11 downto 0) := X"100";
-   constant C_CRT_ERR_END         : unsigned(11 downto 0) := X"1FF";
-
    -- Request and response
-   signal qnice_req_status        : std_logic_vector(15 downto 0);
-   signal qnice_req_length        : std_logic_vector(31 downto 0);
-   signal qnice_req_valid         : std_logic;
-   signal qnice_resp_status       : std_logic_vector( 3 downto 0);
-   signal qnice_resp_error        : std_logic_vector( 3 downto 0);
-   
+   signal qnice_req_status : std_logic_vector( 3 downto 0);
+
+   signal qnice_csr_data   : std_logic_vector(15 downto 0);
+   signal qnice_csr_wait   : std_logic;
+   signal qnice_csr        : std_logic;
+
    -- PRG load address
-   signal prg_start               : unsigned(15 downto 0);
-   
+   signal prg_start        : unsigned(15 downto 0);
+
    -- Communication and reset state machine (see comment directly at the state machine below)
-   constant C_COMM_DELAY          : natural := 50;
-   constant C_RESET_DELAY         : natural := 4 * CORE_CLK_SPEED;  -- 3 seconds
-        
+   constant C_COMM_DELAY   : natural := 50;
+   constant C_RESET_DELAY  : natural := 4 * CORE_CLK_SPEED;  -- 3 seconds
+
    type t_comm_state is (IDLE_ST,
                          RESET_ST,
                          RESET_POST_ST,
+                         WAIT_OK_ST,
                          TRIGGER_RUN_ST);
 
-   signal state : t_comm_state := IDLE_ST;                         
+   signal state : t_comm_state := IDLE_ST;
    signal delay : natural range 0 to C_RESET_DELAY;
 
+   constant C_ERROR_STRINGS : string_vector(0 to 15) := (others => "OK                 \n");
+
 begin
+
+   -- Handle the generic framework CSR registers
+   i_qnice_csr : entity work.qnice_csr
+      generic map (
+         G_ERROR_STRINGS => C_ERROR_STRINGS
+      )
+      port map (
+         qnice_clk_i          => qnice_clk_i,
+         qnice_rst_i          => qnice_rst_i,
+         qnice_addr_i         => qnice_addr_i,
+         qnice_data_i         => qnice_data_i,
+         qnice_ce_i           => qnice_ce_i,
+         qnice_we_i           => qnice_we_i,
+         qnice_data_o         => qnice_csr_data,
+         qnice_wait_o         => qnice_csr_wait,
+         qnice_csr_o          => qnice_csr,
+         qnice_req_status_o   => qnice_req_status,
+         qnice_req_length_o   => open,
+         -- for now: hardcoded as we do not really parse anything
+         qnice_resp_status_i  => C_CSR_RESP_READY,
+         qnice_resp_error_i   => (others => '0'),
+         qnice_resp_address_i => (others => '0')
+      ); -- i_qnice_csr
+
+
 
    -- Write to registers
    process (qnice_clk_i)
    begin
-      if falling_edge(qnice_clk_i) then    
+      if falling_edge(qnice_clk_i) then
          if qnice_ce_i = '1' and qnice_we_i = '1' then
-            -- control and status register
-            if unsigned(qnice_addr_i(27 downto 12)) = C_CRT_CASREG then
-               case unsigned(qnice_addr_i(11 downto 0)) is
-                  when C_CRT_STATUS =>
-                     qnice_req_status <= qnice_data_i;
-                     if qnice_data_i = C_CRT_ST_LDNG then
-                        state <= RESET_ST;
-                     elsif qnice_data_i = C_CRT_ST_OK then
-                        state <= TRIGGER_RUN_ST;
-                     end if;
-                  when C_CRT_FS_LO  => qnice_req_length(15 downto  0)  <= qnice_data_i;
-                  when C_CRT_FS_HI  => qnice_req_length(31 downto 16)  <= qnice_data_i;
-                  when others => null;
-               end case;
-            
             -- extract low byte of program start
-            elsif qnice_addr_i(27 downto 0) = x"000" & "0000" then
+            if qnice_addr_i(27 downto 0) = X"000000" & "0000" then
                prg_start(7 downto 0) <= unsigned(qnice_data_i(7 downto 0));
-            elsif qnice_addr_i(27 downto 0) = x"000" & "0001" then
+            elsif qnice_addr_i(27 downto 0) = X"000000" & "0001" then
                prg_start(15 downto 8) <= unsigned(qnice_data_i(7 downto 0));
             end if;
          end if;
@@ -118,32 +108,45 @@ begin
          -- hold the signal C_COMM_DELAY QNICE cycles high.
          --
          -- While the C64 resets, it clears some status memory locations so that QNICE needs to wait before
-         -- loading the PRG until the reset is done (C_RESET_DELAY), otherwise we have a race condition.  
+         -- loading the PRG until the reset is done (C_RESET_DELAY), otherwise we have a race condition.
          case state is
             when IDLE_ST =>
-               qnice_wait_o       <= '0';
-               core_reset_o       <= '0';
-               core_triggerrun_o  <= '0';
-               delay              <= C_COMM_DELAY;
-               
+               qnice_wait_o      <= '0';
+               core_reset_o      <= '0';
+               core_triggerrun_o <= '0';
+               if qnice_req_status = C_CSR_REQ_LDNG then
+                  delay <= C_COMM_DELAY;
+                  state <= RESET_ST;
+               end if;
+
+            -- In this state, reset is asserted
             when RESET_ST =>
                qnice_wait_o <= '1';
                core_reset_o <= '1';
                if delay = 0 then
                   state <= RESET_POST_ST;
                   delay <= C_RESET_DELAY;
-                  core_reset_o <= '0';
                else
                   delay <= delay - 1;
                end if;
 
+            -- In this state, reset is cleared, and core is booting
             when RESET_POST_ST =>
+               core_reset_o <= '0';
                if delay = 0 then
-                  state <= IDLE_ST;
+                  state <= WAIT_OK_ST;
                else
                   delay <= delay - 1;
                end if;
-               
+
+            -- In this state, core is ready
+            when WAIT_OK_ST =>
+               if qnice_req_status = C_CSR_REQ_OK then
+                  delay <= C_COMM_DELAY;
+                  state <= TRIGGER_RUN_ST;
+               end if;
+
+            -- In this state, program is being started
             when TRIGGER_RUN_ST =>
                core_triggerrun_o <= '1';
                if delay = 0 then
@@ -157,8 +160,6 @@ begin
          end case;
 
          if qnice_rst_i = '1' then
-            qnice_req_status  <= C_CRT_ST_IDLE;           
-            qnice_req_length  <= (others => '0');
             prg_start         <= (others => '0');
             core_reset_o      <= '0';
             core_triggerrun_o <= '0';
@@ -167,44 +168,34 @@ begin
          end if;
       end if;
    end process;
-   
-   -- Read from registers and handle the C64 RAM signals
+
+   -- Handle QNICE read
    process(all)
    begin
       qnice_data_o <= x"0000"; -- By default read back zeros
-      
-      c64ram_addr_o  <= std_logic_vector(prg_start + unsigned(qnice_addr_i(15 downto 0) - 2));
-      c64ram_data_o  <= (others => '0');         
-      c64ram_we_o    <= '0';  
-      
-      -- for now: hardcoded as we do not really parse anything
-      qnice_resp_status <= C_STAT_READY;
-      qnice_resp_error <= (others => '0');
-           
-      -- Control and status registers
-      if qnice_ce_i = '1' and
-         qnice_we_i = '0' and
-         unsigned(qnice_addr_i(27 downto 12)) = C_CRT_CASREG
-      then
-         case to_integer(unsigned(qnice_addr_i(11 downto 0))) is
-            when to_integer(C_CRT_STATUS)  => qnice_data_o <= qnice_req_status;
-            when to_integer(C_CRT_FS_LO)   => qnice_data_o <= qnice_req_length(15 downto  0);
-            when to_integer(C_CRT_FS_HI)   => qnice_data_o(6 downto 0) <= qnice_req_length(22 downto 16);
-            when to_integer(C_CRT_PARSEST) => qnice_data_o <= X"000" & qnice_resp_status;
-            when to_integer(C_CRT_PARSEE1) => qnice_data_o <= X"000" & qnice_resp_error;
-            when others => null;
+
+      if qnice_ce_i = '1' then
+         case qnice_csr is
+            when '0' =>
+               qnice_data_o <= x"00" & c64ram_data_i;
+            when '1' =>
+               qnice_data_o <= qnice_csr_data;
          end case;
       end if;
-      
-      -- Handle C64 RAM signals
-      if qnice_ce_i = '1' and unsigned(qnice_addr_i(27 downto 0)) > 1 and unsigned(qnice_addr_i(27 downto 12)) /= C_CRT_CASREG then
-         if qnice_we_i = '0' then
-            qnice_data_o <= x"00" & c64ram_data_i;
-         else
-            c64ram_we_o <= '1';
-            c64ram_data_o <= qnice_data_i(7 downto 0);
-         end if;
+   end process;
+
+   -- Handle the C64 RAM signals
+   process(all)
+   begin
+      c64ram_addr_o <= std_logic_vector(prg_start + unsigned(qnice_addr_i(15 downto 0) - 2));
+      c64ram_data_o <= qnice_data_i(7 downto 0);
+      c64ram_we_o   <= '0';
+
+      -- Handle write to C64 RAM
+      if qnice_ce_i = '1' and unsigned(qnice_addr_i(27 downto 0)) > 1 and qnice_csr = '0' then
+         c64ram_we_o <= qnice_we_i;
       end if;
    end process;
 
 end architecture beh;
+
