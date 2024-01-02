@@ -337,7 +337,12 @@ architecture synthesis of main is
    -- When pulsing reset_soft_i from the outside (mega65.vhd), then you need to ensure that this
    -- pulse is at least 32 clock cycles long. Currently (see mega65.vhd) there are two sources that
    -- trigger reset_soft_i: The M2M reset manager and sw_cartridge_wrapper. Both are ensuring that
-   -- the rest pulse is at least 32 clock cycles long.   
+   -- the rest pulse is at least 32 clock cycles long.
+   --
+   -- A reset that is coming from a hardware cartridge via cart_reset_i (which is low active) is treated
+   -- just like reset_soft_i. We can assume that the pulse will be long enough because cartridges are
+   -- aware of minimum reset durations. (Example: The EF3 pulses the reset for 7xphi2, which is way longer
+   -- then 32 cycles.)  
    --
    -- CAUTION: NEVER DIRECTLY USE THE INPUT SIGNALS
    --       reset_soft_i and
@@ -515,7 +520,7 @@ begin
    hard_reset : process(clk_main_i)
    begin
       if rising_edge(clk_main_i) then
-         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then
+         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 or cart_reset_i = '0' then
             -- Due to sw_cartridge_wrapper's logic, reset_soft_i stays high longer than reset_hard_i.
             -- We need to make sure that this is not interfering with hard_reset_n
             if reset_hard_i = '1' then
@@ -750,16 +755,35 @@ begin
       cart_ctrl_oe_o       <= '0';
       cart_addr_oe_o       <= '0';
       cart_data_oe_o       <= '0';
-      cart_en_o            <= '1'; -- Enable port. This is needed to enable joystick port B.
+      
+      -- Due to a bug in the R5/R6 boards, the cartridge port needs ALWAYS to be enabled,
+      -- otherwise joystick port B is not working correctly
+      cart_en_o            <= '1';
 
-      cart_reset_oe_o      <= '0';
+      -- For the time being, we are treating GAME, EXROM, NMI and IRQ as READ-ONLY on all board revisions at all times
+      -- @TODO: As soon as we support more sophisticted modules, we need to become more flexible here, too      
       cart_game_oe_o       <= '0';
       cart_exrom_oe_o      <= '0';
       cart_nmi_oe_o        <= '0';
       cart_irq_oe_o        <= '0';
+
+      -- For the time being, we are treating ROML and ROMH as WRITE-ONLY at all times, as soon as c64_exp_port_mode_i = C_EXP_PORT_HARDWARE,
+      -- so the "zero" here is just the deactivated output driver as long as the core is in a non-hardware cartridge mode
+      -- and it will be switched to OUTPUT (WRITE-ONLY) in the code that follows below
       cart_roml_oe_o       <= '0';
       cart_romh_oe_o       <= '0';
-
+      
+      -- Bi-directional reset handling:
+      -- The "zero" here is (similar to above) just the deactivated output in non-hardware cartridge mode.
+      -- As soon as hardware cartridge mode is on, we will switch back and forth between READ and WRITE.
+      -- On R3/R3A boards, we will never be able to read, because the driver is uni-directional output-only.
+      -- This fact is mitigated by top_mega65-r3.vhd setting cart_reset_i to '1' and therefore we are always
+      -- "reading" the situation "no reset from the cartridge" on R3/R3A boards.
+      -- But on R5/R6 and newer boards, we will be able to sense the reset from the cartridge and therefore we will
+      -- not need i_cartridge_heuristics and handle_cartridge_triggered_resets. Instead, cartridges like the EF3
+      -- and the KFF "are just working" on these newer boards.
+      cart_reset_oe_o      <= '0';      
+      
       -- Default values for all signals
       cart_phi2_o          <= '0';
       cart_reset_o         <= '1';
@@ -792,33 +816,40 @@ begin
 
       -- Mode = Use hardware slot
       if c64_exp_port_mode_i = C_EXP_PORT_HARDWARE then
-
-         cart_en_o       <= '1'; -- Enable port
-         -- Expansion Port control signals
+         -- Hardcoded to WRITE-ONLY (OUTPUT) for the time being
          cart_ctrl_oe_o  <= '1';
-         cart_reset_oe_o <= '1';
          cart_roml_oe_o  <= '1';
          cart_romh_oe_o  <= '1';
+
+         -- Bi-directional RESET handling:
+         -- Default is: READ (aka sense reset from the cartridge). We are switching this to WRITE
+         -- as soon as there is a reset from the core that needs to be transmitted to the cartridge.
+         -- cart_reset_o is low active, so by default, cart_reset_oe_o is zero (aka READ).
+         -- We also need to ensure that we are not transmitting any reset that comes from the cartridge
+         -- itself, because in such a case the cartridge wants to reset the C64 but does not want to be reset by the C64.
+         -- cart_reset_i is low active, too.
+         cart_reset_o    <= reset_core_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
+         cart_reset_oe_o <= '0' when cart_reset_o = '1' or cart_reset_i = '0' else '1';
+
+         -- Connect physical output lines to the core's various output signals
          cart_roml_o     <= cart_roml_n;
          cart_romh_o     <= cart_romh_n;
          cart_io1_o      <= cart_io1_n;
          cart_io2_o      <= cart_io2_n;
          cart_rw_o       <= not c64_ram_we;
          cart_phi2_o     <= core_phi2;
+         cart_dotclock_o <= core_dotclk;
 
          -- @TODO: When implementing this, we need to perform more research. It seems that just using
          -- the C64 cores's "cpuHasBus" signal leads to less compatibility than more. For example it
          -- seemed, that the Kung Fu Flash is not working at all any more.
-         cart_ba_o         <= '1';
+         cart_ba_o       <= '1';
 
-         cart_reset_o      <= reset_core_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
-         cart_dotclock_o   <= core_dotclk;
-
-         cart_nmi_n        <= cart_nmi_i;
-         cart_irq_n        <= cart_irq_i;
-         cart_dma_n        <= cart_dma_i;
-         cart_exrom_n      <= cart_exrom_i;
-         cart_game_n       <= cart_game_i;
+         cart_nmi_n      <= cart_nmi_i;
+         cart_irq_n      <= cart_irq_i;
+         cart_dma_n      <= cart_dma_i;
+         cart_exrom_n    <= cart_exrom_i;
+         cart_game_n     <= cart_game_i;
 
          -- @TODO: As soon as we want to support DMA-enabled cartridges,
          -- we need to treat the address bus as a bi-directional port
@@ -913,49 +944,56 @@ begin
          is_an_EF3_o          => cart_is_an_EF3
       ); -- i_cartridge_heuristics
 
-   -- Cartridge-specific workaround due to the fact, that R3 and R3A board do not allow cartridges to pull the reset line to low (i.e. trigger a reset)
+   -- Cartridge-specific workaround due to the fact, that R3/R3A and R4 boards do not allow cartridges to pull the reset line to low (i.e. trigger a reset)
    handle_cartridge_triggered_resets : process (clk_main_i)
-   begin
-      if rising_edge(clk_main_i) then
-         core_phi2_prev <= core_phi2;
-
-         -- In contrast to what is written above in the comment RESET SEMANTICS, we cannot use
-         -- reset_core_n here because as soon as cart_reset_counter is > 0 reset_core_n goes low
-         -- and then cart_reset_counter would be reset back to 0 prematurely
-         if reset_soft_i or reset_hard_i then
-            cart_reset_counter <= 0;
-            cart_res_flckr_ign <= 0;
-
-         -- The reset duration is measured in multiples of phi2 cycles
-         elsif cart_reset_counter > 0 and core_phi2_prev = '1' and core_phi2 = '0' then
-            cart_reset_counter <= cart_reset_counter - 1;
-         end if;
-
-         -- Avoid the "flickering" (trailing) output of the reset to the cartridge after reset_core_n goes high again after the reset
-         if reset_core_n = '0' and cart_reset_counter = 0 and cart_res_flckr_ign /= 0 then
-            cart_res_flckr_ign <= cart_res_flckr_ign - 1;
-         end if;
-
-         -------------------------------------------------------------------------------------------------
-         -- EasyFlash 3
-         -------------------------------------------------------------------------------------------------
-
-         -- The EF3 needs to send a reset signal to the C64 core
-         -- Learn more about the exact mechanics here: https://github.com/MJoergen/C64MEGA65/issues/60
-         -- And/or look at the EF3 source code:
-         --   What happens when "start-entry" key is pressed in the main menu: https://gitlab.com/easyflash/easyflash3-bootimage/-/blob/master/efmenu/src/efmenu.c#L361
-         --   Set the EF ROM bank and change to the given cartridge mode: https://gitlab.com/easyflash/easyflash3-bootimage/-/blob/master/efmenu/src/efmenu_asm.s#L96
-         if cart_is_an_EF3 = '1' and c64_ram_we = '1' and cart_io1_n = '0' and c64_ram_addr_o = x"DE0F" then
-            -- Modes that lead to a reset: https://gitlab.com/easyflash/easyflash3-core/-/blob/master/src/ef3.vhdl#L695
-            -- We are deliberately not supporting the Kernal mode x"02" of the EF3, because in Kernal mode, the EF3 manipulates the address line A14.
-            -- While we could emulate the behavior on our side of the transciever, the problem is, that the transciever and the EF3 would fight" against
-            -- each other: There might be situations where the core sets A14 to zero while the EF3 sets it to one and this "fight" would lead to quite
-            -- some current flowing which might damage either the MEGA65's transciever or the EF3's CPLD or other logic parts.
-            if c64_ram_data_o = x"00" or c64_ram_data_o = x"04" or c64_ram_data_o = x"05" or c64_ram_data_o = x"07" then
-               cart_reset_counter <= C_EF3_RESET_LEN;
-               cart_res_flckr_ign <= 2; -- avoid a short cart_reset_o after cart_reset_counter reached zero
+   begin     
+      if G_BOARD = "MEGA65_R3" or G_BOARD = "MEGA65_R4" then
+         if rising_edge(clk_main_i) then
+            core_phi2_prev <= core_phi2;
+   
+            -- In contrast to what is written above in the comment RESET SEMANTICS, we cannot use
+            -- reset_core_n here because as soon as cart_reset_counter is > 0 reset_core_n goes low
+            -- and then cart_reset_counter would be reset back to 0 prematurely
+            if reset_soft_i or reset_hard_i then
+               cart_reset_counter <= 0;
+               cart_res_flckr_ign <= 0;
+   
+            -- The reset duration is measured in multiples of phi2 cycles
+            elsif cart_reset_counter > 0 and core_phi2_prev = '1' and core_phi2 = '0' then
+               cart_reset_counter <= cart_reset_counter - 1;
+            end if;
+   
+            -- Avoid the "flickering" (trailing) output of the reset to the cartridge after reset_core_n goes high again after the reset
+            if reset_core_n = '0' and cart_reset_counter = 0 and cart_res_flckr_ign /= 0 then
+               cart_res_flckr_ign <= cart_res_flckr_ign - 1;
+            end if;
+   
+            -------------------------------------------------------------------------------------------------
+            -- EasyFlash 3
+            -------------------------------------------------------------------------------------------------
+   
+            -- The EF3 needs to send a reset signal to the C64 core
+            -- Learn more about the exact mechanics here: https://github.com/MJoergen/C64MEGA65/issues/60
+            -- And/or look at the EF3 source code:
+            --   What happens when "start-entry" key is pressed in the main menu: https://gitlab.com/easyflash/easyflash3-bootimage/-/blob/master/efmenu/src/efmenu.c#L361
+            --   Set the EF ROM bank and change to the given cartridge mode: https://gitlab.com/easyflash/easyflash3-bootimage/-/blob/master/efmenu/src/efmenu_asm.s#L96
+            if cart_is_an_EF3 = '1' and c64_ram_we = '1' and cart_io1_n = '0' and c64_ram_addr_o = x"DE0F" then
+               -- Modes that lead to a reset: https://gitlab.com/easyflash/easyflash3-core/-/blob/master/src/ef3.vhdl#L695
+               -- We are deliberately not supporting the Kernal mode x"02" of the EF3, because in Kernal mode, the EF3 manipulates the address line A14.
+               -- While we could emulate the behavior on our side of the transciever, the problem is, that the transciever and the EF3 would fight" against
+               -- each other: There might be situations where the core sets A14 to zero while the EF3 sets it to one and this "fight" would lead to quite
+               -- some current flowing which might damage either the MEGA65's transciever or the EF3's CPLD or other logic parts.
+               if c64_ram_data_o = x"00" or c64_ram_data_o = x"04" or c64_ram_data_o = x"05" or c64_ram_data_o = x"07" then
+                  cart_reset_counter <= C_EF3_RESET_LEN;
+                  cart_res_flckr_ign <= 2; -- avoid a short cart_reset_o after cart_reset_counter reached zero
+               end if;
             end if;
          end if;
+         
+      -- Boards newer than R3/R3A/R4 do not need this workaround
+      else
+         cart_reset_counter <= 0;
+         cart_res_flckr_ign <= 0;         
       end if;
    end process;
 
