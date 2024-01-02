@@ -361,6 +361,7 @@ architecture synthesis of main is
    -- hard_reset_n IS NOT MEANT TO BE USED IN MAIN.VHD
    -- with the exception of the "cpu_data_in" the reset input of "i_cartridge".    
    signal reset_core_n         : std_logic := '1';
+   signal reset_core_int_n     : std_logic := '1';
    signal hard_reset_n         : std_logic := '1';
 
    constant C_HARD_RST_DELAY   : natural   := 100_000; -- roundabout 1/30 of a second
@@ -520,7 +521,7 @@ begin
    hard_reset : process(clk_main_i)
    begin
       if rising_edge(clk_main_i) then
-         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 or cart_reset_i = '0' then
+         if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then
             -- Due to sw_cartridge_wrapper's logic, reset_soft_i stays high longer than reset_hard_i.
             -- We need to make sure that this is not interfering with hard_reset_n
             if reset_hard_i = '1' then
@@ -530,20 +531,35 @@ begin
 
             -- reset_core_n is low-active, so prevent_reset = 0 means execute reset
             -- but a hard reset can override
-            reset_core_n      <= prevent_reset and (not reset_hard_i);
+            reset_core_int_n     <= prevent_reset and (not reset_hard_i);
          else
             -- The idea of the hard reset is, that while reset_core_n is back at '1' and therefore the core is
             -- running (not being reset any more), hard_reset_n stays low for C_HARD_RST_DELAY clock cycles.
             -- Reason: We need to give the KERNAL time to execute the routine $FD02 where it checks for the
             -- cartridge signature "CBM80" in $8003 onwards. In case reset_n = '0' during these tests (i.e. hard
             -- reset active) we will return zero instead of "CBM80" and therefore perform a hard reset.
-            reset_core_n      <= '1';
+            reset_core_int_n <= '1';
             if hard_rst_counter = 0 then
-               hard_reset_n   <= '1';
+               hard_reset_n <= '1';
             else
                hard_rst_counter <= hard_rst_counter - 1;
             end if;
          end if;
+      end if;
+   end process;
+   
+   -- Combined reset signal to be used throughout main.vhd: reset triggered by the MEGA65's reset button (reset_core_int_n)
+   -- and reset triggered by an external cartridge.
+   combined_reset : process(all)
+   begin
+      reset_core_n <= '1';
+      
+      -- cart_reset_i becomes cart_reset_o as soon as cart_reset_oe_o = '1', and the latter one becomes '1' as soon
+      -- as reset_core_int_n = '0' so we need to ignore cart_reset_i in this case
+      if reset_core_int_n = '0' then
+         reset_core_n <= '0';
+      elsif cart_reset_i = '0' and prevent_reset = '0' then
+         reset_core_n <= '0';
       end if;
    end process;
 
@@ -826,10 +842,10 @@ begin
          -- as soon as there is a reset from the core that needs to be transmitted to the cartridge.
          -- cart_reset_o is low active, so by default, cart_reset_oe_o is zero (aka READ).
          -- We also need to ensure that we are not transmitting any reset that comes from the cartridge
-         -- itself, because in such a case the cartridge wants to reset the C64 but does not want to be reset by the C64.
-         -- cart_reset_i is low active, too.
-         cart_reset_o    <= reset_core_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
-         cart_reset_oe_o <= '0' when cart_reset_o = '1' or cart_reset_i = '0' else '1';
+         -- itself, because in such a case the cartridge wants to reset the C64 but does not want to be reset by the C64,
+         -- which is why we use reset_core_int_n instead of reset_core_n.
+         cart_reset_o    <= reset_core_int_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
+         cart_reset_oe_o <= not cart_reset_o;
 
          -- Connect physical output lines to the core's various output signals
          cart_roml_o     <= cart_roml_n;
