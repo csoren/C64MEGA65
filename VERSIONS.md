@@ -2,25 +2,30 @@ Version 5.1 - MONTH, DAY, YEAR
 ==============================
 
 The main purpose of this release is to support the new 2024 batches of the
-MEGA65 (aka "R5") which sports enhanced hardware and better compatibility for
+MEGA65 (aka "R6") which sports enhanced hardware and better compatibility for
 Commodore 64 cartridges. It also delivers an improved sound-over-HDMI
 compatibility, fixes some bugs for all boards, such as the "long-reset bug"
 and improves the compatibility of the core with demanding demos.
 
-## New Features: R4/R5 boards only
+## New Features: R4/R5/R6 boards only
 
 * Heavily improved quality of the analog audio output via the 3.1mm audio jack
-  thanks to utilizing MEGA65's new audio DAC. (R4 and R5)
+  thanks to utilizing MEGA65's new audio DAC. (R4/R5/R6)
 
-WIP The hardware of the MEGA65's Expansion Port (aka cartridge port) is now 100%
+* The hardware of the MEGA65's Expansion Port (aka cartridge port) is now 100%
   compatible to the C64's hardware as it has bi-directional signals for RESET,
-  IRQ and NMI. This allowed us to make the core compatible with even more
-  cartridges. One example stands out is, that you do not need the "reset
-  workaround" for the Kung Fu Flash (KFF) any more. (R5 only)
+  IRQ and NMI. The C64 core is currently only leveraging the bi-directional
+  signals for RESET, but this allowed us to make the core compatible with even
+  more cartridges. Two examples that stands out are: (1) You do not need the
+  "reset workaround" for the Kung Fu Flash (KFF) any more that is documented
+  for the R3 board in doc/cartridges.md. (2) The EasyFlash 3 now also supports
+  alternative kernals. (R5/R6 only)
 @TODO: Needs update of the cartridge documentation that for example the reset
 workaround is not needed for the KungFu Flash any more
 
 ## New Features: All boards
+
+WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
 
 * You can now close the "About & Help" screens also by pressing Run/Stop.
 
@@ -33,15 +38,23 @@ workaround is not needed for the KungFu Flash any more
 * Fixed random micro cuts of sound that occured on on some HDMI displays.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/13)
 
-## Improved C64 Compatibility: All boards
+## Improved C64 Accuracy & Compatibility: All boards
 
 * Added VIC-II compatibility fix from MiSTer by gyurco which improves the
   core's compatibility with several demos
   (Fixes GitHub issue https://github.com/MiSTer-devel/C64_MiSTer/issues/160)
 
-## Bugfixes: R4/R5 boards only
+WIP Improved disk change detection for multi-disk demos. This fixes for
+  example Coma/Void, +H2K/Plush, Royal Arte/Booze Design and
+  Soiled Legacy/Resource.
+  (MiSTer's GitHub issue 160 was "re-used" for this fix which is completely
+  independent from the above-mentioned one, this is why we are linking to
+  a specific comment: https://github.com/MiSTer-devel/C64_MiSTer/issues/160#issuecomment-1874613523)
+
+## Bugfixes: R4/R5/R6 boards only
 
 * HDMI backpower is no issue any more
+@TODO: Update documentation and FAQ
 
 ## Bugfixes: All boards
 

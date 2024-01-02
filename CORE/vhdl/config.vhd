@@ -4,7 +4,7 @@
 -- C64 for MEGA65
 -- Configuration data for the Shell
 --
--- MiSTer2MEGA65 done by sy2002 and MJoergen in 2023 and licensed under GPL v3
+-- MiSTer2MEGA65 done by sy2002 and MJoergen in 2024 and licensed under GPL v3
 ----------------------------------------------------------------------------------
 
 library ieee;
@@ -79,7 +79,7 @@ constant SCR_WELCOME : string :=
 
    "\n Commodore 64 for MEGA65 Version 5.1A5\n\n" &
 
-   " MiSTer port 2023 by MJoergen & sy2002\n" &
+   " MiSTer port 2024 by MJoergen & sy2002\n" &
    " Powered by MiSTer2MEGA65\n\n\n" &
 
    " While the C64 is running: Press HELP\n" &
@@ -99,7 +99,7 @@ constant HELP_1 : string :=
 
    "\n Commodore 64 for MEGA65 Version 5.1A5\n\n" &
 
-   " MiSTer port 2023 by MJoergen & sy2002\n" &
+   " MiSTer port 2024 by MJoergen & sy2002\n" &
    " Powered by MiSTer2MEGA65\n\n" &
 
    " Quickstart:\n\n" &
