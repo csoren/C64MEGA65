@@ -16,6 +16,7 @@ library work;
 use work.globals.all;
 use work.types_pkg.all;
 use work.qnice_tools.all;
+use work.video_modes_pkg.all;
 
 library xpm;
 use xpm.vcomponents.all;
@@ -35,11 +36,7 @@ port (
 
    -- Video and audio mode control
    qnice_dvi_o             : out std_logic;                 -- 0=HDMI (with sound), 1=DVI (no sound)
-   qnice_video_mode_o      : out natural range 0 to 6;      -- HDMI 1280x720 @ 50 Hz resolution = mode 0,
-                                                            -- HDMI 1280x720 @ 60 Hz resolution = mode 1,
-                                                            -- PAL 576p in 4:3 and 5:4 are modes 2 and 3
-                                                            -- HDMI 640x480  @ 60 Hz = mode 4
-                                                            -- HDMI 720x480  @ 60 Hz = mode 5
+   qnice_video_mode_o      : out video_mode_type;           -- Defined in video_modes_pkg.vhd
    qnice_osm_cfg_scaling_o : out std_logic_vector(8 downto 0);
    qnice_scandoubler_o     : out std_logic;                 -- 0 = no scandoubler, 1 = scandoubler
    qnice_audio_mute_o      : out std_logic;
@@ -752,10 +749,10 @@ begin
    -- while in the 4:3 mode we are outputting a 5:4 image. This is kind of odd, but it seemed that our 4/3 aspect ratio
    -- adjusted image looks best on a 5:4 monitor and the other way round.
    -- Not sure if this will stay forever or if we will come up with a better naming convention.
-   qnice_video_mode_o <= 3 when qnice_osm_control_i(C_MENU_HDMI_5_4_50)  = '1' else -- C_HDMI_576p_50,        -- PAL 576p in 5:4 @ 50 Hz
-                         2 when qnice_osm_control_i(C_MENU_HDMI_4_3_50)  = '1' else -- C_HDMI_576p_50,        -- PAL 576p in 4:3 @ 50 Hz
-                         1 when qnice_osm_control_i(C_MENU_HDMI_16_9_60) = '1' else -- C_HDMI_720p_60,        -- 1280x720        @ 60 Hz
-                         0;                                                         -- C_HDMI_720p_50,        -- HDMI 1280x720   @ 50 Hz
+   qnice_video_mode_o <= C_VIDEO_HDMI_5_4_50   when qnice_osm_control_i(C_MENU_HDMI_5_4_50)  = '1' else
+                         C_VIDEO_HDMI_4_3_50   when qnice_osm_control_i(C_MENU_HDMI_4_3_50)  = '1' else
+                         C_VIDEO_HDMI_16_9_60  when qnice_osm_control_i(C_MENU_HDMI_16_9_60) = '1' else
+                         C_VIDEO_HDMI_16_9_50;                       -- C_MENU_HDMI_16_9_50
 
    -- Use On-Screen-Menu selections to configure several audio and video settings
    -- Video and audio mode control
