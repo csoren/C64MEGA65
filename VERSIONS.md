@@ -4,8 +4,8 @@ Version 5.1 - MONTH, DAY, YEAR
 The main purpose of this release is to support the new 2024 batches of the
 MEGA65 (aka "R5") which sports enhanced hardware and better compatibility for
 Commodore 64 cartridges. It also delivers an improved sound-over-HDMI
-compatibility and fixes some bugs for all boards, such as the
-"long-reset bug".
+compatibility, fixes some bugs for all boards, such as the "long-reset bug"
+and improves the compatibility of the core with demanding demos.
 
 ## New Features: R4/R5 boards only
 
@@ -32,6 +32,12 @@ workaround is not needed for the KungFu Flash any more
 
 * Fixed random micro cuts of sound that occured on on some HDMI displays.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/13)
+
+## Improved C64 Compatibility: All boards
+
+* Added VIC-II compatibility fix from MiSTer by gyurco which improves the
+  core's compatibility with several demos
+  (Fixes GitHub issue https://github.com/MiSTer-devel/C64_MiSTer/issues/160)
 
 ## Bugfixes: R4/R5 boards only
 
