@@ -7,7 +7,7 @@ on your MEGA65!
 This core is based on the MiSTer Commodore 64 core which itself is based on
 the work of many others.
 
-MJoergen and sy2002 ported the core to the MEGA65 in 2022 and 2023.
+MJoergen and sy2002 ported the core to the MEGA65 in 2022, 2023 and 2024.
 
 With our Release 5.1, we are striving for a **retro C64 PAL experience**:
 The core turns your MEGA65 into a Commodore 64 with a C1541 drive (you can
@@ -37,15 +37,13 @@ flawlessly.
 
 ## IMPORTANT: Choose the right core variant for your hardware
 
-We are supporting these MEGA65 variants: R3/R3A, R4 and R5. Use the following
-table to ensure that you select and flash the correct `.cor` from this ZIP
-file. Only use `*.bit` files if you know what you are doing.
+If your MEGA65 was manufactured before 2024, then choose
+`C64MEGA65-V5.1-R3.cor` otherwise choose `C64MEGA65-V5.1-R6.cor`.
 
-| MEGA65 Variant |   Years   | File name             | Comment
-|:--------------:|:---------:|:---------------------:|-------------------------
-| R3/R3A         | 2019-2023 | C64MEGA65-V5.1-R3.cor | R3 is the "DevKit" (100 were built) and R3A are batches 1 and 2. If you received your MEGA65 between before 2024 then you are very likely to have an R3 or R3A machine.
-| R4             | 2023      | C64MEGA65-V5.1-R4.cor | Development board on our way to the R5. Only a bunch of them were manufactured (board only, no complete machines).
-| R5             | 2024+     | C64MEGA65-V5.1-R5.cor | The latest and greatest incarnation of our beloved MEGA65. If you received your MEGA65 in 2024 or later than you have an R5 machine.
+Only use `.bit` files, if you know what you're doing.
+
+Find more details about MEGA65 models here:
+https://github.com/MJoergen/C64MEGA65/blob/develop/doc/models.md
 
 ## Learn more
 

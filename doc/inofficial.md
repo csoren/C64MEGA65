@@ -14,6 +14,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A3 | 11/02/23 | c099921 | Reconfigurable (and completely refactored) MMCM video clock, refactored reset, ASCAL reduced burst length that might fix some rare REU bugs
 | WIP-V5.1-A4 | 11/29/23 | fdd6ec0 | HyperRAM stable on R3, R4, and R5, fixed .crt regression, improved HDMI's audio compatibility, fixed spinning floppy drive
 | WIP-V5.1-A5 | 01/02/24 | b332107 | Bidirectional reset line for better hardware cartridge compatibility (R5 only), improved VIC-II compatibility, RTCF83
+| WIP-V5.1-A6 | 01/05/24 | 9cdaa29 | Improved disk change detection for multi-disk demos and attempt to fix HDMI audio bug
 
 ## Version 5
 
@@ -46,4 +47,3 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5-B2   | 06/04/23 | 6b299b4 | Visualize long reset by turning the MEGA65's drive led blue
 | WIP-V5-B3   | 06/06/23 | 197d9de | Add supoprt for OSM fractional scaling
 | WIP-V5-B4   | 06/10/23 | ff71e71 | Release candidate for Version 5
-
