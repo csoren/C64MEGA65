@@ -16,10 +16,10 @@ and improves the compatibility of the core with demanding demos.
   compatible to the C64's hardware as it has bi-directional signals for RESET,
   IRQ and NMI. The C64 core is currently only leveraging the bi-directional
   signals for RESET, but this allowed us to make the core compatible with even
-  more cartridges. Two examples that stands out are: (1) You do not need the
+  more cartridges. Two examples that stand out are: (1) You do not need the
   "reset workaround" for the Kung Fu Flash (KFF) any more that is documented
-  for the R3 board in doc/cartridges.md. (2) The EasyFlash 3 now also supports
-  alternative kernals. (R5/R6 only)
+  for the R3 board in doc/cartridges.md. (2) Reset buttons and "special"
+  buttons at most freezer cartridges are working now. (R5/R6 only)
 @TODO: Needs update of the cartridge documentation that for example the reset
 workaround is not needed for the KungFu Flash any more
 
