@@ -44,7 +44,7 @@ WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
   core's compatibility with several demos
   (Fixes GitHub issue https://github.com/MiSTer-devel/C64_MiSTer/issues/160)
 
-WIP Improved disk change detection for multi-disk demos. This fixes for
+* Improved disk change detection for multi-disk demos. This fixes for
   example Coma/Void, +H2K/Plush, Royal Arte/Booze Design and
   Soiled Legacy/Resource.
   (MiSTer's GitHub issue 160 was "re-used" for this fix which is completely
