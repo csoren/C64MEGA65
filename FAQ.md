@@ -129,7 +129,7 @@ where to buy and how to install it.
 
 ## 7) My game or demo crashes
 
-* Are you having an [HDMI back powering problem](#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
+* Are you having an [HDMI back powering problem](FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
 
 * Make sure you are using the newest version of the core. Right now this is
   [Version 5.1](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
