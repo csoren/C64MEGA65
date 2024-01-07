@@ -243,7 +243,10 @@ is not working, yet.
 Use the built in flasher that you can start with <kbd>P</kbd> from the EF3
 menu to flash freezers.
 
-### Known issue: The buttons do not work as expected
+### Known issue (pre-2024 MEGA65): The buttons do not work as expected
+
+If you have a MEGA65 that was built in 2024 or later, all buttons are
+working as expected. Otherwise you can expect the behavior as described here.
 
 The EF3's <kbd>Reset</kbd> button does not work at all. The reason is that the
 MEGA65's R3 and R3A board's electronic cannot sense the reset signal of any
@@ -260,6 +263,8 @@ key <kbd>K</kbd> instead to go back to BASIC.
 
 ### Known issue: Kernal mode is not supported
 
+#### Pre-2024 MEGA65
+
 We are deliberately not supporting the Kernal mode of the EF3, because in
 Kernal mode, the EF3 manipulates the address line A14, meaning it pulls at
 this address line while the C64 core might simultaneously be doing the
@@ -270,6 +275,11 @@ For making sure that you're always on the safe side when using the EF3, we
 deactivated the Kernal mode. You will notice that the border of your screen
 is flickering if you try to enter the Kernal mode. This is the safe state,
 nothing bad happens here. Just press <kbd>Reset</kbd> to try something else.
+
+#### 2024 MEGA65
+
+We are not yet supporting the Kernal mode of the EF3 in Version 5.1, but we
+plan to support it in a future release of the C64 for MEGA65 core.
 
 Kung Fu Flash
 -------------
@@ -294,7 +304,11 @@ very rare: We tested very demanding games with the KFF such as "Eye of the
 Beholder", "A Pig Quest" and "Prince of Persia" and none of these games showed
 any glitches. Overall, the KFF works great with the C64 for MEGA65.
 
-### How to use
+### How to use (pre-2024 MEGA65)
+
+If you have a MEGA65 that was built in 2024 or later, the Kung Fu Flash
+will "just work". You can ignore this section. If you have an older machine,
+then read on to learn how to use the KFF.
 
 The circuits of the MEGA65's R3 and R3A boards are not able to detect the
 KFF's signals properly. Therefore you need a workaround to work with the KFF.
@@ -319,7 +333,10 @@ MEGA65 core:
    decide whether you want to enter the menu, then perform step (1) or if
    you want to start the game, then perform step (2).
 
-### Known issue: The buttons do not work as expected
+### Known issue (pre-2024 MEGA65): The buttons do not work as expected
+
+If you have a MEGA65 that was built in 2024 or later, all buttons are
+working as expected. Otherwise you can expect the behavior as described here.
 
 The KFF's <kbd>Reset</kbd> button does not work at all. The reason is that the
 MEGA65's R3 and R3A board's electronic cannot sense the reset signal of any
@@ -329,10 +346,18 @@ The other two buttons <kbd>Special</kbd> and <kbd>Menu</kbd> work in the
 context described above in "How to use" but they do otherwise not work
 as intended.
 
-### Known issue: Freezer cartridges are not working
+### Known issue (pre-2024): Freezer cartridges are not working
 
-Due to the <kbd>Special</kbd> button not working as expected, you cannot
-activate the "freeze" menu of freezer cartridges.
+If you have a MEGA65 that was built in 2024 or later, then freezer
+most cartridges are supposed to be working as expected. Due to the fact
+that we did not implement bi-directional NMI and IRQ lines, yet in
+Version 5.1 of the core, there might be freezer cartridges that are not yet
+working as expected, even on a 2024 MEGA65. We plan to continue to improve
+the core to support more freezer cartridges on the KFF in future.
+
+Otherwise, if you have a pre-2024 MEGA65, due to the <kbd>Special</kbd>
+button not working as expected, you cannot activate the "freeze" menu
+of freezer cartridges.
 
 Utility Cartridges that are known to work
 =========================================
@@ -367,10 +392,13 @@ But not everything within the freezer menu works as intended. For example when
 exiting the machine language monitor with `x`, the C64 does not continue
 where it left off.
 
-### Known issue with all utility cartridges: Reset button
+### Known issue with all utility cartridges (pre-2024 MEGA65): Reset button
 
-The reset button does not work. The reason is that the MEGA65's R3 and R3A
-board's electronic cannot sense the reset signal of any cartridge inserted
+If you have a MEGA65 that was built in 2024 or later, reset buttons are
+supposed to work as expdected.
+
+Otherwise, the reset button will not work. The reason is that the MEGA65's R3
+and R3A board's electronic cannot sense the reset signal of any cartridge inserted
 into the Expansion Port.
 
 GeoRAM
