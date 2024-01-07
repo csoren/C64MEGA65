@@ -354,7 +354,7 @@ digits are. Don't forget to go to the folder `m` and remove `mover.sh`.
 
 Make sure that you have a `/c64` folder on your SD card and make sure that
 you copy the `c64mega65` file that came with the
-[ZIP file that contains Version 5](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
+[ZIP file that contains Version 5.1](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
 to this very folder.
 
 When going from an older version of the C64 core to a newer version
