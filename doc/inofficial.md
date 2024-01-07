@@ -15,6 +15,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A4 | 11/29/23 | fdd6ec0 | HyperRAM stable on R3, R4, and R5, fixed .crt regression, improved HDMI's audio compatibility, fixed spinning floppy drive
 | WIP-V5.1-A5 | 01/02/24 | b332107 | Bidirectional reset line for better hardware cartridge compatibility (R5 only), improved VIC-II compatibility, RTCF83
 | WIP-V5.1-A6 | 01/05/24 | 9cdaa29 | Improved disk change detection for multi-disk demos and attempt to fix HDMI audio bug
+| WIP-V5.1-A7 | 01/07/24 | 8c0a152 | Fixed HBlank issue and new attempt to fix HDMI audio bug
 
 ## Version 5
 
