@@ -144,13 +144,16 @@ where to buy and how to install it.
   important fact
   [here](README.md#512-kb-ram-expansion-unit-1750-reu).
 
+* Double-check that you have the appropriate setting for "Expansion Port": If you
+  are for exampling simulating a cartridge using a `.crt` file and then while doing so
+  directly load a `.prg` file, then this might lead to a crash. But it might also work,
+  if you are for example simulating a certain freezer cartridge.
+  
 * Power-cycle your MEGA65 (while making sure that you are not running into any
-  [HDMI back powering problem](FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)
-  and try again: The
-  [reset is not perfect](#16-hard-reset-aka-long-reset-is-not-always-working)
-  and sometimes "stuff" remains in memory or in registers that prevents games
-  or demos from starting.
-
+  [HDMI back powering problem](FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly).
+  The reset is not perfect and sometimes "stuff" remains in memory or in registers
+  that prevents games or demos from starting.
+  
 * If you use [JiffyDOS](doc/jiffy.md) or any other fastloader (for example
   by using a freezer cartridge): Switch everything back to the C64's
   [standard Kernal](README.md#commodore-kernals-and-jiffydos) and try
