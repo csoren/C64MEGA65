@@ -45,8 +45,7 @@ WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
   (Fixes GitHub issue https://github.com/MiSTer-devel/C64_MiSTer/issues/160)
 
 * Improved disk change detection for multi-disk demos. This fixes for
-  example Coma/Void, +H2K/Plush, Royal Arte/Booze Design and
-  Soiled Legacy/Resource.
+  example Royal Arte/Booze Design.
   (MiSTer's GitHub issue 160 was "re-used" for this fix which is completely
   independent from the above-mentioned one, this is why we are linking to
   a specific comment: https://github.com/MiSTer-devel/C64_MiSTer/issues/160#issuecomment-1874613523)

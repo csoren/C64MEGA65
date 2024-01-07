@@ -1,17 +1,22 @@
 # FAQ - Frequently Asked Questions
 
-## 1) Which core should I install? I am confused what R3/R3A, R4 and R5 means
+## 1) Which core should I install? I am confused what R3/R3A/R4/R5/R6 means
 
-There are different MEGA65 models on the market. They are called R3, R3A, R4
-and R5. Head over to the [dedicated MEGA65 model documentation](doc/models.md)
-to learn more about the models, which `.cor` files to use and about how the
-C64 for MEGA65 core behaves slightly differently on different MEGA65 models.
+There are different MEGA65 models on the market.
+
+Download Version 5.1
+[here](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241). In
+the ZIP file you will find multiple variants of the core: One for each
+supported MEGA65 model.
+
+If your MEGA65 was manufactured before 2024, then install the "R3/R3A" core
+which is`C64MEGA65-V5.1-R3.cor`. Otherwise install the "R6" core, which is
+`C64MEGA65-V5.1-R6.cor`.
 
 ## 2) My MEGA65 or the C64 core is behaving somehow weirdly
 
-If you own an R4 or R5 MEGA65, then you can skip this section as the
-underlying hardware bug that haunts R3 and R3A boards is fixed on later
-board revisions.
+If you own a MEGA65 that was built in 2024 or later, then you can skip this
+section as the underlying hardware bug that haunts older boards is fixed.
 
 **The "HDMI back powering problem" is the root of all evil!**
 
@@ -235,6 +240,8 @@ The core is able to run more than 99% of all game
 cartridges.
 
 ### If only very few cartridges are working, you need to update CORE #0
+
+This section is only relevant for machines that have been built before 2024.
 
 If only some original retro cartridges are working but the vast majority
 of modern cartridges are not working then it is very likely that you need

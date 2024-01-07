@@ -32,11 +32,3 @@ Differences in the C64 for MEGA65 core on different MEGA65 models
 | 1      | HDMI backpower issues                            | [Learn more](../FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly), what wide range of problems and strange effects HDMI backpower issues are creating and how to avoid these issues.                                                                     | yes      | no     | no   | no   |
 | 2      | DAC for analog 3.5mm audio jack                  | While on R3/R3A machines the analog audio that comes out from the 3.5mm audio jack is "OK" and sometimes is plagued by hissing and humming, the newer machines feature a high-quality audio digital to analog converter (DAC) that leads to a crystal clear output.    | standard | DAC    | DAC  | DAC  |
 | 3      | Hardware cartridges: Bi-directional reset signal | Makes the core compatible with even more cartridges. Two examples that stand out are: (1) You do not need the "reset workaround" for the Kung Fu Flash (KFF) any more (2) Reset buttons and "special" buttons at most freezer cartridges are working now.              | no       | no     | yes  | yes  |
-
-@TODO: INTERNAL LIST TO BE CLEARED BEFORE RELEASE
--------------------------------------------------
-
-cartridges.md
-
-1) EF3: Revisit all known issues and check, if we can fix them on R5
-2) Kung Fu Flash: ditto

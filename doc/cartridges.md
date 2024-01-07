@@ -1,4 +1,20 @@
-Cartridge Cases
+Different levels of compatibility between different MEGA65 revisions
+====================================================================
+
+Since 2024 the hardware of the MEGA65's Expansion Port (aka cartridge port) is
+now 100% compatible to the C64's hardware as it has bi-directional signals for
+RESET, IRQ and NMI. Even though the current version 5.1 of the C64 core is
+"only" supporting bi-directional RESET and not yet supporting bi-directional
+IRQ/NMI, this already leads to a great leap forward in compatibility with all
+sorts of cartridges which are now "just working".
+
+Older hardware revisions of the MEGA65 are not as compatible. So if you have a
+machine that was built before 2024, then please make sure you understand the
+restrictions and/or apply the workarounds described in this document.
+
+Learn more about [different MEGA65 revisions here](models.md).
+
+Cartridge cases
 ===============
 
 Some modern "homebrew" cartridges come as a raw PCB, without a plastic case.
@@ -12,7 +28,7 @@ Put your cartridges in cartride cases from
 or from
 [Protoparts](https://www.protoparts.at/product-category/gehaeuse/).
 
-Flash Cartridges
+Flash cartridges
 ================
 
 First of all: Please support our friends at 
@@ -123,8 +139,7 @@ Buy one cartridge per game. For avoiding misunderstanding: The EF 1CR
 can be re-flashed as often as you like.
 
 Conveniently, the Easy Flash 1CR comes with a preinstalled flasher: When you
-insert the cartridge into your MEGA65's Expansion Port and
-[start the machine and the cartridge correctly (!)](@TODO)
+insert the cartridge into your MEGA65's Expansion Port and start the machine
 then you will see the EasyFlash program's start screen and you will
 imediatelly be able to flash the `*.crt` file as
 [described here](https://skoe.de/easyflash/writecrt/). If you don't have a
