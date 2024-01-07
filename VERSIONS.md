@@ -10,7 +10,7 @@ and improves the compatibility of the core with demanding demos.
 ## New Features: 2024 MEGA65 only
 
 * Heavily improved quality of the analog audio output via the 3.1mm audio jack
-  thanks to utilizing MEGA65's new audio DAC. (R4/R5/R6)
+  thanks to utilizing MEGA65's new audio DAC.
 
 * The hardware of the MEGA65's Expansion Port (aka cartridge port) is now 100%
   compatible to the C64's hardware as it has bi-directional signals for RESET,
@@ -19,11 +19,12 @@ and improves the compatibility of the core with demanding demos.
   more cartridges. Two examples that stand out are: (1) You do not need the
   "reset workaround" for the Kung Fu Flash (KFF) any more that is documented
   for the R3 board in doc/cartridges.md. (2) Reset buttons and "special"
-  buttons at most freezer cartridges are working now. (R5/R6 only)
+  buttons at most freezer cartridges are working now.
 
 ## New Features: All MEGA65
 
-WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
+WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above; add
+documentation in README.md
 
 * You can now close the "About & Help" screens also by pressing Run/Stop.
 
@@ -62,8 +63,8 @@ WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
 
 * Stabilized the REU simulation. This fixes a known glitch plus it ensures
   that the REU simulation will run more stable also on the newer
-  HyperRAM revisions that are built into some newer batches of R3A and that
-  will be built into R5: Treu Love demo: Fixed very rare REU/HyperRAM issues
+  HyperRAM revisions that are built into 2023 and 2024 batches of the MEGA65:
+  Treu Love demo: Fixed very rare REU/HyperRAM issues
   (GitHub issue https://github.com/MJoergen/C64MEGA65/issues/55)
 
 * In V5 we introduced a new feature: You can go one menu-level up (from a sub-
