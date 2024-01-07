@@ -145,7 +145,7 @@ where to buy and how to install it.
   [here](README.md#512-kb-ram-expansion-unit-1750-reu).
 
 * Power-cycle your MEGA65 (while making sure that you are not running into any
-  [HDMI back powering problem](#1-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly))
+  [HDMI back powering problem](FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)
   and try again: The
   [reset is not perfect](#16-hard-reset-aka-long-reset-is-not-always-working)
   and sometimes "stuff" remains in memory or in registers that prevents games
