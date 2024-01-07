@@ -7,11 +7,16 @@ There are different MEGA65 models on the market.
 Download Version 5.1
 [here](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241). In
 the ZIP file you will find multiple variants of the core: One for each
-supported MEGA65 model.
+supported MEGA65 model:
 
-If your MEGA65 was manufactured before 2024, then install the "R3/R3A" core
-which is`C64MEGA65-V5.1-R3.cor`. Otherwise install the "R6" core, which is
+* If your MEGA65 was manufactured before 2024, then install the "R3/R3A" core
+which is`C64MEGA65-V5.1-R3.cor`.
+
+* Otherwise install the "R6" core, which is
 `C64MEGA65-V5.1-R6.cor`.
+
+Learn more about the different MEGA65 models
+[here](doc/models.md).
 
 ## 2) My MEGA65 or the C64 core is behaving somehow weirdly
 
@@ -48,7 +53,7 @@ known to work
 
 Most SD card problems can be resolved by considering these possible causes:
 
-1. Are you having an [HDMI back powering problem](FAQ.md#1-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
+1. Are you having an [HDMI back powering problem](FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
 
 2. Is your card formatted as something other than `FAT32`?
 
@@ -124,15 +129,15 @@ where to buy and how to install it.
 
 ## 7) My game or demo crashes
 
-* Are you having an [HDMI back powering problem](#1-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
+* Are you having an [HDMI back powering problem](#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
 
 * Make sure you are using the newest version of the core. Right now this is
-  [Version 5](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
+  [Version 5.1](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
   The only officially supported place to get cores is the
   [MEGA65 FileHost](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241),
   so make sure you downloaded your copy there. Do not use any Alpha or Beta versions
   any more. Also double-check by pressing <kbd>Help</kbd> and then choosing the menu
-  item "About & Help" that you are really running Version 5.
+  item "About & Help" that you are really running Version 5.1.
 
 * If the game or demo is not designed for the REU, you absolutely need to
   switch-off the REU before running the game or demo. Learn more about this
@@ -175,7 +180,7 @@ where to buy and how to install it.
 
 ## 8) No image or no sound via HDMI
 
-1. Make sure you are running [Version 5](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
+1. Make sure you are running [Version 5.1](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
    of the core.
 
 2. Try everything that is described
@@ -276,7 +281,7 @@ to learn more and **exactly** follow the instructions there.
 
 ### A certain simulated freezer (`*.crt`) does not work
 
-While Version 5 - the most recent version of the core - does support
+While Version 5.1 - the most recent version of the core - does support
 quite a bunch of **hardware** freezer and flash cartridges very well,
 support for **simulated** (`*.crt`) freezer cartridges is still in
 its infancy.
@@ -407,8 +412,8 @@ is a smooth start to FPGA development. It uses some of the tutorials of the
 and some resources from the web to get you started.
 
 Moreover, the
-[#learn-fpga-dev](https://discord.com/channels/719326990221574164/1057791653517209601)
-channel on Discord is a great place to meet likeminded people and to ask questions.
+[Learning Resources for FPGA Development](https://discord.com/channels/719326990221574164/1180179132668203118)
+post on Discord is a great place to meet likeminded people and to ask questions.
 
 [Download and read](https://github.com/sy2002/MiSTer2MEGA65/blob/master/doc/wiki/assets/FPGAs_VHDL_First_Steps_v2p3.pdf)
 Helen DeBlumont's beginner "FPGAs with VHDL: First Steps" or go deep by working through the textbook
