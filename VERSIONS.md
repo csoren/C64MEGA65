@@ -1,5 +1,5 @@
-Version 5.1 - MONTH, DAY, YEAR
-==============================
+Version 5.1 - MONTH DAY, 2024
+=============================
 
 The main purpose of this release is to support the new 2024 batches of the
 MEGA65 (aka "R6") which sports enhanced hardware and better compatibility for
@@ -7,7 +7,7 @@ Commodore 64 cartridges. It also delivers an improved sound-over-HDMI
 compatibility, fixes some bugs for all boards, such as the "long-reset bug"
 and improves the compatibility of the core with demanding demos.
 
-## New Features: R4/R5/R6 boards only
+## New Features: 2024 MEGA65 only
 
 * Heavily improved quality of the analog audio output via the 3.1mm audio jack
   thanks to utilizing MEGA65's new audio DAC. (R4/R5/R6)
@@ -20,16 +20,14 @@ and improves the compatibility of the core with demanding demos.
   "reset workaround" for the Kung Fu Flash (KFF) any more that is documented
   for the R3 board in doc/cartridges.md. (2) Reset buttons and "special"
   buttons at most freezer cartridges are working now. (R5/R6 only)
-@TODO: Needs update of the cartridge documentation that for example the reset
-workaround is not needed for the KungFu Flash any more
 
-## New Features: All boards
+## New Features: All MEGA65
 
 WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
 
 * You can now close the "About & Help" screens also by pressing Run/Stop.
 
-## Improved HDMI Compatibility: All boards
+## Improved HDMI Compatibility: All MEGA65
 
 * Some monitors (e.g. the Philips S-line 275S1AE) did not output audio when
   displaying HDMI. The problem was related to a parity error in the IEC60958
@@ -38,7 +36,7 @@ WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
 * Fixed random micro cuts of sound that occured on on some HDMI displays.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/13)
 
-## Improved C64 Accuracy & Compatibility: All boards
+## Improved C64 Accuracy & Compatibility: All MEGA65
 
 * Added VIC-II compatibility fix from MiSTer by gyurco which improves the
   core's compatibility with several demos
@@ -50,12 +48,11 @@ WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above
   independent from the above-mentioned one, this is why we are linking to
   a specific comment: https://github.com/MiSTer-devel/C64_MiSTer/issues/160#issuecomment-1874613523)
 
-## Bugfixes: R4/R5/R6 boards only
+## Bugfixes: 2024 MEGA65 only
 
 * HDMI backpower is no issue any more
-@TODO: Update documentation and FAQ
 
-## Bugfixes: All boards
+## Bugfixes: All MEGA65
 
 * The "long-reset" feature was broken in V5.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/79)
