@@ -303,7 +303,7 @@ begin
 
   begin
     if pcm_rst = '1' then
-      iec_req   <= '0';
+      -- iec_req   <= '0';
       iec_count <= 0;
       iec_sync  <= '0';
       iec_l     <= (others => '0');
@@ -357,12 +357,21 @@ begin
         else
           iec_count <= iec_count+1;
         end if;
-        iec_req <= '1';
-      elsif iec_ack = '1' then
-        iec_req <= '0';
+      --   iec_req <= '1';
+      -- elsif iec_ack = '1' then
+      --   iec_req <= '0';
       end if;
     end if;
   end process PCM;
+
+  P_IEC_REQ: process (pcm_rst, iec_ack, pcm_clk) is
+  begin
+    if pcm_rst = '1' or iec_ack = '1' then
+      iec_req <= '0';
+    elsif rising_edge(pcm_clk) and pcm_clken = '1' then
+      iec_req <= '1';
+    end if;
+  end process P_IEC_REQ;
 
   -- clock domain crossing
 
@@ -390,17 +399,18 @@ begin
 
   vga_acr    <= pcm_acr_s(1) and not pcm_acr_s(2);
   vga_iec_en <= iec_req_s(1) and not iec_req_s(2);
+  iec_ack    <= iec_req_s(2);
 
-  SYNC2: component sync_reg
-    generic map (
-      WIDTH => 1,
-      DEPTH => 2
-    )
-    port map (
-      clk   => pcm_clk,
-      d(0)  => iec_req_s(2),
-      q(0)  => iec_ack
-    );
+  -- SYNC2: component sync_reg
+  --   generic map (
+  --     WIDTH => 1,
+  --     DEPTH => 2
+  --   )
+  --   port map (
+  --     clk   => pcm_clk,
+  --     d(0)  => iec_req_s(2),
+  --     q(0)  => iec_ack
+  --   );
 
   SYNC3: component sync_reg
     generic map (
@@ -525,6 +535,7 @@ begin
       blank_count <= 0;
       data_req    <= (others => '0');
       data_ack    <= (others => '0');
+      pcm_count   <= 0;
       hb_a        <= (others => (others => '0'));
       pb_a        <= (others => (others => '0'));
       hb          <= (others => (others => (others => '0')));
