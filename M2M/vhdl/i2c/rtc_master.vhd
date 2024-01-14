@@ -49,7 +49,7 @@ end entity rtc_master;
 
 architecture synthesis of rtc_master is
 
-  type cmd_t is (NOP_CMD, WRITE_CMD, WAIT_CMD, SHIFT_IN_CMD, SHIFT_OUT_CMD, END_CMD);
+  type cmd_t is (NOP_CMD, WRITE_CMD, WAIT_CMD, SHIFT_IN_CMD, SHIFT_OUT_CMD, VERIFY_CMD, END_CMD);
   type action_t is record
     cmd  : cmd_t;
     addr : std_logic_vector( 7 downto 0);
@@ -83,17 +83,23 @@ architecture synthesis of rtc_master is
     6 => (WAIT_CMD,     X"F1", X"0000"),   -- Wait until I2C command is accepted
     7 => (WAIT_CMD,     X"F1", X"0001"),   -- Wait until I2C is idle
     8 => (SHIFT_IN_CMD, X"00", X"0004"),   -- Read seven bytes from buffer
-    9 => (END_CMD,      X"00", X"0000")
+    9 => (VERIFY_CMD,   X"00", X"0000")
    );
 
   constant C_ACTION_LIST_WRITE_R3 : action_list_t := (
     -- This writes to the RTC
-    0 => (WAIT_CMD,      X"F1", X"0001"),   -- Wait until I2C is idle
-    1 => (SHIFT_OUT_CMD, X"00", X"0005"),   -- Prepare to write to RTC
-    2 => (WRITE_CMD,     X"F0", X"08DE"),   -- Send eight bytes from RTC
-    3 => (WAIT_CMD,      X"F1", X"0000"),   -- Wait until I2C command is accepted
-    4 => (WAIT_CMD,      X"F1", X"0001"),   -- Wait until I2C is idle
-    5 => (END_CMD,       X"00", X"0000")
+     0 => (WAIT_CMD,      X"F1", X"0001"),   -- Wait until I2C is idle
+     1 => (WRITE_CMD,     X"00", X"0841"),   -- Prepare to write 0x41 to address 0x08
+     2 => (WRITE_CMD,     X"F0", X"02DE"),   -- Send two bytes to RTC
+     3 => (WAIT_CMD,      X"F1", X"0000"),   -- Wait until I2C command is accepted
+     4 => (WAIT_CMD,      X"F1", X"0001"),   -- Wait until I2C is idle
+     5 => (SHIFT_OUT_CMD, X"00", X"0005"),   -- Prepare to write to RTC
+     6 => (WRITE_CMD,     X"F0", X"08DE"),   -- Send eight bytes to RTC
+     7 => (WAIT_CMD,      X"F1", X"0000"),   -- Wait until I2C command is accepted
+     8 => (WAIT_CMD,      X"F1", X"0001"),   -- Wait until I2C is idle
+     9 => (WRITE_CMD,     X"00", X"0801"),   -- Prepare to write 0x01 to address 0x08
+    10 => (WRITE_CMD,     X"F0", X"02DE"),   -- Send two bytes from RTC
+    11 => (END_CMD,       X"00", X"0000")
    );
 
   -- For the R5 board:
@@ -122,7 +128,7 @@ architecture synthesis of rtc_master is
     6 => (WAIT_CMD,      X"F1", X"0000"),   -- Wait until I2C command is accepted
     7 => (WAIT_CMD,      X"F1", X"0001"),   -- Wait until I2C is idle
     8 => (SHIFT_IN_CMD,  X"00", X"0004"),   -- Read seven bytes from buffer
-    9 => (END_CMD,       X"00", X"0000")
+    9 => (VERIFY_CMD,    X"00", X"0000")
    );
 
   constant C_ACTION_LIST_WRITE_R456 : action_list_t := (
@@ -157,9 +163,25 @@ architecture synthesis of rtc_master is
   pure function post_read(board : string; arg : std_logic_vector) return std_logic_vector is
   begin
     if board = "MEGA65_R3" then
-      return arg(55 downto 0) & X"00";
+      if arg(23) = '1' then
+        -- 24 hour format
+        return (arg(55 downto 0) and X"FFFFFFFF7FFFFF") & X"00";
+      else
+        -- 12 hour format
+        if arg(21) = '1' then
+          -- PM
+          if arg(19 downto 16) < "1000" then
+            return ((arg(55 downto 0) and X"FFFFFFFFDFFFFF") + X"000000120000") & X"00";
+          else
+            return ((arg(55 downto 0) and X"FFFFFFFFDFFFFF") + X"000000080000") & X"00";
+          end if;
+        else
+          -- AM
+          return arg(55 downto 0) & X"00";
+        end if;
+      end if;
     else
-      -- Valid for R4 and R5
+      -- Valid for R4, R5, and R6
       return arg(39 downto 32) & arg(63 downto 40) & arg(31 downto 0);
     end if;
   end function post_read;
@@ -170,7 +192,7 @@ architecture synthesis of rtc_master is
     if board = "MEGA65_R3" then
       return X"00" & arg(63 downto 8) & X"00";
     else
-      -- Valid for R4 and R5
+      -- Valid for R4, R5, and R6
       return arg(55 downto 32) & arg(63 downto 56) & arg(31 downto 0) & X"00";
     end if;
   end function pre_write;
@@ -179,8 +201,8 @@ architecture synthesis of rtc_master is
   constant C_ACTION_LIST_READ  : action_list_t := get_action_list_read(G_BOARD);
   constant C_ACTION_LIST_WRITE : action_list_t := get_action_list_write(G_BOARD);
 
-  type state_t is (RESET_ST, IDLE_ST, BUSY_ST);
-  signal state : state_t := IDLE_ST;
+  type state_t is (RESET_ST, IDLE_ST, BUSY_ST, VERIFY_ST);
+  signal state : state_t := RESET_ST;
 
   signal action_idx  : natural range 0 to 15;
   signal action      : action_t;
@@ -188,6 +210,25 @@ architecture synthesis of rtc_master is
   signal rtc         : std_logic_vector(63 downto 0);
   signal rtc_write   : std_logic_vector(71 downto 0);
   signal write       : std_logic;
+
+  constant C_SIM : boolean :=
+    -- synthesis translate_off
+    not
+    -- synthesis translate_on
+    false;
+
+  -- This does the same as the ternary operator "cond ? t : f" in the C language
+  pure function cond_select(cond : boolean; t : natural; f : natural) return natural is
+  begin
+    if cond then
+      return t;
+    else
+      return f;
+    end if;
+  end function cond_select;
+
+  constant C_COUNT_DOWN_MAX : natural := cond_select(C_SIM, 1_000, 1_000_000);
+  signal count_down : natural range 0 to C_COUNT_DOWN_MAX;
 
 begin
 
@@ -289,11 +330,33 @@ begin
                   end if;
                 end if;
 
+              when VERIFY_CMD =>
+                count_down <= C_COUNT_DOWN_MAX;
+                rtc        <= post_read(G_BOARD, rtc);
+                state      <= VERIFY_ST;
+
               when END_CMD =>
-                rtc   <= post_read(G_BOARD, rtc);
                 state <= IDLE_ST;
 
             end case; -- action.cmd
+          end if;
+
+        when VERIFY_ST =>
+          -- Occasionally, reading from RTC fails. To detect this, we check the DayOfMonth
+          -- MonthOfYear. If these two fields are zero, then the read from RTC has failed.
+          if rtc(47 downto 32) = X"0000" then
+            if count_down = 0 then
+              -- Reading from RTC did not work. Try again.
+              action_idx  <= 0;
+              action      <= C_ACTION_LIST_READ(0);
+              next_action <= '0';
+              state       <= BUSY_ST;
+              write       <= '0';
+            else
+              count_down <= count_down - 1;
+            end if;
+          else
+            state <= IDLE_ST;
           end if;
       end case; -- state
 
