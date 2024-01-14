@@ -17,6 +17,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A6 | 01/05/24 | 9cdaa29 | Improved disk change detection for multi-disk demos and attempt to fix HDMI audio bug
 | WIP-V5.1-A7 | 01/07/24 | 8c0a152 | Fixed HBlank issue and new attempt to fix HDMI audio bug
 | WIP-V5.1-A8 | 01/09/24 | f0928ab | New attempt to fix HDMI audio bug
+| WIP-V5.1-A9 | 01/14/24 | 94b7cd0 | New attempt to fix HDMI audio bug
 
 ## Version 5
 
