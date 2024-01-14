@@ -92,7 +92,7 @@ architecture synth of vga_to_hdmi is
   signal   iec_rp        : std_logic;                              -- IEC60958 right channel status
   signal   iec_ack       : std_logic;                              -- }
 
-  signal   iec_req_s     : std_logic_vector(0 to 2);               -- } clock domain crossing logic
+  signal   iec_req_s     : std_logic_vector(0 to 4);               -- } clock domain crossing logic
   signal   pcm_acr_s     : std_logic_vector(0 to 2);               -- }
 
   signal   vga_iec_en    : std_logic;                              -- enable for the following...
@@ -377,7 +377,7 @@ begin
 
   SYNC1: component sync_reg
     generic map (
-      WIDTH => 6,
+      WIDTH => 8,
       DEPTH => 1
     )
     port map (
@@ -389,17 +389,21 @@ begin
       d(3)  => iec_req,
       d(4)  => iec_req_s(0),
       d(5)  => iec_req_s(1),
+      d(6)  => iec_req_s(2),
+      d(7)  => iec_req_s(3),
       q(0)  => pcm_acr_s(0),
       q(1)  => pcm_acr_s(1),
       q(2)  => pcm_acr_s(2),
       q(3)  => iec_req_s(0),
       q(4)  => iec_req_s(1),
-      q(5)  => iec_req_s(2)
+      q(5)  => iec_req_s(2),
+      q(6)  => iec_req_s(3),
+      q(7)  => iec_req_s(4)
     );
 
   vga_acr    <= pcm_acr_s(1) and not pcm_acr_s(2);
-  vga_iec_en <= iec_req_s(1) and not iec_req_s(2);
-  iec_ack    <= iec_req_s(2);
+  vga_iec_en <= iec_req_s(3) and not iec_req_s(4);
+  iec_ack    <= iec_req_s(4);
 
   -- SYNC2: component sync_reg
   --   generic map (
