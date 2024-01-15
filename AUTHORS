@@ -88,6 +88,9 @@ Other than that and our own work, C64MEGA65 uses:
   * Optimal choice of MiSTer video post-processing filters, done by KiDra
     https://github.com/KiDraDragon
 
+  * RTC GEOS driver: CP-ClockF83_1.3.D64, by Jörg Sproß
+    https://retroport.de/hardware-b-c/   (scroll down to: "CP-Uhr")
+
   * Anikki-16x16 font, archived and provided by k80w
     https://github.com/k80w/consolefonts
 

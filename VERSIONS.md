@@ -5,7 +5,8 @@ The main purpose of this release is to support the new 2024 batches of the
 MEGA65 (aka "R6") which sports enhanced hardware and better compatibility for
 Commodore 64 cartridges. It also delivers an improved sound-over-HDMI
 compatibility, fixes some bugs for all boards, such as the "long-reset bug"
-and improves the compatibility of the core with demanding demos.
+and improves the compatibility of the core with demanding demos. Last but not
+least it adds Real-Time-Clock (RTC) support for GEOS.
 
 ## New Features: 2024 MEGA65 only
 
@@ -23,8 +24,10 @@ and improves the compatibility of the core with demanding demos.
 
 ## New Features: All MEGA65
 
-WIP @TODO RTC F83; can be used in GEOS; enhance intro comment above; add
-documentation in README.md
+* The MEGA65's Real Time Clock (RTC) is now able to power the date/time in
+  GEOS as soon as the appropriate GEOS driver is installed (see README.md).
+  From a technical perspective, we are simulating the "CP-Uhr F83" by
+  Jörg Sproß which uses a PCF8583 chip that is connected via the tape port.
 
 * You can now close the "About & Help" screens also by pressing Run/Stop.
 
