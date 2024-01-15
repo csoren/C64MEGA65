@@ -1094,7 +1094,11 @@ begin
 
    -- The M2M framework needs the signals vga_hblank_o, vga_vblank_o, and vga_ce_o.
    -- This shortens the hsync pulse width to 4.82 us, still with a period of 63.94 us.
-   -- This also crops the signal to 384x270 via the vs_hblank and vs_vblank signals.
+   -- This also crops the signal to 382x270 via the vs_hblank and vs_vblank signals.
+   --
+   -- IMPORTANT: For the C64 core, we need to use the video_sync component that is located in
+   -- "C64_MiSTerMEGA65/rtl/video_sync.vhd" and NOT the version that is located in the M2M framework.
+   -- Reason: See commit message for commit 99c27fa
    i_video_sync : entity work.video_sync
       port map (
          clk32     => clk_main_i,
@@ -1427,7 +1431,10 @@ begin
          qnice_we_i           => c64_qnice_we_i
       ); -- i_vdrives
 
-   -- RAM used by the REU inside i_main:
+   --------------------------------------------------------------------------------------------------
+   -- RAM used by the REU inside i_main
+   --------------------------------------------------------------------------------------------------
+
    -- Consists of a three-stage pipeline:
    -- 1) i_avm_fifo does the CDC using a FIFO (as the name suggests) by utilizing Xilinx the specific "xpm_fifo_axis":
    --    It connects to the raw HyperRAM Avalon Memory Mapped interface that M2M's arbiter offers and converts the

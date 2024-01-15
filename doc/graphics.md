@@ -85,5 +85,7 @@ The cropping results in the following border sizes:
 | Top border    |  34     |
 | Bottom border |  36     |
 
-The total visible area is therefore 384x270.
+The total visible area is therefore 382x270.
 
+@TODO: The left/right border value in pixels might have changed after this fix:
+https://github.com/MJoergen/C64MEGA65/commit/99c27fa9d4a4963af9db43a80996dd389d23a961
