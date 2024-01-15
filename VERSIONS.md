@@ -1,12 +1,13 @@
 Version 5.1 - MONTH DAY, 2024
 =============================
 
-The main purpose of this release is to support the new 2024 batches of the
+The main purpose of this release is to support the new 2024 version of the
 MEGA65 (aka "R6") which sports enhanced hardware and better compatibility for
-Commodore 64 cartridges. It also delivers an improved sound-over-HDMI
-compatibility, fixes some bugs for all boards, such as the "long-reset bug"
-and improves the compatibility of the core with demanding demos. Last but not
-least it adds Real-Time-Clock (RTC) support for GEOS.
+Commodore 64 cartridges. Moreover, this release also delivers improvements
+for all MEGA65 models such as improved sound-over-HDMI compatibility,
+bugfixes such as the "long-reset bug" and it improves the compatibility of
+the core with demanding demos. Last but not least it makes the MEGA65's
+Real-Time-Clock (RTC) available in GEOS.
 
 ## New Features: 2024 MEGA65 only
 
