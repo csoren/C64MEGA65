@@ -25,7 +25,7 @@ least it adds Real-Time-Clock (RTC) support for GEOS.
 ## New Features: All MEGA65
 
 * The MEGA65's Real Time Clock (RTC) is now able to power the date/time in
-  GEOS as soon as the appropriate GEOS driver is installed (see README.md).
+  GEOS as soon as the appropriate [GEOS driver is installed](doc/RTC.md).
   From a technical perspective, we are simulating the "CP-Uhr F83" by
   Jörg Sproß which uses a PCF8583 chip that is connected via the tape port.
 

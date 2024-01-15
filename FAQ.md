@@ -381,6 +381,7 @@ a great step-by-step documentation:
 
 1. Download GEOS [using this download link](https://github.com/MJoergen/C64MEGA65/raw/master/doc/assets/geos.zip)
 2. Work with AmokPhaze101's tutorial: [View and download PDF](https://github.com/MJoergen/C64MEGA65/blob/master/doc/GEOS_WITH_THE_C64_CORE.pdf)
+3. Learn how to use the [Real Time Clock](doc/RTC.md)
 
 ## 17) Which features are on the roadmap?
 
