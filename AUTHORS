@@ -74,7 +74,7 @@ Other than that and our own work, C64MEGA65 uses:
     https://github.com/MEGA65/mega65-core
 
   * HDMI IP core, done by Adam Barnes
-    https://github.com/amb5l/tyto_project
+    https://github.com/amb5l/tyto2
 
   * AVALON SCALER used for scaling on HDMI, done by temlib.org
     http://temlib.org/site/?page_id=10
