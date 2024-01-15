@@ -177,7 +177,9 @@ Installation
    display this folder on startup. Otherwise the root folder will be shown.
    If you want the core to remember the settings, make sure you read the
    section [Config file](#config-file) below.
-6. Press the <kbd>Help</kbd> key on your MEGA65 keyboard as soon as the core
+6. Optional: Install [JiffyDOS](doc/jiffy.md) and install the Real-Time-Clock
+   (RTC) [driver for GEOS](doc/RTC.md).
+7. Press the <kbd>Help</kbd> key on your MEGA65 keyboard as soon as the core
    is running to mount disks and to configure the core.
    
 ### Config file
@@ -495,9 +497,9 @@ If you press the reset button shortly ("soft-reset"), then the cartridge is
 restarted. If you press the reset button longer than 2 seconds ("hard-reset"),
 then the C64 ignores the cartridge and starts into Basic.
 
-### CORE #0 update
+### CORE #0 update (pre-2024 MEGA65s only)
 
-If you received your MEGA65 before late 2023 then you very likely need to
+If your MEGA65 was built before 2024, then you very likely need to
 update your so-called "CORE #0". This is the MEGA65 core that decides, which
 core is supposed to run when a cartridge is inserted. The original CORE #0
 crashed when so-called "Ultimax mode" cartridges were inserted and therefore
