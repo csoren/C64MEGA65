@@ -18,10 +18,10 @@ Real-Time-Clock (RTC) available in GEOS.
   compatible to the C64's hardware as it has bi-directional signals for RESET,
   IRQ and NMI. The C64 core is currently only leveraging the bi-directional
   signals for RESET, but this allowed us to make the core compatible with even
-  more cartridges. Two examples that stand out are: (1) You do not need the
+  more cartridges. Three examples that stand out are: (1) You do not need the
   "reset workaround" for the Kung Fu Flash (KFF) any more that is documented
   for the R3 board in doc/cartridges.md. (2) Reset buttons and "special"
-  buttons at most freezer cartridges are working now.
+  buttons at most freezer cartridges are working now. (3) MSSIAH works.
 
 ## New Features: All MEGA65
 
