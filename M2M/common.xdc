@@ -47,14 +47,14 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports hr_d_io[*]]
 set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports hr_d_io[*]]
 
-set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o_reg*/C] -to [get_ports hw_rwds_io]
-set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o_reg*/C] -to [get_ports hw_rwds_io]
+set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o_reg*/C] -to [get_ports hr_rwds_io]
+set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_rwds_oe_o_reg*/C] -to [get_ports hr_rwds_io]
 
 set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports hr_d_io[*]]
 set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports hr_d_io[*]]
 
-set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg*/C] -to [get_ports hw_rwds_io]
-set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg*/C] -to [get_ports hw_rwds_io]
+set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg*/C] -to [get_ports hr_rwds_io]
+set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg*/C] -to [get_ports hr_rwds_io]
 
 # setup
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds_io hr_d_io[*]}]
