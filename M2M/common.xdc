@@ -44,12 +44,12 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 # FPGA to HyperRAM (address and write data)
 
 # setup
-set_output_delay -max  $HR_tIS -clock hr_ck [get_ports hr_d_io[*]]
-set_output_delay -max  $HR_tIS -clock hr_ck [get_ports hr_d_io[*]] -clock_fall -add_delay
+set_output_delay -max  $HR_tIS -clock hr_ck [get_ports hr_rwds_io hr_d_io[*]]
+set_output_delay -max  $HR_tIS -clock hr_ck [get_ports hr_rwds_io hr_d_io[*]] -clock_fall -add_delay
 
 # hold
-set_output_delay -min -$HR_tIH -clock hr_ck [get_ports hr_d_io[*]]
-set_output_delay -min -$HR_tIH -clock hr_ck [get_ports hr_d_io[*]] -clock_fall -add_delay
+set_output_delay -min -$HR_tIH -clock hr_ck [get_ports hr_rwds_io hr_d_io[*]]
+set_output_delay -min -$HR_tIH -clock hr_ck [get_ports hr_rwds_io hr_d_io[*]] -clock_fall -add_delay
 
 ################################################################################
 # HyperRAM to FPGA (read data, clocked in by RWDS)
