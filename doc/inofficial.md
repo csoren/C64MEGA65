@@ -19,6 +19,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A8  | 01/09/24 | f0928ab | New attempt to fix HDMI audio bug
 | WIP-V5.1-A9  | 01/14/24 | 94b7cd0 | New attempt to fix HDMI audio bug
 | WIP-V5.1-RC1 | 01/26/24 | e168101 | Release Candidate 1
+| WIP-V5.1-A10 | 01/29/24 | d3a028f | Attempt to fix issue #127
 
 ## Version 5
 
