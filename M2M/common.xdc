@@ -43,6 +43,13 @@ set tDSHmin -0.8 ; # RWDS to data invalid, min
 ################################################################################
 # FPGA to HyperRAM (address and write data)
 
+# multicycle for OE (assumes OE asserted 1 clock before address/data is driven valid)
+set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports {hw_rwds_io hr_d_io[*]}]
+set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports {hw_rwds_io hr_d_io[*]}]
+
+set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports {hw_rwds_io hr_d_io[*]}]
+set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports {hw_rwds_io hr_d_io[*]}]
+
 # setup
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds_io hr_d_io[*]}]
 set_output_delay -max  $HR_tIS -clock hr_ck [get_ports {hr_rwds_io hr_d_io[*]}] -clock_fall -add_delay
@@ -54,13 +61,6 @@ set_output_delay -min -$HR_tIH -clock hr_ck [get_ports {hr_rwds_io hr_d_io[*]}] 
 ################################################################################
 # HyperRAM to FPGA (read data, clocked in by RWDS)
 # edge aligned, so pretend that data is launched by previous edge
-
-# multicycle for OE (assumes OE asserted 1 clock before address/data is driven valid)
-set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports hr_d_io[*]]
-set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_ctrl/hb_dq_oe_o_reg*/C] -to [get_ports hr_d_io[*]]
-
-set_multicycle_path 2 -setup -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports hr_d_io[*]]
-set_multicycle_path 1 -hold  -from [get_pins i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg*/C] -to [get_ports hr_d_io[*]]
 
 # setup
 set_input_delay -max [expr 5.0+$tDSSmax] -clock hr_rwds [get_ports hr_d_io[*]]
