@@ -35,6 +35,7 @@ set_clock_groups -name cg_async -asynchronous \
 set_property IOB TRUE [get_cells i_framework/i_hyperram/i_hyperram_io/b_output.hr_rwds_oe_n_reg ]
 set_property IOB TRUE [get_cells i_framework/i_hyperram/i_hyperram_io/b_output.hr_dq_oe_n_reg[*] ]
 
+set_property IOB true [get_cells i_framework/i_hyperram/i_hyperram_io/b_input.ctrl_rwds_in_reg ]
 
 ################################################################################
 # HyperRAM timing (correct for IS66WVH8M8DBLL-100B1LI)
