@@ -21,6 +21,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-RC1 | 01/26/24 | e168101 | Release Candidate 1
 | WIP-V5.1-A10 | 01/29/24 | d3a028f | Attempt to fix issue #127
 | WIP-V5.1-A11 | 01/31/24 | ca70837 | Another attempt to fix issue #127
+| WIP-V5.1-A12 | 02/02/24 | fc997ec | Yet another fix for issue #127
 
 ## Version 5
 
