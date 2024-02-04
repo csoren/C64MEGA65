@@ -442,8 +442,9 @@ begin
 
    i_avm_arbit : entity work.avm_arbit
       generic map (
-         G_ADDRESS_SIZE  => 32,
-         G_DATA_SIZE     => 16
+         G_PREFER_SWAP  => true,
+         G_ADDRESS_SIZE => 32,
+         G_DATA_SIZE    => 16
       )
       port map (
          clk_i                  => hr_clk_i,
