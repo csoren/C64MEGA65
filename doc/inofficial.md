@@ -23,6 +23,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A11 | 01/31/24 | ca70837 | "Attack of the PETSCII Robots REU version" HyperRAM issue: Confirmed fix of issue #127
 | WIP-V5.1-A12 | 02/02/24 | fc997ec | "Attack of the PETSCII Robots REU version" HyperRAM issue: Failed and reverted additional attempt to fix issue #127
 | WIP-V5.1-A13 | 02/03/24 | 53a06d7 | Fix macOS quirk / missing ".." in subfolders: Fixes issue #111
+| WIP-V5.1-A14 | 02/04/24 | b272f0d | "Attack of the PETSCII Robots REU version" HyperRAM issue: Another attempt to fix issue #127
 
 ## Version 5
 
