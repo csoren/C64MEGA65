@@ -62,6 +62,9 @@ Real-Time-Clock (RTC) available in GEOS.
 * The "long-reset" feature was broken in V5.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/79)
 
+* Fixed missing ".." in folders created with certain macOS versions
+  (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/111)
+
 * Fixed a crash in the file browser.
   (Fixed GitHub issue https://github.com/MJoergen/C64MEGA65/issues/95)
 
