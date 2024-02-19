@@ -638,7 +638,7 @@ begin
          c64_qnice_we_i         => qnice_c64_qnice_we,
 
          -- CBM-488/IEC serial (hardware) port
-         iec_hardware_port_en   => main_osm_control_i(C_MENU_IEC),
+         iec_hardware_port_en_i => main_osm_control_i(C_MENU_IEC),
          iec_reset_n_o          => iec_reset_n_o,
          iec_atn_n_o            => iec_atn_n_o,
          iec_clk_en_o           => iec_clk_en_o,

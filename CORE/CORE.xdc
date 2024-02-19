@@ -12,12 +12,12 @@ create_generated_clock -name main_clk [get_pins CORE/clk_gen/i_clk_c64_orig/CLKO
 set_false_path -from [get_pins -hier id1_reg[*]/C]
 set_false_path -from [get_pins -hier id2_reg[*]/C]
 set_false_path -from [get_pins -hier busy_reg/C]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/reset_sync/s1_reg[*]/D]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/change_sync/s1_reg[*]/D]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/save_sync/s1_reg[*]/D]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/c1541/drives[*].c1541_drv/c1541_track/track_sync/s1_reg[*]/D]
+set_false_path -to   [get_pins CORE/i_main/iec_drive_inst/c1541/drives[*].c1541_drv/c1541_track/reset_sync/s1_reg[*]/D]
+set_false_path -to   [get_pins CORE/i_main/iec_drive_inst/c1541/drives[*].c1541_drv/c1541_track/change_sync/s1_reg[*]/D]
+set_false_path -to   [get_pins CORE/i_main/iec_drive_inst/c1541/drives[*].c1541_drv/c1541_track/save_sync/s1_reg[*]/D]
+set_false_path -to   [get_pins CORE/i_main/iec_drive_inst/c1541/drives[*].c1541_drv/c1541_track/track_sync/s1_reg[*]/D]
 
 ## Disk type register that moves very slow (on each (re-)mount) and that is initialized with very stable signals
-set_false_path -from [get_pins CORE/i_main/i_iec_drive/dtype_reg[*][*]/C]
-set_false_path -to   [get_pins CORE/i_main/i_iec_drive/dtype_reg[*][*]/D]
+set_false_path -from [get_pins CORE/i_main/iec_drive_inst/dtype_reg[*][*]/C]
+set_false_path -to   [get_pins CORE/i_main/iec_drive_inst/dtype_reg[*][*]/D]
 

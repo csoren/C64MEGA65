@@ -25,11 +25,11 @@ entity main is
       clk_main_i             : in  std_logic;
 
       -- Read the RESET SEMANTICS comment below
-      -- A pulse of reset_soft_i needs to be 32 clock cycles long at a minimum      
+      -- A pulse of reset_soft_i needs to be 32 clock cycles long at a minimum
       reset_soft_i           : in  std_logic;
       reset_hard_i           : in  std_logic;
 
-      -- Pull high to pause the core      
+      -- Pull high to pause the core
       pause_i                : in  std_logic;
 
       -- Trigger the sequence RUN<Return> to autostart PRG files
@@ -129,7 +129,7 @@ entity main is
       c64_qnice_we_i         : in  std_logic;
 
       -- CBM-488/IEC serial (hardware) port
-      iec_hardware_port_en   : in  std_logic;
+      iec_hardware_port_en_i : in  std_logic;
       iec_reset_n_o          : out std_logic;
       iec_atn_n_o            : out std_logic;
       iec_clk_en_o           : out std_logic;
@@ -245,22 +245,19 @@ end entity main;
 
 architecture synthesis of main is
 
-   constant C_EXP_PORT_HARDWARE : natural := 0;
-   constant C_EXP_PORT_REU      : natural := 1;
-   constant C_EXP_PORT_SIMCRT   : natural := 2;
-
    -- Generic MiSTer C64 signals
    signal c64_pause            : std_logic;
    signal c64_drive_led        : std_logic;
 
    -- directly connect the C64's CIA1 to the emulated keyboard matrix within keyboard.vhd
-   signal cia1_pa_i            : std_logic_vector(7 downto 0);
-   signal cia1_pa_o            : std_logic_vector(7 downto 0);
-   signal cia1_pb_i            : std_logic_vector(7 downto 0);
-   signal cia1_pb_o            : std_logic_vector(7 downto 0);
+   signal cia1_pa_in           : std_logic_vector(7 downto 0);
+   signal cia1_pa_out          : std_logic_vector(7 downto 0);
+   signal cia1_pb_in           : std_logic_vector(7 downto 0);
+   signal cia1_pb_out          : std_logic_vector(7 downto 0);
 
-   -- the Restore key is special : it creates a non maskable interrupt (NMI)
-   signal restore_key_n        : std_logic;
+   constant C_EXP_PORT_HARDWARE : natural := 0;
+   constant C_EXP_PORT_REU      : natural := 1;
+   constant C_EXP_PORT_SIMCRT   : natural := 2;
 
    -- signals for RAM
    signal c64_ram_ce           : std_logic;
@@ -273,48 +270,47 @@ architecture synthesis of main is
    signal alo                  : std_logic_vector(15 downto 0);
    signal aro                  : std_logic_vector(15 downto 0);
 
+   -- the Restore key is special : it creates a non maskable interrupt (NMI)
+   signal restore_key_n        : std_logic;
+
    -- C64's IEC signals
-   signal c64_iec_clk_o        : std_logic;
-   signal c64_iec_clk_i        : std_logic;
-   signal c64_iec_atn_o        : std_logic;
-   signal c64_iec_data_o       : std_logic;
-   signal c64_iec_data_i       : std_logic;
+   signal c64_iec_clk_out      : std_logic;
+   signal c64_iec_clk_in       : std_logic;
+   signal c64_iec_atn_out      : std_logic;
+   signal c64_iec_data_out     : std_logic;
+   signal c64_iec_data_in      : std_logic;
 
    -- Hardware IEC port
-   signal hw_iec_clk_n_i       : std_logic;
-   signal hw_iec_data_n_i      : std_logic;
+   signal hw_iec_clk_n_in      : std_logic;
+   signal hw_iec_data_n_in     : std_logic;
 
    -- Simulated IEC drives
    signal iec_drive_ce         : std_logic;      -- chip enable for iec_drive (clock divider, see generate_drive_ce below)
    signal iec_dce_sum          : integer := 0;   -- caution: we expect 32-bit integers here and we expect the initialization to 0
 
-   signal iec_img_mounted_i    : std_logic_vector(G_VDNUM - 1 downto 0);
-   signal iec_img_readonly_i   : std_logic;
-   signal iec_img_size_i       : std_logic_vector(31 downto 0);
-   signal iec_img_type_i       : std_logic_vector( 1 downto 0);
+   signal iec_img_mounted      : std_logic_vector(G_VDNUM - 1 downto 0);
+   signal iec_img_readonly     : std_logic;
+   signal iec_img_size         : std_logic_vector(31 downto 0);
+   signal iec_img_type         : std_logic_vector( 1 downto 0);
 
    signal iec_drives_reset     : std_logic_vector(G_VDNUM - 1 downto 0);
    signal vdrives_mounted      : std_logic_vector(G_VDNUM - 1 downto 0);
    signal cache_dirty          : std_logic_vector(G_VDNUM - 1 downto 0);
    signal prevent_reset        : std_logic;
 
-   signal iec_sd_lba_o         : vd_vec_array(G_VDNUM - 1 downto 0)(31 downto 0);
-   signal iec_sd_blk_cnt_o     : vd_vec_array(G_VDNUM - 1 downto 0)( 5 downto 0);
-   signal iec_sd_rd_o          : vd_std_array(G_VDNUM - 1 downto 0);
-   signal iec_sd_wr_o          : vd_std_array(G_VDNUM - 1 downto 0);
-   signal iec_sd_ack_i         : vd_std_array(G_VDNUM - 1 downto 0);
-   signal iec_sd_buf_addr_i    : std_logic_vector(13 downto 0);
-   signal iec_sd_buf_data_i    : std_logic_vector( 7 downto 0);
-   signal iec_sd_buf_data_o    : vd_vec_array(G_VDNUM - 1 downto 0)(7 downto 0);
-   signal iec_sd_buf_wr_i      : std_logic;
-   signal iec_par_stb_i        : std_logic;
-   signal iec_par_stb_o        : std_logic;
-   signal iec_par_data_i       : std_logic_vector(7 downto 0);
-   signal iec_par_data_o       : std_logic_vector(7 downto 0);
-   signal iec_rom_std_i        : std_logic;
-   signal iec_rom_addr_i       : std_logic_vector(15 downto 0);
-   signal iec_rom_data_i       : std_logic_vector( 7 downto 0);
-   signal iec_rom_wr_i         : std_logic;
+   signal iec_sd_lba           : vd_vec_array(G_VDNUM - 1 downto 0)(31 downto 0);
+   signal iec_sd_blk_cnt       : vd_vec_array(G_VDNUM - 1 downto 0)( 5 downto 0);
+   signal iec_sd_rd            : vd_std_array(G_VDNUM - 1 downto 0);
+   signal iec_sd_wr            : vd_std_array(G_VDNUM - 1 downto 0);
+   signal iec_sd_ack           : vd_std_array(G_VDNUM - 1 downto 0);
+   signal iec_sd_buf_addr      : std_logic_vector(13 downto 0);
+   signal iec_sd_buf_data_in   : std_logic_vector( 7 downto 0);
+   signal iec_sd_buf_data_out  : vd_vec_array(G_VDNUM - 1 downto 0)(7 downto 0);
+   signal iec_sd_buf_wr        : std_logic;
+   signal iec_par_stb_in       : std_logic;
+   signal iec_par_stb_out      : std_logic;
+   signal iec_par_data_in      : std_logic_vector(7 downto 0);
+   signal iec_par_data_out     : std_logic_vector(7 downto 0);
 
    -- unprocessed video output of the C64 core
    signal vga_hs               : std_logic;
@@ -342,7 +338,7 @@ architecture synthesis of main is
    -- A reset that is coming from a hardware cartridge via cart_reset_i (which is low active) is treated
    -- just like reset_soft_i. We can assume that the pulse will be long enough because cartridges are
    -- aware of minimum reset durations. (Example: The EF3 pulses the reset for 7xphi2, which is way longer
-   -- then 32 cycles.)  
+   -- then 32 cycles.)
    --
    -- CAUTION: NEVER DIRECTLY USE THE INPUT SIGNALS
    --       reset_soft_i and
@@ -359,7 +355,7 @@ architecture synthesis of main is
    -- protected by using the signal prevent_reset.
    --
    -- hard_reset_n IS NOT MEANT TO BE USED IN MAIN.VHD
-   -- with the exception of the "cpu_data_in" the reset input of "i_cartridge".    
+   -- with the exception of the "cpu_data_in" the reset input of "i_cartridge".
    signal reset_core_n         : std_logic := '1';
    signal reset_core_int_n     : std_logic := '1';
    signal hard_reset_n         : std_logic := '1';
@@ -504,21 +500,24 @@ begin
    -- prevent data corruption by not allowing a soft reset to happen while the cache is still dirty
    -- since we can have more than one cache that might be dirty, we convert the std_logic_vector of length G_VDNUM
    -- into an unsigned and check for zero
-   prevent_reset <= '0' when unsigned(cache_dirty) = 0 else '1';
+   prevent_reset <= '0' when unsigned(cache_dirty) = 0 else
+                    '1';
 
    -- the color of the drive led is green normally, but it turns yellow
    -- when the cache is dirty and/or currently being flushed
-   drive_led_col_o <= x"00FF00" when unsigned(cache_dirty) = 0 else x"FFFF00";
+   drive_led_col_o <= x"00FF00" when unsigned(cache_dirty) = 0 else
+                      x"FFFF00";
 
    -- the drive led is on if either the C64 is writing to the virtual disk (cached in RAM)
    -- or if the dirty cache is dirty and/orcurrently being flushed to the SD card
-   drive_led_o <= c64_drive_led when unsigned(cache_dirty) = 0 else '1';
+   drive_led_o <= c64_drive_led when unsigned(cache_dirty) = 0 else
+                  '1';
 
    --------------------------------------------------------------------------------------------------
    -- Hard reset
    --------------------------------------------------------------------------------------------------
 
-   hard_reset : process(clk_main_i)
+   hard_reset_proc : process (clk_main_i)
    begin
       if rising_edge(clk_main_i) then
          if reset_soft_i = '1' or reset_hard_i = '1' or cart_reset_counter /= 0 then
@@ -546,14 +545,14 @@ begin
             end if;
          end if;
       end if;
-   end process;
-   
+   end process hard_reset_proc;
+
    -- Combined reset signal to be used throughout main.vhd: reset triggered by the MEGA65's reset button (reset_core_int_n)
    -- and reset triggered by an external cartridge.
-   combined_reset : process(all)
+   combined_reset_proc : process (all)
    begin
       reset_core_n <= '1';
-      
+
       -- cart_reset_i becomes cart_reset_o as soon as cart_reset_oe_o = '1', and the latter one becomes '1' as soon
       -- as reset_core_int_n = '0' so we need to ignore cart_reset_i in this case
       if reset_core_int_n = '0' then
@@ -561,11 +560,11 @@ begin
       elsif cart_reset_i = '0' and prevent_reset = '0' then
          reset_core_n <= '0';
       end if;
-   end process;
+   end process combined_reset_proc;
 
    -- To make sure that cartridges in the Expansion Port start properly, we must not do a hard reset and mask the $8000 memory area,
    -- when the core is launched for the first time (cold start).
-   handle_cold_start : process(clk_main_i)
+   handle_cold_start_proc : process (clk_main_i)
    begin
       if rising_edge(clk_main_i) then
          hard_reset_n_d <= hard_reset_n;
@@ -574,13 +573,13 @@ begin
             cold_start_done <= '1';
          end if;
       end if;
-   end process;
+   end process handle_cold_start_proc;
 
    --------------------------------------------------------------------------------------------------
    -- Access to C64's RAM and hardware/simulated cartridge ROM
    --------------------------------------------------------------------------------------------------
 
-   cpu_data_in : process(all)
+   cpu_data_in_proc : process (all)
    begin
       c64_ram_data <= x"00";
 
@@ -614,7 +613,7 @@ begin
          c64_ram_data <= c64_ram_data_i;
 
       end if;
-   end process;
+   end process cpu_data_in_proc;
 
    -- RAM write enable also needs to check for chip enable
    c64_ram_we_o <= c64_ram_ce and c64_ram_we;
@@ -623,7 +622,7 @@ begin
    -- MiSTer Commodore 64 core / main machine
    --------------------------------------------------------------------------------------------------
 
-   i_fpga64_sid_iec : entity work.fpga64_sid_iec
+   fpga64_sid_iec_inst : entity work.fpga64_sid_iec
       port map (
          clk32       => clk_main_i,
          clk32_speed => clk_main_speed_i,
@@ -636,10 +635,10 @@ begin
          pause_out   => c64_pause,        -- unused
 
          -- keyboard interface: directly connect the CIA1
-         cia1_pa_i   => cia1_pa_i,
-         cia1_pa_o   => cia1_pa_o,
-         cia1_pb_i   => cia1_pb_i,
-         cia1_pb_o   => cia1_pb_o,
+         cia1_pa_i   => cia1_pa_in,
+         cia1_pa_o   => cia1_pa_out,
+         cia1_pb_i   => cia1_pb_in,
+         cia1_pb_o   => cia1_pb_out,
 
          -- external memory
          ramAddr     => c64_ram_addr_o,
@@ -733,11 +732,11 @@ begin
          cnt1_o      => open,
 
          -- IEC
-         iec_clk_i   => c64_iec_clk_i and hw_iec_clk_n_i,
-         iec_clk_o   => c64_iec_clk_o,
-         iec_atn_o   => c64_iec_atn_o,
-         iec_data_i  => c64_iec_data_i and hw_iec_data_n_i,
-         iec_data_o  => c64_iec_data_o,
+         iec_clk_i   => c64_iec_clk_in and hw_iec_clk_n_in,
+         iec_clk_o   => c64_iec_clk_out,
+         iec_atn_o   => c64_iec_atn_out,
+         iec_data_i  => c64_iec_data_in and hw_iec_data_n_in,
+         iec_data_o  => c64_iec_data_out,
 
          -- Cassette drive
          cass_write  => cass_write,       -- output
@@ -751,7 +750,7 @@ begin
          c64rom_addr_i  => c64rom_addr_i,
          c64rom_data_i  => c64rom_data_i,
          c64rom_data_o  => c64rom_data_o
-      ); -- i_fpga64_sid_iec
+      ); -- fpga64_sid_iec_inst
 
    --------------------------------------------------------------------------------------------------
    -- Expansion Port (aka Cartridge Port) handling:
@@ -760,7 +759,7 @@ begin
    --    * Simulateed cartridge using data from .crt file
    --------------------------------------------------------------------------------------------------
 
-   handle_hardware_expansion_port : process(all)
+   handle_hardware_expansion_proc : process (all)
    begin
       -- C64 Expansion Port (aka Cartridge Port) control lines
       -- *_en is low active else tri-state high impedance
@@ -771,13 +770,13 @@ begin
       cart_ctrl_oe_o       <= '0';
       cart_addr_oe_o       <= '0';
       cart_data_oe_o       <= '0';
-      
+
       -- Due to a bug in the R5/R6 boards, the cartridge port needs ALWAYS to be enabled,
       -- otherwise joystick port B is not working correctly
       cart_en_o            <= '1';
 
       -- For the time being, we are treating GAME, EXROM, NMI and IRQ as READ-ONLY on all board revisions at all times
-      -- @TODO: As soon as we support more sophisticted modules, we need to become more flexible here, too      
+      -- @TODO: As soon as we support more sophisticted modules, we need to become more flexible here, too
       cart_game_oe_o       <= '0';
       cart_exrom_oe_o      <= '0';
       cart_nmi_oe_o        <= '0';
@@ -788,7 +787,7 @@ begin
       -- and it will be switched to OUTPUT (WRITE-ONLY) in the code that follows below
       cart_roml_oe_o       <= '0';
       cart_romh_oe_o       <= '0';
-      
+
       -- Bi-directional reset handling:
       -- The "zero" here is (similar to above) just the deactivated output in non-hardware cartridge mode.
       -- As soon as hardware cartridge mode is on, we will switch back and forth between READ and WRITE.
@@ -798,8 +797,8 @@ begin
       -- But on R5/R6 and newer boards, we will be able to sense the reset from the cartridge and therefore we will
       -- not need i_cartridge_heuristics and handle_cartridge_triggered_resets. Instead, cartridges like the EF3
       -- and the KFF "are just working" on these newer boards.
-      cart_reset_oe_o      <= '0';      
-      
+      cart_reset_oe_o      <= '0';
+
       -- Default values for all signals
       cart_phi2_o          <= '0';
       cart_reset_o         <= '1';
@@ -893,9 +892,9 @@ begin
             end if;
          end if;
       end if;
-   end process;
+   end process handle_hardware_expansion_proc;
 
-   handle_cores_expansion_port_signals : process(all)
+   handle_cores_expansion_port_signals_proc : process (all)
    begin
       core_game_n          <= '1';
       core_exrom_n         <= '1';
@@ -943,10 +942,10 @@ begin
          when others =>
             null;
       end case;
-   end process;
+   end process handle_cores_expansion_port_signals_proc;
 
    -- Detect certain hardware cartridges that need a special treatment due to unidirectional reset, irq or nmi signals
-   i_cartridge_heuristics : entity work.cartridge_heuristics
+   cartridge_heuristics_inst : entity work.cartridge_heuristics
       port map (
          clk_main_i           => clk_main_i,
          reset_core_n_i       => reset_core_n,
@@ -958,36 +957,36 @@ begin
          c64_ram_addr_i       => std_logic_vector(c64_ram_addr_o),
          phi2_i               => core_phi2,
          is_an_EF3_o          => cart_is_an_EF3
-      ); -- i_cartridge_heuristics
+      ); -- cartridge_heuristics_inst
 
    -- Cartridge-specific workaround due to the fact, that R3/R3A and R4 boards do not allow cartridges to pull the reset line to low (i.e. trigger a reset)
-   handle_cartridge_triggered_resets : process (clk_main_i)
-   begin     
+   handle_cartridge_triggered_resets_proc : process (clk_main_i)
+   begin
       if G_BOARD = "MEGA65_R3" or G_BOARD = "MEGA65_R4" then
          if rising_edge(clk_main_i) then
             core_phi2_prev <= core_phi2;
-   
+
             -- In contrast to what is written above in the comment RESET SEMANTICS, we cannot use
             -- reset_core_n here because as soon as cart_reset_counter is > 0 reset_core_n goes low
             -- and then cart_reset_counter would be reset back to 0 prematurely
             if reset_soft_i or reset_hard_i then
                cart_reset_counter <= 0;
                cart_res_flckr_ign <= 0;
-   
+
             -- The reset duration is measured in multiples of phi2 cycles
             elsif cart_reset_counter > 0 and core_phi2_prev = '1' and core_phi2 = '0' then
                cart_reset_counter <= cart_reset_counter - 1;
             end if;
-   
+
             -- Avoid the "flickering" (trailing) output of the reset to the cartridge after reset_core_n goes high again after the reset
             if reset_core_n = '0' and cart_reset_counter = 0 and cart_res_flckr_ign /= 0 then
                cart_res_flckr_ign <= cart_res_flckr_ign - 1;
             end if;
-   
+
             -------------------------------------------------------------------------------------------------
             -- EasyFlash 3
             -------------------------------------------------------------------------------------------------
-   
+
             -- The EF3 needs to send a reset signal to the C64 core
             -- Learn more about the exact mechanics here: https://github.com/MJoergen/C64MEGA65/issues/60
             -- And/or look at the EF3 source code:
@@ -1005,13 +1004,13 @@ begin
                end if;
             end if;
          end if;
-         
+
       -- Boards newer than R3/R3A/R4 do not need this workaround
       else
          cart_reset_counter <= 0;
-         cart_res_flckr_ign <= 0;         
+         cart_res_flckr_ign <= 0;
       end if;
-   end process;
+   end process handle_cartridge_triggered_resets_proc;
 
    --------------------------------------------------------------------------------------------------
    -- Simulated REU
@@ -1020,7 +1019,7 @@ begin
    -- REU configuration: "00":None, "01":512k, "10":2M, "11":16M
    reu_cfg <= "01" when c64_exp_port_mode_i = C_EXP_PORT_REU else "00";
 
-   i_reu : reu
+   reu_inst : component reu
       port map (
          clk       => clk_main_i,
          reset     => not reset_core_n,
@@ -1043,7 +1042,7 @@ begin
          cpu_we    => c64_ram_we,
          cpu_cs    => reu_iof,
          irq       => reu_irq
-      ); -- i_reu
+      ); -- reu_inst
 
    reu_oe <= reu_iof;
 
@@ -1055,8 +1054,8 @@ begin
    -- IMPORTANT: The component sets the correct exrom_o and game_o while cart_loading_i='1'.
    -- During a reset signal via "rst_i" exrom_o, game_o and other stateful signals are reset to the
    -- neutral state. Due to the fact, that sw_cartridge_wrapper uses a soft reset to make sure the
-   -- C64 starts the cartridge, we must not reset i_cartridge on soft reset. 
-   i_cartridge : entity work.cartridge
+   -- C64 starts the cartridge, we must not reset i_cartridge on soft reset.
+   cartridge_inst : entity work.cartridge
       port map (
          clk_i          => clk_main_i,
          rst_i          => not hard_reset_n, -- See "IMPORTANT" in above comment
@@ -1083,7 +1082,7 @@ begin
          mod_key_i      => '0',
          nmi_o          => crt_nmi,
          nmi_ack_i      => core_nmi_ack
-      ); -- i_cartridge
+      ); -- cartridge_inst
 
    crt_ioe_we_o <= core_ioe and c64_ram_we;
    crt_iof_we_o <= core_iof and c64_ram_we;
@@ -1099,7 +1098,7 @@ begin
    -- IMPORTANT: For the C64 core, we need to use the video_sync component that is located in
    -- "C64_MiSTerMEGA65/rtl/video_sync.vhd" and NOT the version that is located in the M2M framework.
    -- Reason: See commit message for commit 99c27fa
-   i_video_sync : entity work.video_sync
+   video_sync_inst : entity work.video_sync
       port map (
          clk32     => clk_main_i,
          pause     => '0',
@@ -1111,7 +1110,7 @@ begin
          vsync_out => video_vs_o,
          hblank    => video_hblank_o,
          vblank    => video_vblank_o
-      ); -- i_video_sync
+      ); -- video_sync_inst
 
    video_red_o        <= std_logic_vector(vga_red);
    video_green_o      <= std_logic_vector(vga_green);
@@ -1120,12 +1119,12 @@ begin
    video_ce_ovl_o     <= '1' when video_retro15kHz_i = '0' else not video_ce(0);
 
    -- Clock divider: The core's pixel clock is 1/4 of the main clock
-   generate_video_ce : process(clk_main_i)
+   video_ce_proc : process (clk_main_i)
    begin
       if rising_edge(clk_main_i) then
          video_ce <= video_ce + 1;
       end if;
-   end process;
+   end process video_ce_proc;
 
    --------------------------------------------------------------------------------------------------
    -- Keyboard- and joystick controller
@@ -1133,7 +1132,7 @@ begin
 
    -- Convert MEGA65 keystrokes to the C64 keyboard matrix that the CIA1 can scan
    -- and convert the MEGA65 joystick signals to CIA1 signals as well
-   i_m65_to_c64 : entity work.keyboard
+   keyboard_inst : entity work.keyboard
       port map (
          clk_main_i           => clk_main_i,
          reset_i              => not reset_core_n,
@@ -1177,20 +1176,20 @@ begin
          -- A and B into this keyboard driver which then emulates the behavior of the physical
          -- C64 keyboard including the possibility to "scan" via the row, i.e. pull one or more bits of
          -- port A to zero (one by one) and read via the "column" (i.e. from port B) or vice versa.
-         cia1_pai_o           => cia1_pa_i,
-         cia1_pao_i           => cia1_pa_o,
-         cia1_pbi_o           => cia1_pb_i,
-         cia1_pbo_i           => cia1_pb_o,
+         cia1_pai_o           => cia1_pa_in,
+         cia1_pao_i           => cia1_pa_out,
+         cia1_pbi_o           => cia1_pb_in,
+         cia1_pbo_i           => cia1_pb_out,
 
          -- Restore key = NMI
          restore_n            => restore_key_n
-      ); -- i_m65_to_c64
+      ); -- keyboard_inst
 
    --------------------------------------------------------------------------------------------------
    -- MiSTer audio signal processing: Convert the core's 18-bit signal to a signed 16-bit signal
    --------------------------------------------------------------------------------------------------
 
-   audio_processing : process(all)
+   audio_processing_proc : process (all)
       variable alm, arm : std_logic_vector(16 downto 0);
    begin
       -- "alm" and "alr" are used to mix various audio sources
@@ -1216,7 +1215,7 @@ begin
       else
          aro               <= arm(15 downto 0);
       end if;
-   end process;
+   end process audio_processing_proc;
 
    audio_left_o  <= signed(alo);
    audio_right_o <= signed(aro);
@@ -1225,7 +1224,7 @@ begin
    -- Hardware IEC port
    --------------------------------------------------------------------------------------------------
 
-   handle_hardware_iec_port : process(all)
+   handle_hardware_iec_proc : process (all)
    begin
       iec_reset_n_o     <= '1';
       iec_atn_n_o       <= '1';
@@ -1241,8 +1240,8 @@ begin
       -- All signals are LOW active, so we need to AND them.
       -- As soon as we have more participants than just i_fpga64_sid_iec and i_iec_drive we will
       -- need to have some more signals for the bus instead of directly connecting them as we do today.
-      hw_iec_clk_n_i    <= '1';
-      hw_iec_data_n_i   <= '1';
+      hw_iec_clk_n_in    <= '1';
+      hw_iec_data_n_in   <= '1';
 
       -- According to https://www.c64-wiki.com/wiki/Serial_Port, the C64 does not use the SRQ line and therefore
       -- we are at this time also not using it. The wiki article states, hat even though it is not used, it is
@@ -1253,7 +1252,7 @@ begin
       iec_srq_en_o      <= '0';
       iec_srq_n_o       <= '1';
 
-      if iec_hardware_port_en = '1' then
+      if iec_hardware_port_en_i = '1' then
          -- The IEC bus is low active. By default, we let the hardware bus lines float by setting the NC7SZ126P5X
          -- output driver's OE to zero. We hardcode all output lines to zero and as soon as we need to pull a line
          -- to zero, we activate the NC7SZ126P5X OE by setting it to one. This means that the actual signalling is
@@ -1265,37 +1264,37 @@ begin
          -- These lines are not connected to a NC7SZ126P5X since the C64 is supposed to be the only
          -- party in the bus who is allowed to pull this line to zero
          iec_reset_n_o     <= reset_core_n;
-         iec_atn_n_o       <= c64_iec_atn_o;
+         iec_atn_n_o       <= c64_iec_atn_out;
 
          -- Read from the hardware IEC port (see comment above: We need to connect this to i_fpga64_sid_iec and i_iec_drive)
-         hw_iec_clk_n_i    <= iec_clk_n_i;
-         hw_iec_data_n_i   <= iec_data_n_i;
+         hw_iec_clk_n_in    <= iec_clk_n_i;
+         hw_iec_data_n_in   <= iec_data_n_i;
 
          -- Write to the IEC port by pulling the signals low and otherwise let them float (using the NC7SZ126P5X chip)
          -- We need to invert the logic, because if the C64 wants to pull something to LOW we need to ENABLE the NC7SZ126P5X's OE
-         iec_clk_en_o      <= not c64_iec_clk_o;
-         iec_data_en_o     <= not c64_iec_data_o;
+         iec_clk_en_o      <= not c64_iec_clk_out;
+         iec_data_en_o     <= not c64_iec_data_out;
       end if;
-   end process;
+   end process handle_hardware_iec_proc;
 
    --------------------------------------------------------------------------------------------------
    -- MiSTer IEC drives
    --------------------------------------------------------------------------------------------------
 
    -- Parallel C1541 port: not implemented, yet
-   iec_par_stb_i        <= '0';
-   iec_par_data_i       <= (others => '0');
+   iec_par_stb_in        <= '0';
+   iec_par_data_in       <= (others => '0');
 
    -- Drive is held to reset if the core is held to reset or if the drive is not mounted, yet
    -- @TODO: MiSTer also allows these options when it comes to drive-enable:
    --        "P2oPQ,Enable Drive #8,If Mounted,Always,Never;"
    --        "P2oNO,Enable Drive #9,If Mounted,Always,Never;"
    --        This code currently only implements the "If Mounted" option
-   g_iec_drv_reset : for i in 0 to G_VDNUM - 1 generate
+   iec_drv_reset_gen : for i in 0 to G_VDNUM - 1 generate
       iec_drives_reset(i) <= (not reset_core_n) or (not vdrives_mounted(i));
-   end generate g_iec_drv_reset;
+   end generate iec_drv_reset_gen;
 
-   i_iec_drive : entity work.iec_drive
+   iec_drive_inst : entity work.iec_drive
       generic map (
          PARPORT        => 0,                -- Parallel C1541 port for faster (~20x) loading time using DolphinDOS
          DUALROM        => 1,                -- Two switchable ROMs: Standard DOS and JiffyDOS
@@ -1308,39 +1307,39 @@ begin
          pause          => pause_i,
 
          -- interface to the C64 core
-         iec_clk_i      => c64_iec_clk_o and hw_iec_clk_n_i,
-         iec_clk_o      => c64_iec_clk_i,
-         iec_atn_i      => c64_iec_atn_o,
-         iec_data_i     => c64_iec_data_o and hw_iec_data_n_i,
-         iec_data_o     => c64_iec_data_i,
+         iec_clk_i      => c64_iec_clk_out and hw_iec_clk_n_in,
+         iec_clk_o      => c64_iec_clk_in,
+         iec_atn_i      => c64_iec_atn_out,
+         iec_data_i     => c64_iec_data_out and hw_iec_data_n_in,
+         iec_data_o     => c64_iec_data_in,
 
          -- disk image status
-         img_mounted    => iec_img_mounted_i,
-         img_readonly   => iec_img_readonly_i,
-         img_size       => iec_img_size_i,
-         img_type       => iec_img_type_i,         -- 00=1541 emulated GCR(D64), 01=1541 real GCR mode (G64,D64), 10=1581 (D81)
+         img_mounted    => iec_img_mounted,
+         img_readonly   => iec_img_readonly,
+         img_size       => iec_img_size,
+         img_type       => iec_img_type,         -- 00=1541 emulated GCR(D64), 01=1541 real GCR mode (G64,D64), 10=1581 (D81)
 
          -- QNICE SD-Card/FAT32 interface
          clk_sys        => c64_clk_sd_i,           -- "SD card" clock for writing to the drives' internal data buffers
 
-         sd_lba         => iec_sd_lba_o,
-         sd_blk_cnt     => iec_sd_blk_cnt_o,
-         sd_rd          => iec_sd_rd_o,
-         sd_wr          => iec_sd_wr_o,
-         sd_ack         => iec_sd_ack_i,
-         sd_buff_addr   => iec_sd_buf_addr_i,
-         sd_buff_dout   => iec_sd_buf_data_i,   -- data from SD card to the buffer RAM within the drive ("dout" is a strange name)
-         sd_buff_din    => iec_sd_buf_data_o,   -- read the buffer RAM within the drive
-         sd_buff_wr     => iec_sd_buf_wr_i,
+         sd_lba         => iec_sd_lba,
+         sd_blk_cnt     => iec_sd_blk_cnt,
+         sd_rd          => iec_sd_rd,
+         sd_wr          => iec_sd_wr,
+         sd_ack         => iec_sd_ack,
+         sd_buff_addr   => iec_sd_buf_addr,
+         sd_buff_dout   => iec_sd_buf_data_in,   -- data from SD card to the buffer RAM within the drive ("dout" is a strange name)
+         sd_buff_din    => iec_sd_buf_data_out,   -- read the buffer RAM within the drive
+         sd_buff_wr     => iec_sd_buf_wr,
 
          -- drive led
          led            => c64_drive_led,
 
          -- Parallel C1541 port
-         par_stb_i      => iec_par_stb_i,
-         par_stb_o      => iec_par_stb_o,
-         par_data_i     => iec_par_data_i,
-         par_data_o     => iec_par_data_o,
+         par_stb_i      => iec_par_stb_in,
+         par_stb_o      => iec_par_stb_out,
+         par_data_i     => iec_par_data_in,
+         par_data_o     => iec_par_data_out,
 
          -- Access custom rom (DOS): All in QNICE clock domain but rom_std_i is in main clock domain
          rom_std_i      => c64_rom_i(0) or c64_rom_i(1), -- 1=use the factory default ROM
@@ -1348,7 +1347,7 @@ begin
          rom_data_i     => c1541rom_data_i,
          rom_wr_i       => c1541rom_we_i,
          rom_data_o     => c1541rom_data_o
-      ); -- i_iec_drive
+      ); -- iec_drive_inst
 
    -- 16 MHz chip enable for the IEC drives, so that ph2_r and ph2_f can be 1 MHz (C1541's CPU runs with 1 MHz)
    -- Uses a counter to compensate for clock drift, because the input clock is not exactly at 32 MHz
@@ -1360,7 +1359,7 @@ begin
    -- This leads to a different frequency ratio C64 vs 1541 and therefore to incompatibilities such as the
    -- one described in this GitHub issue:
    -- https://github.com/MJoergen/C64MEGA65/issues/2
-   generate_drive_ce : process(all)
+   iec_drive_ce_proc : process (all)
       variable msum, nextsum: integer;
    begin
       msum    := clk_main_speed_i;
@@ -1378,9 +1377,9 @@ begin
             end if;
          end if;
       end if;
-   end process;
+   end process iec_drive_ce_proc;
 
-   i_vdrives : entity work.vdrives
+   vdrives_inst : entity work.vdrives
       generic map (
          VDNUM                => G_VDNUM,             -- amount of virtual drives
          BLKSZ                => 1                    -- 1 = 256 bytes block size
@@ -1391,10 +1390,10 @@ begin
          reset_core_i         => not reset_core_n,
 
          -- MiSTer's "SD config" interface, which runs in the core's clock domain
-         img_mounted_o        => iec_img_mounted_i,
-         img_readonly_o       => iec_img_readonly_i,
-         img_size_o           => iec_img_size_i,
-         img_type_o           => iec_img_type_i,      -- 00=1541 emulated GCR(D64), 01=1541 real GCR mode (G64,D64), 10=1581 (D81)
+         img_mounted_o        => iec_img_mounted,
+         img_readonly_o       => iec_img_readonly,
+         img_size_o           => iec_img_size,
+         img_type_o           => iec_img_type,      -- 00=1541 emulated GCR(D64), 01=1541 real GCR mode (G64,D64), 10=1581 (D81)
 
          -- While "img_mounted_o" needs to be strobed, "drive_mounted" latches the strobe in the core's clock domain,
          -- so that it can be used for resetting (and unresetting) the drive.
@@ -1409,18 +1408,18 @@ begin
 
          -- MiSTer's "SD block level access" interface, which runs in QNICE's clock domain
          -- using dedicated signal on Mister's side such as "clk_sys"
-         sd_lba_i             => iec_sd_lba_o,
-         sd_blk_cnt_i         => iec_sd_blk_cnt_o,    -- number of blocks-1
-         sd_rd_i              => iec_sd_rd_o,
-         sd_wr_i              => iec_sd_wr_o,
-         sd_ack_o             => iec_sd_ack_i,
+         sd_lba_i             => iec_sd_lba,
+         sd_blk_cnt_i         => iec_sd_blk_cnt,    -- number of blocks-1
+         sd_rd_i              => iec_sd_rd,
+         sd_wr_i              => iec_sd_wr,
+         sd_ack_o             => iec_sd_ack,
 
          -- MiSTer's "SD byte level access": the MiSTer components use a combination of the drive-specific sd_ack and the sd_buff_wr
          -- to determine, which RAM buffer actually needs to be written to (using the clk_qnice_i clock domain)
-         sd_buff_addr_o       => iec_sd_buf_addr_i,
-         sd_buff_dout_o       => iec_sd_buf_data_i,
-         sd_buff_din_i        => iec_sd_buf_data_o,
-         sd_buff_wr_o         => iec_sd_buf_wr_i,
+         sd_buff_addr_o       => iec_sd_buf_addr,
+         sd_buff_dout_o       => iec_sd_buf_data_in,
+         sd_buff_din_i        => iec_sd_buf_data_out,
+         sd_buff_wr_o         => iec_sd_buf_wr,
 
          -- QNICE interface (MMIO, 4k-segmented)
          -- qnice_addr is 28-bit because we have a 16-bit window selector and a 4k window: 65536*4096 = 268.435.456 = 2^28
@@ -1429,7 +1428,7 @@ begin
          qnice_data_o         => c64_qnice_data_o,
          qnice_ce_i           => c64_qnice_ce_i,
          qnice_we_i           => c64_qnice_we_i
-      ); -- i_vdrives
+      ); -- vdrives_inst
 
    --------------------------------------------------------------------------------------------------
    -- RAM used by the REU inside i_main
@@ -1443,7 +1442,7 @@ begin
    -- 3) i_reu_mapper: Converts the Avalon interface into the interface that the REU expects PLUS
    --    it includes an optimization ("hack") that ensures that the REU is cycle accurate
    -- The result of stage (3) is then passed to i_main which uses these signals directly with MiSTer's i_reu
-   i_reu_mapper : entity work.reu_mapper
+   reu_mapper_inst : entity work.reu_mapper
       generic map (
          G_BASE_ADDRESS => X"0020_0000"  -- 2MW
       )
@@ -1466,9 +1465,9 @@ begin
          avm_readdata_i      => map_readdata,
          avm_readdatavalid_i => map_readdatavalid,
          avm_waitrequest_i   => map_waitrequest
-      ); -- i_reu_mapper
+      ); -- reu_mapper_inst
 
-   i_avm_cache : entity work.avm_cache
+   avm_cache_inst : entity work.avm_cache
       generic map (
          G_CACHE_SIZE   => 8,
          G_ADDRESS_SIZE => 32,
@@ -1495,10 +1494,10 @@ begin
          m_avm_burstcount_o    => avm_burstcount_o,
          m_avm_readdata_i      => avm_readdata_i,
          m_avm_readdatavalid_i => avm_readdatavalid_i
-      ); -- i_avm_cache
+      ); -- avm_cache_inst
 
    -- Instantiate the PCF8583 RTC I2C emulator
-   i_rtcF83 : component rtcF83
+   rtcF83_inst : component rtcF83
       generic map (
          CLOCK_RATE => CORE_CLK_SPEED,
          HAS_RAM    => 0
@@ -1511,7 +1510,7 @@ begin
          scl_i => cass_write,
          sda_i => cass_motor,
          sda_o => rtcF83_sda
-      ); -- i_rtcF83
+      ); -- rtcF83_inst
 
     cass_rtc <= not (rtcF83_sda and cass_motor);
 

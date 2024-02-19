@@ -21,9 +21,9 @@
 -- MiSTer2MEGA65 done by sy2002 and MJoergen in 2022 and licensed under GPL v3
 ---------------------------------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity keyboard is
    port (
@@ -449,4 +449,6 @@ begin
                      (cia1_pao_i(5) or key_pressed_n(m65_comma))        and
                      (cia1_pao_i(6) or key_pressed_n(m65_slash))        and
                      (cia1_pao_i(7) or key_pressed_n(m65_run_stop));                    
-end beh;
+
+end architecture beh;
+
