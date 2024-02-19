@@ -407,7 +407,7 @@ begin
    --            HDMI: Flicker-free: 0.25% slower
    clk_gen : entity work.clk
       port map (
-         sys_clk_i         => CLK,             -- expects 100 MHz
+         sys_clk_i         => clk_i,           -- expects 100 MHz
 
          core_speed_i      => hr_core_speed,   -- 0=PAL/original C64, 1=PAL/HDMI flicker-free, 2=NTSC
 
