@@ -104,7 +104,7 @@ port (
    -- Core Clock Domain
    --------------------------------------------------------------------------------------------------------
 
-   CLK                     : in  std_logic;                 -- 100 MHz clock
+   clk_i                   : in  std_logic;              -- 100 MHz clock
 
    -- Share clock and reset with the framework
    main_clk_o              : out std_logic;                 -- CORE's clock
