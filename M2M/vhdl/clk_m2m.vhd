@@ -28,8 +28,8 @@ entity clk_m2m is
       qnice_clk_o       : out std_logic;   -- QNICE's 50 MHz main clock
       qnice_rst_o       : out std_logic;   -- QNICE's reset, synchronized
 
-      hr_clk_x1_o       : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz
-      hr_clk_x1_del_o   : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz phase delayed
+      hr_clk_o          : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz
+      hr_clk_del_o      : out std_logic;   -- MEGA65 HyperRAM @ 100 MHz phase delayed
       hr_delay_refclk_o : out std_logic;   -- MEGA65 HyperRAM @ 200 MHz
       hr_rst_o          : out std_logic;   -- MEGA65 HyperRAM reset, synchronized
 
@@ -45,8 +45,8 @@ architecture rtl of clk_m2m is
 signal audio_fb_mmcm        : std_logic;
 signal qnice_fb_mmcm        : std_logic;
 signal qnice_clk_mmcm       : std_logic;
-signal hr_clk_x1_mmcm       : std_logic;
-signal hr_clk_x1_del_mmcm   : std_logic;
+signal hr_clk_mmcm          : std_logic;
+signal hr_clk_del_mmcm      : std_logic;
 signal hr_delay_refclk_mmcm : std_logic;
 signal audio_clk_mmcm       : std_logic;
 
@@ -93,9 +93,9 @@ begin
          CLKFBOUT            => qnice_fb_mmcm,
          CLKIN1              => sys_clk_i,
          CLKOUT0             => qnice_clk_mmcm,
-         CLKOUT1             => hr_clk_x1_mmcm,
+         CLKOUT1             => hr_clk_mmcm,
          CLKOUT2             => hr_delay_refclk_mmcm,
-         CLKOUT3             => hr_clk_x1_del_mmcm,
+         CLKOUT3             => hr_clk_del_mmcm,
          LOCKED              => qnice_locked,
          PWRDWN              => '0',
          RST                 => '0'
@@ -134,16 +134,16 @@ begin
          O => qnice_clk_o
       );
 
-   hr_clk_x1_bufg : BUFG
+   hr_clk_bufg : BUFG
       port map (
-         I => hr_clk_x1_mmcm,
-         O => hr_clk_x1_o
+         I => hr_clk_mmcm,
+         O => hr_clk_o
       );
 
-   hr_clk_x1_del_bufg : BUFG
+   hr_clk_del_bufg : BUFG
       port map (
-         I => hr_clk_x1_del_mmcm,
-         O => hr_clk_x1_del_o
+         I => hr_clk_del_mmcm,
+         O => hr_clk_del_o
       );
 
    hr_delay_refclk_bufg : BUFG
@@ -184,7 +184,7 @@ begin
          -- assumes that both ends maintain state information and agree on this state information. Therefore,
          -- one side can not be reset in the middle of e.g. a burst transaction, without the other end becoming confused.
          src_arst  => not (qnice_locked and sys_rstn_i and core_rstn_i),
-         dest_clk  => hr_clk_x1_o,      -- 1-bit input: Destination clock.
+         dest_clk  => hr_clk_o,         -- 1-bit input: Destination clock.
          dest_arst => hr_rst_o          -- 1-bit output: src_rst synchronized to the destination clock domain.
                                         -- This output is registered.
       );
