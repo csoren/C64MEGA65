@@ -25,7 +25,7 @@ can be checked in the "About & Help" menu of the core.
 | WIP-V5.1-A13 | 02/03/24 | 53a06d7 | Fix macOS quirk / missing ".." in subfolders: Fixes issue #111
 | WIP-V5.1-A14 | 02/04/24 | b272f0d | "Attack of the PETSCII Robots REU version" HyperRAM issue: Another attempt to fix issue #127
 | WIP-V5.1-A15 | 02/17/24 | 3ade5ea | "Attack of the PETSCII Robots REU version" HyperRAM issue: Another attempt to fix issue #127
-| WIP-V5.1-RC2 | 03/01/24 |         | Release Candidate 2
+| WIP-V5.1-RC2 | 03/01/24 | 138723e | Release Candidate 2
 
 ## Version 5
 
