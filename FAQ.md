@@ -358,7 +358,7 @@ you copy the `c64mega65` file that came with the
 to this very folder.
 
 When going from an older version of the C64 core to a newer version
-(for example from Version 4 to Version 5).1 you always need to overwrite your
+(for example from Version 4 to Version 5.1) you always need to overwrite your
 old `c64mega65` file by the new one that came with the
 [ZIP file](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
 
