@@ -165,7 +165,6 @@ begin
                         read_clk_count    <= burst_count+1;
                         read_return_count <= burst_count;
                         hb_read_o         <= '1';
-                        timeout_count     <= 15;
                         state             <= READ_ST;
                      else
                         write_clk_count <= burst_count;
