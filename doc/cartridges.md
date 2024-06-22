@@ -346,7 +346,7 @@ The other two buttons <kbd>Special</kbd> and <kbd>Menu</kbd> work in the
 context described above in "How to use" but they do otherwise not work
 as intended.
 
-### Known issue (pre-2024): Freezer cartridges are not working
+### Known issue (pre-2024 MEGA65): Freezer cartridges are not working
 
 If you have a MEGA65 that was built in 2024 or later, then freezer
 most cartridges are supposed to be working as expected. Due to the fact
