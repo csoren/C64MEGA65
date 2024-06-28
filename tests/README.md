@@ -10,18 +10,18 @@ Version 5.1 - June 28, 2024
 
 | Status                 | Test                                                 | Done by                | Date              
 |:-----------------------|------------------------------------------------------|:-----------------------|:--------------------------
-| :white_check_mark:     | Basic regression tests: Main menu                    | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | Basic regression tests: Additional Smoke Tests       | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | HDMI & VGA                                           | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | SID                                                  | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | C64 Emulator Test Suite V2.15                        | AmokPhaze101           | 25/Jun/2024
-|                        | [Demos](demos.md)                                    | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | Writing to `*.d64` images                            | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | GEOS: REU (sim), GeoRAM (HW), mouse, disk write test | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | PLA Test                                             | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | Dedicated REU tests                                  | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | Dedicated hardware cartridge tests                   | AmokPhaze101           | 25/Jun/2024
-| :white_check_mark:     | Dedicated simulated cartridge tests                  | AmokPhaze101           | 25/Jun/2024
+| :white_check_mark:     | Basic regression tests: Main menu                    | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | Basic regression tests: Additional Smoke Tests       | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | HDMI & VGA                                           | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | SID                                                  | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | C64 Emulator Test Suite V2.15                        | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | [Demos](demos.md)                                    | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | Writing to `*.d64` images                            | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | GEOS: REU (sim), GeoRAM (HW), mouse, disk write test | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | PLA Test                                             | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | Dedicated REU tests                                  | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | Dedicated hardware cartridge tests                   | AmokPhaze101           | 6/25/24
+| :white_check_mark:     | Dedicated simulated cartridge tests                  | AmokPhaze101           | 6/25/24
 
 ### Basic regression tests
 
@@ -59,10 +59,6 @@ you have a JTAG connection and an **active serial terminal** to observe the debu
   resets the whole core (not only the C64).
 * Giana Sisters: Joystick and latency
 * Space Lords: Support for 4 paddles
-
-##### Regression
-
-:bangbang: Long reset does not reset Eagle's Nest any more: [GitHub issue #79](https://github.com/MJoergen/C64MEGA65/issues/79)
 
 ### HDMI & VGA
 
@@ -192,14 +188,14 @@ Better than Version 5.0 on R3A - so we consider this as a success.
 | :white_check_mark: | Test an old Ultimax game                                                                                                    | Tested Pinball Spectacular, SeaWolves 
 | :white_check_mark: | Test a bunch of new game cartridges                                                                                         | Tested ZetaWing, Sam's Journey, Galencia, Soul Force, Robot Jet Action, Super Bread Box  
 | :white_check_mark: | Save game and load game to/from the original Sam's Journey cartridge                                                        |
-| :grey_exclamation: | Final Cartridge III                                                                                                         | I do not own this cartridge  
-| :grey_exclamation: | Action Replay Professional 6.0                                                                                              | I do not own this cartridge
+| :grey_exclamation: | Final Cartridge III                                                                                                         | Not tested this time (last test: Version 5.0)  
+| :grey_exclamation: | Action Replay Professional 6.0                                                                                              | Not tested this time (last test: Version 5.0)
 | :white_check_mark: | Power Cartridge                                                                                                             |
 | :white_check_mark: | Flash the EasyFlash **1CR** with a small (<64k) and large (>512k) game and playtest these games                             |
 | :white_check_mark: | Flash the EasyFlash **3** with a small (<64k) and large (>512k) game and playtest these games                               |
 | :white_check_mark: | EasyFlash **3**: Test all freezers that the EF3 supports as described in [cartridges.md](../doc/cartridges.md)              | 
-| :white_check_mark: | Kung Fu Flash                                                                                                               | No workaround needed on R6  
-| :grey_exclamation: | Work with GEOS and GeoRAM                                                                                                   | I do not own GeoRam hardware 
+| :white_check_mark: | Kung Fu Flash                                                                                                               | Success: No workaround needed on R6 in contrast to R3A
+| :grey_exclamation: | Work with GEOS and GeoRAM                                                                                                   | Not tested this time (last test: Version 5.0)
 | :white_check_mark: | Xpander 3 with Datel Midi interface, Cynth Cart 64 and Midi Keyboard                                                        |
 
 ### Dedicated simulated cartridge tests
