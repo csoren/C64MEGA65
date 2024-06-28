@@ -73,3 +73,9 @@ particular order:
   so the update (wait until MiSTer does the same upstream)
 * Re-do QNICE's SD Card controller: Go from SPI to native
 * Hardware debugger (single-step the CPU via the on-screen-menu)
+
+Roadmap Items on GitHub
+-----------------------
+
+* [List of known bugs](https://github.com/MJoergen/C64MEGA65/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
+* [Feature requests](https://github.com/MJoergen/C64MEGA65/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)

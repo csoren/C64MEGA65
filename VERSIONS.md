@@ -1,5 +1,5 @@
-Version 5.1 - MONTH DAY, 2024
-=============================
+Version 5.1 - June 28, 2024
+===========================
 
 The main purpose of this release is to support the new 2024 version of the
 MEGA65 (aka "R6") which sports enhanced hardware and better compatibility for

@@ -7,7 +7,7 @@ The MEGA65's Real Time Clock (RTC) is able to power the date/time in GEOS.
 How to use the RTC in GEOS
 --------------------------
 
-1. Optional: [Learn how to use GEOS using C64 for MEGA65](https://github.com/MJoergen/C64MEGA65/blob/develop/FAQ.md#16-how-can-i-work-with-geos)
+1. Optional: [Learn how to use GEOS using C64 for MEGA65](https://github.com/MJoergen/C64MEGA65/blob/master/FAQ.md#17-how-can-i-work-with-geos)
 1. Use the MEGA65's "Configuration Utility" to set the correct date and time. Learn more in the
    [MEGA65 User's Guide](https://files.mega65.org?id=a5081244-a976-4a21-9153-27cca13fd613)
    chapter "The Configuration Utility".
@@ -18,7 +18,7 @@ How to use the RTC in GEOS
 ### Differences between pre-2024 MEGA65s and 2024+ MEGA65s
 
 * If you have a MEGA65 that has been built in 2024 or later, then you are all set.
-* If you have a pre-2024 MEGA65 model, then you need to install a CR2032 battery as described in the "MEGA65 User's Guide",
+* If you have a pre-2024 MEGA65 model, then you need to install a CR1220 battery as described in the "MEGA65 User's Guide",
   otherwise the RTC will "forget" the date/time each time you power-off your machine.
   [Here](https://files.mega65.org?ar=14d5ca1e-bc16-45d4-83f5-41b0a0545e0d)
   are instructions how to install the battery.

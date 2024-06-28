@@ -3,13 +3,20 @@ Commodore 64 for MEGA65
 
 Experience the [Commodore 64](https://en.wikipedia.org/wiki/Commodore_64) with
 great accuracy and sublime compatibility on your
-[MEGA65](https://mega65.org/)! If you are in a hurry or have issues,
-go to the
+[MEGA65](https://mega65.org/)!
+To get a glimpse of what the C64 core can do for you,
+[watch this trailer on YouTube](https://youtu.be/n3ke0alwjds?si=RT6c1nxfgn12dWsv).
+Go to the MEGA65 Filehost to
+[download the most recent version 5.1](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
+of the C64 core.
+If you are in a hurry or have issues, read the
 [FAQ - Frequently Asked Questions](FAQ.md). If you are a
 [developer](doc/developer.md)
 and want to build the C64 core by yourself then head to our
 [developer documentation](doc/developer.md).
-Otherwise, scroll down and read the user's manual.
+You can also
+[learn more what's new in Version 5.1](VERSIONS.md).
+Otherwise, scroll down and enjoy the user's manual.
 
 ![Commodore64](doc/c64.jpg)
 
@@ -493,9 +500,9 @@ Working with original retro cartridges and most modern cartridges is simple:
 Make sure that your MEGA65 is configured to use the hardware port by selecting
 `Use hardware slot` in the `Expansion Port` menu. Switch-off your MEGA65,
 insert the cartridge and then switch-on the MEGA65 and the cartridge starts.
-If you press the reset button shortly ("soft-reset"), then the cartridge is
-restarted. If you press the reset button longer than 2 seconds ("hard-reset"),
-then the C64 ignores the cartridge and starts into Basic.
+
+Use the [soft-reset](#hard-reset-vs-soft-reset) to reset and/or start
+hardware cartridges. Do not use the hard-reset for hardware cartridges.
 
 ### CORE #0 update (pre-2024 MEGA65s only)
 
@@ -519,6 +526,10 @@ You have two options when you own such a MEGA65:
    mechanisms in place that shield the inner guts of the MEGA65 from the
    Expansion Port. A lot of MEGA65 users have used this option for a while
    and until now, no damaged MEGA65 due to this workaround are known.
+
+And if you are interested in the technical details about how your MEGA65
+handles the whole multi core functionality during startup, then
+[head to this MEGA65 Wiki article](https://mega65.atlassian.net/wiki/spaces/MEGA65/pages/158924822/MEGA65+System+Startup+Flow).
 
 ### Flash cartridges, freezers and homebrew cartridges
 
@@ -718,12 +729,18 @@ the difference between the two:
   and
   [Eagle's Nest](https://csdb.dk/search/?seinsel=all&search=eagles+nest&Go.x=0&Go.y=0)
   are examples for this. The bottom line is: A
-  soft reset will allow you to enjoy the original behavior including "reset
+  soft-reset will allow you to enjoy the original behavior including "reset
   demos" but you will also be stuck with the drawbacks.
 
 * Hard-reset: The core is doing a "forced reset" by simulating what is
   described [here](https://www.c64-wiki.com/wiki/Reset_Button) and what
   modules like the Action Replay did. This will always reset the machine.
+  If you notice that the MEGA65's "Drive" LED turns blue, then you know
+  that you pressed the reset button long enough to initiate a Hard-reset.
+  [Learn more](FAQ.md#18-what-do-the-two-leds-signal) about what the two
+  LEDs are signalling.
+  **IMPORTANT: Do not use the Hard-reset when a hardware
+  cartridge is plugged in the Expansion Port of the MEGA65.**
 
 There is another difference between the hard-reset and the soft-reset that is
 more related to your convenience while using the file browser and the 

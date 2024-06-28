@@ -49,7 +49,15 @@ MEGA65 and your device. You will find two Amazon links to devices that are
 known to work
 [here in Dan's MEGA65 Welcome Guide](https://dansanderson.com/mega65/welcome/hardware-issues.html?highlight=hdmi#failure-to-boot-and-keyboard-lights-glow-when-off).
 
-## 3) SD card errors
+## 3) The keyboard is not working
+
+If your keyboard is working while you are using the MEGA65 core but you cannot
+type properly while using the C64 core and the <kbd>Help</kbd> menu works fine
+then please check if you have an **Amiga Mouse** or a joystick or other device
+with activated auto-fire connected to port #1. If so, please remove it and you
+will be able to type properly.
+
+## 4) SD card errors
 
 Most SD card problems can be resolved by considering these possible causes:
 
@@ -95,7 +103,7 @@ this case: Step (5) or step (6) will solve the issue.
   official SD card organization provides:
   [Download it here](https://www.sdcard.org/downloads/formatter/sd-memory-card-formatter-for-mac-download/).
 
-## 4) How compatible is the C64 core?
+## 5) How compatible is the C64 core?
 
 It is very compatible. Not yet as good as Vice but the
 core runs hundreds of
@@ -113,21 +121,21 @@ Expansion Port,
 by plugging them into the MEGA65's IEC port. You can even
 [work with retro 15 kHz cathode ray tube monitors](doc/retrotubes.md).
 
-## 5) I cannot format a disk image (`*.d64`)
+## 6) I cannot format a disk image (`*.d64`)
 
 Indeed, the core is not yet able to format disks. We do have this topic on our
 [roadmap](ROADMAP.md). What we suggest is that you use tools like the awesome
 [DirMaster](https://style64.org/dirmaster) to create a bunch of formatted, empty
 `*.d64` disk images and then use these disk images with your C64 for MEGA65 core.
 
-## 6) The screen goes black when I choose JiffyDOS
+## 7) The screen goes black when I choose JiffyDOS
 
 JiffyDOS is commercial software. The C64 core does not come with
 a pre-installed copy of JiffyDOS.
 [Learn here](doc/jiffy.md)
 where to buy and how to install it.
 
-## 7) My game or demo crashes
+## 8) My game or demo crashes
 
 * Are you having an [HDMI back powering problem](FAQ.md#2-my-mega65-or-the-c64-core-is-behaving-somehow-weirdly)?
 
@@ -181,7 +189,7 @@ where to buy and how to install it.
   [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200)
   channel on Discord.
 
-## 8) No image or no sound via HDMI
+## 9) No image or no sound via HDMI
 
 1. Make sure you are running [Version 5.1](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
    of the core.
@@ -194,7 +202,7 @@ where to buy and how to install it.
    [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200)
    channel on Discord.
 
-## 9) The VGA output looks strange or flickers or I lose VGA sync
+## 10) The VGA output looks strange or flickers or I lose VGA sync
 
 1. Always try the "auto-adjust" (or similarly named feature) of your screen
    first. This resolves 90% of all issues.
@@ -205,7 +213,7 @@ where to buy and how to install it.
 
 3. If your monitor supports it, try to use the [retro "15 kHz RGB" mode](doc/retrotubes.md)
 
-## 10) My retro monitor does not work with the core
+## 11) My retro monitor does not work with the core
 
 ### Analog devices
 
@@ -219,7 +227,7 @@ Make sure that you have
 [switched-off HDMI: Flicker-free](README.md#important-advice-for-users-of-analog-vga-and-retro-15-khz-rgb-over-vga)
 when using retro monitors via the MEGA65's VGA out.
 
-## 11) My mouse does not work
+## 12) My mouse does not work
 
 Make sure that you use either a real C64 mouse or
 [MouSTer](https://retrohax.net/shop/modulesandparts/mouster/).
@@ -234,7 +242,7 @@ Caution: AMIGA mice look pretty much like C64 mice but the C64 core does not
 support AMIGA mice, yet. The MEGA65 core does support AMIGA mice and this
 feature is on our roadmap.
 
-## 12) Can I use cartridges?
+## 13) Can I use cartridges?
 
 Yes, from
 [Version 5](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241)
@@ -246,6 +254,27 @@ that you can load as `*.crt` files from your SD card.
 
 The core is able to run more than 99% of all game
 cartridges.
+
+### Do not do a "hard-reset" when working with cartridges
+
+If you are not sure what the difference between a "hard-reset" (aka
+"long-reset") and a "soft-reset" (aka "short-reset") is, then
+[please read here](README.md#hard-reset-vs-soft-reset). You will recognize a
+hard-reset when the power LED of the MEGA65 turns blue.
+
+Do not use hard-reset reset for any hardware cartridge. Instead always use the
+soft-reset. Otherwise you will experience very odd behavior.
+
+This is by design: We are masking the "CBM80" signature on "hard-reset". In the
+previous core versions (before Version 5.1), there was a bug in our hard-reset
+implementation that prevented you from leaving games like Uridium or Eagles
+Nest via hard-reset. Now, from Version 5.1 on, hard-reset is fixed that means
+each cartridge that relies on the "CBM80" signature will not work properly when
+you use hard-reset. Not all cartridges rely on this signature. Learn more
+about this signature by
+[reading this article](http://tech.guitarsite.de/cbm80.html) and learn more
+about how we implemented the hard-reset by
+[reading this German C64 Wiki article](https://www.c64-wiki.de/wiki/Reset-Taster ).
 
 ### If only very few cartridges are working, you need to update CORE #0
 
@@ -269,6 +298,9 @@ Expansion Port. The old version that most of the MEGA65 have installed is
 buggy and needs to be updated.
 
 [Learn how to update or how to use a workaround here](README.md#core-0-update).
+And if you are interested in the technical details about how your MEGA65
+handles the whole multi core functionality during startup, then
+[head to this MEGA65 Wiki article](https://mega65.atlassian.net/wiki/spaces/MEGA65/pages/158924822/MEGA65+System+Startup+Flow).
 
 ### My hardware freezer or flash cartridge does not work
 
@@ -298,7 +330,22 @@ Always make sure that you insert a cartridge that is
 [housed in a proper case](doc/cartridges.md#cartridge-cases) and never
 insert a barebone PCB into the MEGA65's Expansion Port.
 
-### 13) Can I use IEC devices?
+### Rare case: Zeta Wing cartridge is not working (maybe also relevant for other Protovision cartridges)
+
+There is [a very detailed story on Discord](https://discord.com/channels/719326990221574164/794775503818588200/1222651625475149834)
+written by AmokPhaze101 which has proven evidence, that his Zeta Wing
+cartridge by Protovision had a faulty SN74HC02N chip: Replacing this chip lead
+to the cartridge working like a charme.
+
+This chip is rather easy to replace if you know how to solder. You can google
+something like `buy SN74HC02N`, the chip is roundabout 1 EUR or $1.
+
+There is no evidence that other Protovision cartridges are affected by this,
+but just in case you stumble into a non-working Protovision cartridge and
+you are already running a proper MEGA65 CORE #0 version on your machine
+(see above), then replacing the SN74HC02N might be your next step.
+
+## 14) Can I use IEC devices?
 
 Yes, from Version 5 on, you can connect floppy drives (such as the original
 1541 and 1581), hard disks, printers, plotters or modern devices such as the
@@ -337,7 +384,7 @@ output frequency and the frequencies that modern HDMI monitors are
 actually able to display.
 [Learn more here](README.md#flicker-free-hdmi).
 
-## 14) How many files in a folder can the file browser handle?
+## 15) How many files in a folder can the file browser handle?
 
 The file browser can handle about 25,000 characters. If we assume an average
 length of a filename (including the file extension) of 40 characters then this
@@ -350,7 +397,7 @@ have a directory structure `a .. z` and the files are moved there by name,
 plus you will have a folder called `0` where all the files that start with
 digits are. Don't forget to go to the folder `m` and remove `mover.sh`.
 
-## 15) The core is not remembering my settings
+## 16) The core is not remembering my settings
 
 Make sure that you have a `/c64` folder on your SD card and make sure that
 you copy the `c64mega65` file that came with the
@@ -358,7 +405,7 @@ you copy the `c64mega65` file that came with the
 to this very folder.
 
 When going from an older version of the C64 core to a newer version
-(for example from Version 4 to Version 5) you always need to overwrite your
+(for example from Version 4 to Version 5.1) you always need to overwrite your
 old `c64mega65` file by the new one that came with the
 [ZIP file](https://files.mega65.org?id=896a012f-59e4-456c-b91f-7e989b958241).
 
@@ -374,28 +421,47 @@ Currently, we cannot automate this manual chore and need to ask users to copy th
 this by following
 [this GitHub issue](https://github.com/MJoergen/C64MEGA65/issues/16).
 
-## 16) How can I work with GEOS?
+## 17) How can I work with GEOS?
 
-GEOS works very well on the MEGA65 using Version 5 of the core. AmokPhaze101 wrote
+GEOS works very well on the MEGA65 using Version 5.1 of the core. AmokPhaze101 wrote
 a great step-by-step documentation:
 
 1. Download GEOS [using this download link](https://github.com/MJoergen/C64MEGA65/raw/master/doc/assets/geos.zip)
 2. Work with AmokPhaze101's tutorial: [View and download PDF](https://github.com/MJoergen/C64MEGA65/blob/master/doc/GEOS_WITH_THE_C64_CORE.pdf)
 3. Learn how to use the [Real Time Clock](doc/RTC.md)
 
-## 17) Which features are on the roadmap?
+## 18) What do the two LEDs signal?
+
+The MEGA65 has two LEDs above the keyboard. One is labeled "Power" and one is
+labeled "Drive":
+
+* Both leds blinking like ambulance lights: The core has a fatal error.
+* Power green: Machine is powered on, core is running.
+* Power blue: You pressed the reset button long enough to initiate a so
+  called "Hard-reset" [(learn more)](README.md#hard-reset-vs-soft-reset).
+* Drive off: No access to simulated 1541 drive.
+* Drive green: The currently running C64 software is reading from or writing
+  to the simulated 1541 drive.
+* Drive blinking green: The last read/write operation to the simulated 1541
+  drive failed.
+* Drive yellow: The C64 core is writing changes made by the simulated 1541
+  drive to the disk image file (`*.d64`) on the SD card.
+  [Learn more](https://github.com/MJoergen/C64MEGA65/blob/V5.1-release/README.md#writing-to-disk-images)
+  about how this mechanism works.
+
+## 19) Which features are on the roadmap?
 
 [Here](ROADMAP.md) is the roadmap for future versions. Additionally, there are also 
 [feature requests](https://github.com/MJoergen/C64MEGA65/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
 that we might consider for future releases.
 
-## 18) Where can I post and discuss my feature request?
+## 20) Where can I post and discuss my feature request?
 
 [Engage with us on GitHub](https://github.com/MJoergen/C64MEGA65/issues) or in the
 [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200) channel
 on Discord to discuss feature requests and the future of the C64 for MEGA65 core.
 
-## 19) Are there cores other than the C64 available or in development?
+## 21) Are there cores other than the C64 available or in development?
 
 Yes. Please visit this website, it contains a list of MEGA65 cores that
 will be constantly updated:
@@ -407,7 +473,7 @@ projects such as MiSTer: The website is also sharing additional information
 about how to get started with doing this and about the
 [MiSTer2MEGA65 framework](https://github.com/sy2002/MiSTer2MEGA65).
 
-## 20) I am a total newby and want to learn FPGA development and making or porting cores
+## 22) I am a total newby and want to learn FPGA development and making or porting cores
 
 If you own a MEGA65, then
 [this short article](https://files.mega65.org?ar=898d573b-d30d-4438-8893-09455bd16400)

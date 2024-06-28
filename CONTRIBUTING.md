@@ -53,12 +53,13 @@ Pull Requests
 
 * Make sure that you test your changes thoroughly. It is a best practice
   to share your beta-version of the new core with people on the MEGA65
-  Discord (#other-cores channel) or with other beta testers, so that a
+  Discord (#c64-core channel) or with other beta testers, so that a
   wide range of test cases (and hardware combinations) are tested.
 
 * If you plan a larger contribution, it might make sense to discuss it
-  with us upfront by opening an issue: Describe what you plan to do
-  and @mention one or more of the core developers.
+  with us upfront by opening an issue:
+  https://github.com/MJoergen/C64MEGA65/issues
+  Describe what you plan to do and at-mention @MJoergen, @sy2002 and @paich64.
 
 * Try to stick to the coding style of the actual file(s) that you are
   modifying. The styles might differ per file.

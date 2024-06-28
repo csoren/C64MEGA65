@@ -1,7 +1,7 @@
 Commodore 64 for MEGA65 aka C64MEGA65
 =====================================
 
-done in 2022 by
+done in 2024 by
     * MJoergen   github.com/MJoergen
     * sy2002     github.com/sy2002     www.sy2002.de
 
@@ -30,6 +30,8 @@ and for writing the dedicated documentation doc/retrotubes.md
 Special thanks to Adam Barnes for not only creating the most awesome Open Source HDMI core on the
 planet (see below) but also for patiently sharing his wisdom and tirelessly supporting us in improving
 our HyperRAM controller
+
+Special thanks to Antti Lukats/Trenz Electronic for helping us to stabilize our HyperRAM controller
 
 C64MEGA65:
 ----------

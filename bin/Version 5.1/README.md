@@ -9,6 +9,9 @@ the work of many others.
 
 MJoergen and sy2002 ported the core to the MEGA65 in 2022, 2023 and 2024.
 
+To get a glimpse of what the C64 core can do for you, watch this trailer
+on YouTube: https://youtu.be/n3ke0alwjds?si=RT6c1nxfgn12dWsv
+
 With our Release 5.1, we are striving for a **retro C64 PAL experience**:
 The core turns your MEGA65 into a Commodore 64 with a C1541 drive (you can
 mount `*.d64`) images. It supports the following hardware ports of the MEGA65:
@@ -43,7 +46,7 @@ If your MEGA65 was manufactured before 2024, then choose
 Only use `.bit` files, if you know what you're doing.
 
 Find more details about MEGA65 models here:
-https://github.com/MJoergen/C64MEGA65/blob/develop/doc/models.md
+https://github.com/MJoergen/C64MEGA65/blob/master/doc/models.md
 
 ## Learn more
 
@@ -54,7 +57,7 @@ If you want the core to remember the settings you made in the on-screen-menu,
 then make sure that you copy the following file (`c64mega65`) into a folder
 called `/c64`. This `c64` folder needs to be located in the root folder of the
 SD card that is active when you boot the core:
-https://github.com/MJoergen/C64MEGA65/blob/master/bin/Version%205.1/c64mega65
+https://github.com/MJoergen/C64MEGA65/raw/master/bin/Version%205.1/c64mega65
 
 For using hardware cartridges, make sure that you have a MEGA65 core #0 which
 is from mid 2023. Follow this instructions to upgrade:
