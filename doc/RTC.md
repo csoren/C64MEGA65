@@ -7,7 +7,7 @@ The MEGA65's Real Time Clock (RTC) is able to power the date/time in GEOS.
 How to use the RTC in GEOS
 --------------------------
 
-1. Optional: [Learn how to use GEOS using C64 for MEGA65](https://github.com/MJoergen/C64MEGA65/blob/develop/FAQ.md#16-how-can-i-work-with-geos)
+1. Optional: [Learn how to use GEOS using C64 for MEGA65](https://github.com/MJoergen/C64MEGA65/blob/master/FAQ.md#17-how-can-i-work-with-geos)
 1. Use the MEGA65's "Configuration Utility" to set the correct date and time. Learn more in the
    [MEGA65 User's Guide](https://files.mega65.org?id=a5081244-a976-4a21-9153-27cca13fd613)
    chapter "The Configuration Utility".
