@@ -298,6 +298,9 @@ Expansion Port. The old version that most of the MEGA65 have installed is
 buggy and needs to be updated.
 
 [Learn how to update or how to use a workaround here](README.md#core-0-update).
+And if you are interested in the technical details about how your MEGA65
+handles the whole multi core functionality during startup, then
+[head to this MEGA65 Wiki article](https://mega65.atlassian.net/wiki/spaces/MEGA65/pages/158924822/MEGA65+System+Startup+Flow).
 
 ### My hardware freezer or flash cartridge does not work
 
@@ -427,19 +430,38 @@ a great step-by-step documentation:
 2. Work with AmokPhaze101's tutorial: [View and download PDF](https://github.com/MJoergen/C64MEGA65/blob/master/doc/GEOS_WITH_THE_C64_CORE.pdf)
 3. Learn how to use the [Real Time Clock](doc/RTC.md)
 
-## 18) Which features are on the roadmap?
+## 18) What do the two LEDs signal?
+
+The MEGA65 has two LEDs above the keyboard. One is labeled "Power" and one is
+labeled "Drive":
+
+* Both leds blinking like ambulance lights: The core has a fatal error.
+* Power green: Machine is powered on, core is running
+* Power blue: You pressed the reset button long enough to initiate a so
+  called "Hard-reset" [(learn more)](README.md#hard-reset-vs-soft-reset)
+* Drive off: No access to simulated 1541 drive
+* Drive green: The currently running C64 software is reading from or writing
+  to the simulated 1541 drive.
+* Drive blinking green: The last read/write operation to the simulated 1541
+  drive failed
+* Drive yellow: The C64 core is writing changes made by the simulated 1541
+  drive to the disk image file (`*.d64`) on the SD card.
+  [Learn more](https://github.com/MJoergen/C64MEGA65/blob/V5.1-release/README.md#writing-to-disk-images)
+  about how this mechanism works.
+
+## 19) Which features are on the roadmap?
 
 [Here](ROADMAP.md) is the roadmap for future versions. Additionally, there are also 
 [feature requests](https://github.com/MJoergen/C64MEGA65/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
 that we might consider for future releases.
 
-## 19) Where can I post and discuss my feature request?
+## 20) Where can I post and discuss my feature request?
 
 [Engage with us on GitHub](https://github.com/MJoergen/C64MEGA65/issues) or in the
 [#c64-core](https://discord.com/channels/719326990221574164/794775503818588200) channel
 on Discord to discuss feature requests and the future of the C64 for MEGA65 core.
 
-## 20) Are there cores other than the C64 available or in development?
+## 21) Are there cores other than the C64 available or in development?
 
 Yes. Please visit this website, it contains a list of MEGA65 cores that
 will be constantly updated:
@@ -451,7 +473,7 @@ projects such as MiSTer: The website is also sharing additional information
 about how to get started with doing this and about the
 [MiSTer2MEGA65 framework](https://github.com/sy2002/MiSTer2MEGA65).
 
-## 21) I am a total newby and want to learn FPGA development and making or porting cores
+## 22) I am a total newby and want to learn FPGA development and making or porting cores
 
 If you own a MEGA65, then
 [this short article](https://files.mega65.org?ar=898d573b-d30d-4438-8893-09455bd16400)
