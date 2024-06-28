@@ -436,14 +436,14 @@ The MEGA65 has two LEDs above the keyboard. One is labeled "Power" and one is
 labeled "Drive":
 
 * Both leds blinking like ambulance lights: The core has a fatal error.
-* Power green: Machine is powered on, core is running
+* Power green: Machine is powered on, core is running.
 * Power blue: You pressed the reset button long enough to initiate a so
-  called "Hard-reset" [(learn more)](README.md#hard-reset-vs-soft-reset)
-* Drive off: No access to simulated 1541 drive
+  called "Hard-reset" [(learn more)](README.md#hard-reset-vs-soft-reset).
+* Drive off: No access to simulated 1541 drive.
 * Drive green: The currently running C64 software is reading from or writing
   to the simulated 1541 drive.
 * Drive blinking green: The last read/write operation to the simulated 1541
-  drive failed
+  drive failed.
 * Drive yellow: The C64 core is writing changes made by the simulated 1541
   drive to the disk image file (`*.d64`) on the SD card.
   [Learn more](https://github.com/MJoergen/C64MEGA65/blob/V5.1-release/README.md#writing-to-disk-images)
