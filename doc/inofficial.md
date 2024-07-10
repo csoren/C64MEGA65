@@ -5,6 +5,12 @@ builds that were not there in older builds. By finding the last known-to-work
 build, we have a better chance to hunt down problems. The name of the build
 can be checked in the "About & Help" menu of the core.
 
+## Version 5.2
+
+| Name          | Date     | Commit  | Comment
+|---------------|----------|---------|--------------------------------------
+| WIP-V5.2-A1   | 07/10/24 | f4df717 | "HDMI barcode" which is in reality a HyperRAM issue: Attempt to fix issue #145
+
 ## Version 5.1
 
 | Name          | Date     | Commit  | Comment
