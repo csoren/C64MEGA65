@@ -32,6 +32,13 @@ framework and [QNICE-FPGA](https://github.com/sy2002/QNICE-FPGA) for
 FAT32 support (loading ROMs, mounting disks) and for the
 on-screen-menu.
 
+Brand new and very comprehensive user's guide
+----------------------------------------------
+
+**[Head over to c64.mega65.org to read the brand
+new and very comprehensive user's guide for
+the C64 core.](https://c64.mega65.org)**
+
 Features
 --------
 
