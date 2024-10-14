@@ -70,19 +70,19 @@ port (
    -- HyperRAM Clock Domain
    --------------------------------------------------------------------------------------------------------
 
-   hr_clk_i                : in  std_logic;
-   hr_rst_i                : in  std_logic;
-   hr_core_write_o         : out std_logic;
-   hr_core_read_o          : out std_logic;
-   hr_core_address_o       : out std_logic_vector(31 downto 0);
-   hr_core_writedata_o     : out std_logic_vector(15 downto 0);
-   hr_core_byteenable_o    : out std_logic_vector( 1 downto 0);
-   hr_core_burstcount_o    : out std_logic_vector( 7 downto 0);
-   hr_core_readdata_i      : in  std_logic_vector(15 downto 0);
-   hr_core_readdatavalid_i : in  std_logic;
-   hr_core_waitrequest_i   : in  std_logic;
-   hr_high_i               : in  std_logic; -- Core is too fast
-   hr_low_i                : in  std_logic; -- Core is too slow
+   mem_clk_i                : in  std_logic;
+   mem_rst_i                : in  std_logic;
+   mem_core_write_o         : out std_logic;
+   mem_core_read_o          : out std_logic;
+   mem_core_address_o       : out std_logic_vector(31 downto 0);
+   mem_core_writedata_o     : out std_logic_vector(15 downto 0);
+   mem_core_byteenable_o    : out std_logic_vector( 1 downto 0);
+   mem_core_burstcount_o    : out std_logic_vector( 7 downto 0);
+   mem_core_readdata_i      : in  std_logic_vector(15 downto 0);
+   mem_core_readdatavalid_i : in  std_logic;
+   mem_core_waitrequest_i   : in  std_logic;
+   mem_high_i               : in  std_logic;  -- Core is too fast
+   mem_low_i                : in  std_logic;  -- Core is too slow
 
    --------------------------------------------------------------------------------------------------------
    -- Video Clock Domain
@@ -284,34 +284,34 @@ signal main_reset_from_prgloader  : std_logic;
 signal main_prg_trigger_run       : std_logic;
 
 ---------------------------------------------------------------------------------------------
--- hr_clk
+-- mem_clk
 ---------------------------------------------------------------------------------------------
 
-signal hr_core_speed              : unsigned(1 downto 0);    -- see clock.vhd for details
+signal mem_core_speed              : unsigned(1 downto 0);    -- see clock.vhd for details
 
-signal hr_reu_write               : std_logic;
-signal hr_reu_read                : std_logic;
-signal hr_reu_address             : std_logic_vector(31 downto 0);
-signal hr_reu_writedata           : std_logic_vector(15 downto 0);
-signal hr_reu_byteenable          : std_logic_vector( 1 downto 0);
-signal hr_reu_burstcount          : std_logic_vector( 7 downto 0);
-signal hr_reu_readdata            : std_logic_vector(15 downto 0);
-signal hr_reu_readdatavalid       : std_logic;
-signal hr_reu_waitrequest         : std_logic;
+signal mem_reu_write               : std_logic;
+signal mem_reu_read                : std_logic;
+signal mem_reu_address             : std_logic_vector(31 downto 0);
+signal mem_reu_writedata           : std_logic_vector(15 downto 0);
+signal mem_reu_byteenable          : std_logic_vector( 1 downto 0);
+signal mem_reu_burstcount          : std_logic_vector( 7 downto 0);
+signal mem_reu_readdata            : std_logic_vector(15 downto 0);
+signal mem_reu_readdatavalid       : std_logic;
+signal mem_reu_waitrequest         : std_logic;
 
-signal hr_c64_exp_port_mode       : std_logic_vector( 1 downto 0);
+signal mem_c64_exp_port_mode       : std_logic_vector( 1 downto 0);
 
-signal hr_crt_write               : std_logic;
-signal hr_crt_read                : std_logic;
-signal hr_crt_address             : std_logic_vector(31 downto 0);
-signal hr_crt_writedata           : std_logic_vector(15 downto 0);
-signal hr_crt_byteenable          : std_logic_vector( 1 downto 0);
-signal hr_crt_burstcount          : std_logic_vector( 7 downto 0);
-signal hr_crt_readdata            : std_logic_vector(15 downto 0);
-signal hr_crt_readdatavalid       : std_logic;
-signal hr_crt_waitrequest         : std_logic;
+signal mem_crt_write               : std_logic;
+signal mem_crt_read                : std_logic;
+signal mem_crt_address             : std_logic_vector(31 downto 0);
+signal mem_crt_writedata           : std_logic_vector(15 downto 0);
+signal mem_crt_byteenable          : std_logic_vector( 1 downto 0);
+signal mem_crt_burstcount          : std_logic_vector( 7 downto 0);
+signal mem_crt_readdata            : std_logic_vector(15 downto 0);
+signal mem_crt_readdatavalid       : std_logic;
+signal mem_crt_waitrequest         : std_logic;
 
-signal hr_hdmi_ff                 : std_logic;
+signal mem_hdmi_ff                 : std_logic;
 
 ---------------------------------------------------------------------------------------------
 -- qnice_clk
@@ -403,13 +403,12 @@ signal qnice_crt_qnice_wait         : std_logic;
 
 begin
 
-   -- MMCME2_ADV clock generators
-   --   C64 PAL: 31.528 MHz (main) and 63.056 MHz (video)
-   --            HDMI: Flicker-free: 0.25% slower
-   clk_inst : entity work.clk
+   -- MMCME2_ADV clock generators:
+   --   @TODO YOURCORE:       54 MHz
+   clk_gen : entity work.clk
       port map (
          sys_clk_i    => clk_i,           -- expects 100 MHz
-         core_speed_i => hr_core_speed,   -- 0=PAL/original C64, 1=PAL/HDMI flicker-free, 2=NTSC
+         core_speed_i => mem_core_speed,   -- 0=PAL/original C64, 1=PAL/HDMI flicker-free, 2=NTSC
          main_clk_o   => main_clk_o,      -- core's clock
          main_rst_o   => main_rst_o       -- core's reset, synchronized
       ); -- clk_inst
@@ -419,22 +418,22 @@ begin
    video_rst_o <= main_rst_o;
 
    ---------------------------------------------------------------------------------------------
-   -- hr_clk (HyperRAM clock)
+   -- mem_clk (HyperRAM clock)
    ---------------------------------------------------------------------------------------------
 
    -- Switch between two clock rates for the CORE, corresponding to frame rates that
    -- closely "embrace" the output rate of exactly 50 Hz (determined by the HDMI resolution).
-   process (hr_clk_i)
+   process (mem_clk_i)
    begin
-      if rising_edge(hr_clk_i) then
-         if hr_low_i = '1' then     -- the core is too slow ...
-            hr_core_speed <= "00";  -- ... switch to PAL original (50.124 Hz)
+      if rising_edge(mem_clk_i) then
+         if mem_low_i = '1' then     -- the core is too slow ...
+            mem_core_speed <= "00";  -- ... switch to PAL original (50.124 Hz)
          end if;
-         if hr_high_i = '1' then    -- the core is too fast ...
-            hr_core_speed <= "01";  -- ... switch to PAL slow (49.999 Hz)
+         if mem_high_i = '1' then    -- the core is too fast ...
+            mem_core_speed <= "01";  -- ... switch to PAL slow (49.999 Hz)
          end if;
-         if hr_hdmi_ff = '0' then
-            hr_core_speed <= "00";
+         if mem_hdmi_ff = '0' then
+            mem_core_speed <= "00";
          end if;
       end if;
    end process;
@@ -446,35 +445,35 @@ begin
          G_DATA_SIZE    => 16
       )
       port map (
-         clk_i                  => hr_clk_i,
-         rst_i                  => hr_rst_i,
-         s0_avm_write_i         => hr_reu_write,
-         s0_avm_read_i          => hr_reu_read,
-         s0_avm_address_i       => hr_reu_address,
-         s0_avm_writedata_i     => hr_reu_writedata,
-         s0_avm_byteenable_i    => hr_reu_byteenable,
-         s0_avm_burstcount_i    => hr_reu_burstcount,
-         s0_avm_readdata_o      => hr_reu_readdata,
-         s0_avm_readdatavalid_o => hr_reu_readdatavalid,
-         s0_avm_waitrequest_o   => hr_reu_waitrequest,
-         s1_avm_write_i         => hr_crt_write,
-         s1_avm_read_i          => hr_crt_read,
-         s1_avm_address_i       => hr_crt_address,
-         s1_avm_writedata_i     => hr_crt_writedata,
-         s1_avm_byteenable_i    => hr_crt_byteenable,
-         s1_avm_burstcount_i    => hr_crt_burstcount,
-         s1_avm_readdata_o      => hr_crt_readdata,
-         s1_avm_readdatavalid_o => hr_crt_readdatavalid,
-         s1_avm_waitrequest_o   => hr_crt_waitrequest,
-         m_avm_write_o          => hr_core_write_o,
-         m_avm_read_o           => hr_core_read_o,
-         m_avm_address_o        => hr_core_address_o,
-         m_avm_writedata_o      => hr_core_writedata_o,
-         m_avm_byteenable_o     => hr_core_byteenable_o,
-         m_avm_burstcount_o     => hr_core_burstcount_o,
-         m_avm_readdata_i       => hr_core_readdata_i,
-         m_avm_readdatavalid_i  => hr_core_readdatavalid_i,
-         m_avm_waitrequest_i    => hr_core_waitrequest_i
+         clk_i                  => mem_clk_i,
+         rst_i                  => mem_rst_i,
+         s0_avm_write_i         => mem_reu_write,
+         s0_avm_read_i          => mem_reu_read,
+         s0_avm_address_i       => mem_reu_address,
+         s0_avm_writedata_i     => mem_reu_writedata,
+         s0_avm_byteenable_i    => mem_reu_byteenable,
+         s0_avm_burstcount_i    => mem_reu_burstcount,
+         s0_avm_readdata_o      => mem_reu_readdata,
+         s0_avm_readdatavalid_o => mem_reu_readdatavalid,
+         s0_avm_waitrequest_o   => mem_reu_waitrequest,
+         s1_avm_write_i         => mem_crt_write,
+         s1_avm_read_i          => mem_crt_read,
+         s1_avm_address_i       => mem_crt_address,
+         s1_avm_writedata_i     => mem_crt_writedata,
+         s1_avm_byteenable_i    => mem_crt_byteenable,
+         s1_avm_burstcount_i    => mem_crt_burstcount,
+         s1_avm_readdata_o      => mem_crt_readdata,
+         s1_avm_readdatavalid_o => mem_crt_readdatavalid,
+         s1_avm_waitrequest_o   => mem_crt_waitrequest,
+         m_avm_write_o          => mem_core_write_o,
+         m_avm_read_o           => mem_core_read_o,
+         m_avm_address_o        => mem_core_address_o,
+         m_avm_writedata_o      => mem_core_writedata_o,
+         m_avm_byteenable_o     => mem_core_byteenable_o,
+         m_avm_burstcount_o     => mem_core_burstcount_o,
+         m_avm_readdata_i       => mem_core_readdata_i,
+         m_avm_readdatavalid_i  => mem_core_readdatavalid_i,
+         m_avm_waitrequest_i    => mem_core_waitrequest_i
       ); -- i_avm_arbit
 
    ---------------------------------------------------------------------------------------------
@@ -928,9 +927,9 @@ begin
          src_clk_i              => main_clk_o,
          src_data_i(1 downto 0) => std_logic_vector(to_unsigned(c64_exp_port_mode, 2)),
          src_data_i(2)          => main_osm_control_i(C_MENU_HDMI_FF),
-         dst_clk_i              => hr_clk_i,
-         dst_data_o(1 downto 0) => hr_c64_exp_port_mode,
-         dst_data_o(2)          => hr_hdmi_ff
+         dst_clk_i              => mem_clk_i,
+         dst_data_o(1 downto 0) => mem_c64_exp_port_mode,
+         dst_data_o(2)          => mem_hdmi_ff
       ); -- i_cdc_main2hr
 
    -- Clock Domain Crossing: CORE -> QNICE
@@ -1024,20 +1023,20 @@ begin
       main_hi_ram_data_o   => main_crt_hi_ram_data,
       main_ioe_ram_data_o  => main_crt_ioe_ram_data,
       main_iof_ram_data_o  => main_crt_iof_ram_data,
-      hr_clk_i             => hr_clk_i,
-      hr_rst_i             => hr_rst_i,
-      hr_write_o           => hr_crt_write,
-      hr_read_o            => hr_crt_read,
-      hr_address_o         => hr_crt_address,
-      hr_writedata_o       => hr_crt_writedata,
-      hr_byteenable_o      => hr_crt_byteenable,
-      hr_burstcount_o      => hr_crt_burstcount,
-      hr_readdata_i        => hr_crt_readdata,
-      hr_readdatavalid_i   => hr_crt_readdatavalid,
-      hr_waitrequest_i     => hr_crt_waitrequest
+      hr_clk_i             => mem_clk_i,
+      hr_rst_i             => mem_rst_i,
+      hr_write_o           => mem_crt_write,
+      hr_read_o            => mem_crt_read,
+      hr_address_o         => mem_crt_address,
+      hr_writedata_o       => mem_crt_writedata,
+      hr_byteenable_o      => mem_crt_byteenable,
+      hr_burstcount_o      => mem_crt_burstcount,
+      hr_readdata_i        => mem_crt_readdata,
+      hr_readdatavalid_i   => mem_crt_readdatavalid,
+      hr_waitrequest_i     => mem_crt_waitrequest
    ); -- i_sw_cartridge_wrapper
 
-   main2hr_avm_fifo : entity work.avm_fifo
+   main2mem_avm_fifo : entity work.avm_fifo
       generic map (
          G_WR_DEPTH     => 16,
          G_RD_DEPTH     => 16,
@@ -1057,18 +1056,18 @@ begin
          s_avm_burstcount_i    => main_avm_reu_burstcount,
          s_avm_readdata_o      => main_avm_reu_readdata,
          s_avm_readdatavalid_o => main_avm_reu_readdatavalid,
-         m_clk_i               => hr_clk_i,
-         m_rst_i               => hr_rst_i,
-         m_avm_waitrequest_i   => hr_reu_waitrequest,
-         m_avm_write_o         => hr_reu_write,
-         m_avm_read_o          => hr_reu_read,
-         m_avm_address_o       => hr_reu_address,
-         m_avm_writedata_o     => hr_reu_writedata,
-         m_avm_byteenable_o    => hr_reu_byteenable,
-         m_avm_burstcount_o    => hr_reu_burstcount,
-         m_avm_readdata_i      => hr_reu_readdata,
-         m_avm_readdatavalid_i => hr_reu_readdatavalid
-      ); -- main2hr_avm_fifo
+         m_clk_i               => mem_clk_i,
+         m_rst_i               => mem_rst_i,
+         m_avm_waitrequest_i   => mem_reu_waitrequest,
+         m_avm_write_o         => mem_reu_write,
+         m_avm_read_o          => mem_reu_read,
+         m_avm_address_o       => mem_reu_address,
+         m_avm_writedata_o     => mem_reu_writedata,
+         m_avm_byteenable_o    => mem_reu_byteenable,
+         m_avm_burstcount_o    => mem_reu_burstcount,
+         m_avm_readdata_i      => mem_reu_readdata,
+         m_avm_readdatavalid_i => mem_reu_readdatavalid
+      ); -- main2mem_avm_fifo
 
 end architecture synthesis;
 

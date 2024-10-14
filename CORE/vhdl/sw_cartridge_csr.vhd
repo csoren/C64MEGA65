@@ -133,7 +133,7 @@ begin
    qnice_hr_byteenable <= "10" when qnice_addr_i(0) = '1'
                      else "01";
 
-   i_qnice2hyperram : entity work.qnice2hyperram
+   i_qnice2avalon : entity work.qnice2avalon
       port map (
          clk_i                 => qnice_clk_i,
          rst_i                 => qnice_rst_i,

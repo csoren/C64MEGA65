@@ -256,7 +256,7 @@ set_property -dict {PACKAGE_PIN G22  IOSTANDARD LVCMOS33} [get_ports {grove_sda_
 set_property -dict {PACKAGE_PIN U22  IOSTANDARD LVCMOS33} [get_ports {led_o}];                  # ULED
 
 # Pmod Header
-set_property -dict {PACKAGE_PIN A18  IOSTANDARD LVCMOS33} [get_ports {p1hi_io[0]}];             # B16_L17_P
+set_property -dict {PACKAGE_PIN G1   IOSTANDARD LVCMOS33} [get_ports {p1hi_io[0]}];             # B35_L5_P
 set_property -dict {PACKAGE_PIN E1   IOSTANDARD LVCMOS33} [get_ports {p1hi_io[1]}];             # B35_L3_P
 set_property -dict {PACKAGE_PIN C2   IOSTANDARD LVCMOS33} [get_ports {p1hi_io[2]}];             # B35_L2_P
 set_property -dict {PACKAGE_PIN B1   IOSTANDARD LVCMOS33} [get_ports {p1hi_io[3]}];             # B35_L1_P
@@ -287,21 +287,21 @@ set_property -dict {PULLUP TRUE}                          [get_ports {qspidb_io[
 
 # Place MAX10 close to I/O pins
 create_pblock pblock_MAX10
-add_cells_to_pblock pblock_MAX10 [get_cells [list MAX10]]
+add_cells_to_pblock pblock_MAX10 [get_cells [list max10_inst]]
 resize_pblock pblock_MAX10 -add {SLICE_X0Y150:SLICE_X7Y174}
 
 # Place Keyboard close to I/O pins
 create_pblock pblock_m65driver
-add_cells_to_pblock pblock_m65driver [get_cells [list i_framework/i_m2m_keyb/m65driver]]
+add_cells_to_pblock pblock_m65driver [get_cells [list framework_inst/m2m_keyb_inst/m65driver]]
 resize_pblock pblock_m65driver -add {SLICE_X0Y225:SLICE_X7Y243}
 
 # Place SD card controller in the middle between the left and right FPGA boundary because the output ports are at the opposide edges
 create_pblock pblock_sdcard
-add_cells_to_pblock pblock_sdcard [get_cells [list i_framework/i_qnice_wrapper/QNICE_SOC/sd_card]]
+add_cells_to_pblock pblock_sdcard [get_cells [list framework_inst/qnice_wrapper_inst/qnice_inst/sd_card]]
 resize_pblock pblock_sdcard -add {SLICE_X66Y178:SLICE_X99Y193}
 
 # Place phase-shifted VGA output registers near the actual output buffers
 create_pblock pblock_vga
-add_cells_to_pblock pblock_vga [get_cells [list i_framework/i_av_pipeline/i_analog_pipeline/VGA_OUT_PHASE_SHIFTED.*]]
+add_cells_to_pblock pblock_vga [get_cells [list framework_inst/av_pipeline_inst/analog_pipeline_inst/VGA_OUT_PHASE_SHIFTED.*]]
 resize_pblock pblock_vga -add SLICE_X0Y75:SLICE_X5Y99
 
