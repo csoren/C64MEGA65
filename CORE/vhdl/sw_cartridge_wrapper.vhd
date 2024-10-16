@@ -8,139 +8,139 @@
 ----------------------------------------------------------------------------------
 
 library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+   use ieee.std_logic_1164.all;
+   use ieee.numeric_std.all;
 
 entity sw_cartridge_wrapper is
-generic (
-   G_BASE_ADDRESS : std_logic_vector(21 downto 0)
-);
-port (
-   qnice_clk_i          : in  std_logic;
-   qnice_rst_i          : in  std_logic;
-   qnice_addr_i         : in  std_logic_vector(27 downto 0);
-   qnice_data_i         : in  std_logic_vector(15 downto 0);
-   qnice_ce_i           : in  std_logic;
-   qnice_we_i           : in  std_logic;
-   qnice_data_o         : out std_logic_vector(15 downto 0);
-   qnice_wait_o         : out std_logic;
+   generic (
+      G_BASE_ADDRESS : std_logic_vector(21 downto 0)
+   );
+   port (
+      qnice_clk_i         : in    std_logic;
+      qnice_rst_i         : in    std_logic;
+      qnice_addr_i        : in    std_logic_vector(27 downto 0);
+      qnice_data_i        : in    std_logic_vector(15 downto 0);
+      qnice_ce_i          : in    std_logic;
+      qnice_we_i          : in    std_logic;
+      qnice_data_o        : out   std_logic_vector(15 downto 0);
+      qnice_wait_o        : out   std_logic;
 
-   main_clk_i           : in  std_logic;
-   main_rst_i           : in  std_logic;
-   main_reset_core_o    : out std_logic;
-   main_loading_o       : out std_logic;
-   main_id_o            : out std_logic_vector(15 downto 0);
-   main_exrom_o         : out std_logic_vector( 7 downto 0);
-   main_game_o          : out std_logic_vector( 7 downto 0);
-   main_size_o          : out std_logic_vector(22 downto 0);
-   main_bank_laddr_o    : out std_logic_vector(15 downto 0);
-   main_bank_size_o     : out std_logic_vector(15 downto 0);
-   main_bank_num_o      : out std_logic_vector(15 downto 0);
-   main_bank_raddr_o    : out std_logic_vector(24 downto 0);
-   main_bank_wr_o       : out std_logic;
-   main_bank_lo_i       : in  std_logic_vector( 6 downto 0);
-   main_bank_hi_i       : in  std_logic_vector( 6 downto 0);
-   main_bank_wait_o     : out std_logic;
-   main_ram_addr_i      : in  std_logic_vector(15 downto 0);
-   main_ram_data_i      : in  std_logic_vector( 7 downto 0);
-   main_ioe_we_i        : in  std_logic;
-   main_iof_we_i        : in  std_logic;
-   main_lo_ram_data_o   : out std_logic_vector(15 downto 0);
-   main_hi_ram_data_o   : out std_logic_vector(15 downto 0);
-   main_ioe_ram_data_o  : out std_logic_vector( 7 downto 0);
-   main_iof_ram_data_o  : out std_logic_vector( 7 downto 0);
+      main_clk_i          : in    std_logic;
+      main_rst_i          : in    std_logic;
+      main_reset_core_o   : out   std_logic;
+      main_loading_o      : out   std_logic;
+      main_id_o           : out   std_logic_vector(15 downto 0);
+      main_exrom_o        : out   std_logic_vector( 7 downto 0);
+      main_game_o         : out   std_logic_vector( 7 downto 0);
+      main_size_o         : out   std_logic_vector(22 downto 0);
+      main_bank_laddr_o   : out   std_logic_vector(15 downto 0);
+      main_bank_size_o    : out   std_logic_vector(15 downto 0);
+      main_bank_num_o     : out   std_logic_vector(15 downto 0);
+      main_bank_raddr_o   : out   std_logic_vector(24 downto 0);
+      main_bank_wr_o      : out   std_logic;
+      main_bank_lo_i      : in    std_logic_vector( 6 downto 0);
+      main_bank_hi_i      : in    std_logic_vector( 6 downto 0);
+      main_bank_wait_o    : out   std_logic;
+      main_ram_addr_i     : in    std_logic_vector(15 downto 0);
+      main_ram_data_i     : in    std_logic_vector( 7 downto 0);
+      main_ioe_we_i       : in    std_logic;
+      main_iof_we_i       : in    std_logic;
+      main_lo_ram_data_o  : out   std_logic_vector(15 downto 0);
+      main_hi_ram_data_o  : out   std_logic_vector(15 downto 0);
+      main_ioe_ram_data_o : out   std_logic_vector( 7 downto 0);
+      main_iof_ram_data_o : out   std_logic_vector( 7 downto 0);
 
-   hr_clk_i             : in  std_logic;
-   hr_rst_i             : in  std_logic;
-   hr_write_o           : out std_logic;
-   hr_read_o            : out std_logic;
-   hr_address_o         : out std_logic_vector(31 downto 0) := (others => '0');
-   hr_writedata_o       : out std_logic_vector(15 downto 0);
-   hr_byteenable_o      : out std_logic_vector( 1 downto 0);
-   hr_burstcount_o      : out std_logic_vector( 7 downto 0);
-   hr_readdata_i        : in  std_logic_vector(15 downto 0);
-   hr_readdatavalid_i   : in  std_logic;
-   hr_waitrequest_i     : in  std_logic
-);
+      hr_clk_i            : in    std_logic;
+      hr_rst_i            : in    std_logic;
+      hr_write_o          : out   std_logic;
+      hr_read_o           : out   std_logic;
+      hr_address_o        : out   std_logic_vector(31 downto 0);
+      hr_writedata_o      : out   std_logic_vector(15 downto 0);
+      hr_byteenable_o     : out   std_logic_vector( 1 downto 0);
+      hr_burstcount_o     : out   std_logic_vector( 7 downto 0);
+      hr_readdata_i       : in    std_logic_vector(15 downto 0);
+      hr_readdatavalid_i  : in    std_logic;
+      hr_waitrequest_i    : in    std_logic
+   );
 end entity sw_cartridge_wrapper;
 
 architecture synthesis of sw_cartridge_wrapper is
 
-   constant C_CACHE_SIZE : natural := 3;
+   constant C_CACHE_SIZE : natural                               := 3;
 
    -- Request and response
-   signal qnice_req_status        : std_logic_vector(15 downto 0);
-   signal qnice_req_length        : std_logic_vector(22 downto 0);
-   signal qnice_req_valid         : std_logic;
-   signal qnice_resp_status       : std_logic_vector( 3 downto 0);
-   signal qnice_resp_error        : std_logic_vector( 3 downto 0);
-   signal qnice_resp_address      : std_logic_vector(22 downto 0);
+   signal   qnice_req_status   : std_logic_vector(15 downto 0);
+   signal   qnice_req_length   : std_logic_vector(22 downto 0);
+   signal   qnice_req_valid    : std_logic;
+   signal   qnice_resp_status  : std_logic_vector( 3 downto 0);
+   signal   qnice_resp_error   : std_logic_vector( 3 downto 0);
+   signal   qnice_resp_address : std_logic_vector(22 downto 0);
 
-   signal qnice_avm_write         : std_logic;
-   signal qnice_avm_read          : std_logic;
-   signal qnice_avm_address       : std_logic_vector(31 downto 0);
-   signal qnice_avm_writedata     : std_logic_vector(15 downto 0);
-   signal qnice_avm_byteenable    : std_logic_vector( 1 downto 0);
-   signal qnice_avm_burstcount    : std_logic_vector( 7 downto 0);
-   signal qnice_avm_readdata      : std_logic_vector(15 downto 0);
-   signal qnice_avm_readdatavalid : std_logic;
-   signal qnice_avm_waitrequest   : std_logic;
+   signal   qnice_avm_write         : std_logic;
+   signal   qnice_avm_read          : std_logic;
+   signal   qnice_avm_address       : std_logic_vector(31 downto 0);
+   signal   qnice_avm_writedata     : std_logic_vector(15 downto 0);
+   signal   qnice_avm_byteenable    : std_logic_vector( 1 downto 0);
+   signal   qnice_avm_burstcount    : std_logic_vector( 7 downto 0);
+   signal   qnice_avm_readdata      : std_logic_vector(15 downto 0);
+   signal   qnice_avm_readdatavalid : std_logic;
+   signal   qnice_avm_waitrequest   : std_logic;
 
    -- Request and response
-   signal hr_req_length           : std_logic_vector(22 downto 0);
-   signal hr_req_valid            : std_logic;
-   signal hr_resp_status          : std_logic_vector( 3 downto 0);
-   signal hr_resp_error           : std_logic_vector( 3 downto 0);
-   signal hr_resp_address         : std_logic_vector(22 downto 0);
+   signal   hr_req_length   : std_logic_vector(22 downto 0);
+   signal   hr_req_valid    : std_logic;
+   signal   hr_resp_status  : std_logic_vector( 3 downto 0);
+   signal   hr_resp_error   : std_logic_vector( 3 downto 0);
+   signal   hr_resp_address : std_logic_vector(22 downto 0);
 
-   signal hr_qnice_write          : std_logic;
-   signal hr_qnice_read           : std_logic;
-   signal hr_qnice_address        : std_logic_vector(31 downto 0);
-   signal hr_qnice_writedata      : std_logic_vector(15 downto 0);
-   signal hr_qnice_byteenable     : std_logic_vector(1 downto 0);
-   signal hr_qnice_burstcount     : std_logic_vector(7 downto 0);
-   signal hr_qnice_readdata       : std_logic_vector(15 downto 0);
-   signal hr_qnice_readdatavalid  : std_logic;
-   signal hr_qnice_waitrequest    : std_logic;
+   signal   hr_qnice_write         : std_logic;
+   signal   hr_qnice_read          : std_logic;
+   signal   hr_qnice_address       : std_logic_vector(31 downto 0);
+   signal   hr_qnice_writedata     : std_logic_vector(15 downto 0);
+   signal   hr_qnice_byteenable    : std_logic_vector(1 downto 0);
+   signal   hr_qnice_burstcount    : std_logic_vector(7 downto 0);
+   signal   hr_qnice_readdata      : std_logic_vector(15 downto 0);
+   signal   hr_qnice_readdatavalid : std_logic;
+   signal   hr_qnice_waitrequest   : std_logic;
 
-   signal hr_crt_write            : std_logic;
-   signal hr_crt_read             : std_logic;
-   signal hr_crt_address          : std_logic_vector(31 downto 0) := (others => '0');
-   signal hr_crt_writedata        : std_logic_vector(15 downto 0);
-   signal hr_crt_byteenable       : std_logic_vector(1 downto 0);
-   signal hr_crt_burstcount       : std_logic_vector(7 downto 0);
-   signal hr_crt_readdata         : std_logic_vector(15 downto 0);
-   signal hr_crt_readdatavalid    : std_logic;
-   signal hr_crt_waitrequest      : std_logic;
+   signal   hr_crt_write         : std_logic;
+   signal   hr_crt_read          : std_logic;
+   signal   hr_crt_address       : std_logic_vector(31 downto 0) := (others => '0');
+   signal   hr_crt_writedata     : std_logic_vector(15 downto 0);
+   signal   hr_crt_byteenable    : std_logic_vector(1 downto 0);
+   signal   hr_crt_burstcount    : std_logic_vector(7 downto 0);
+   signal   hr_crt_readdata      : std_logic_vector(15 downto 0);
+   signal   hr_crt_readdatavalid : std_logic;
+   signal   hr_crt_waitrequest   : std_logic;
 
    -- Writing to BRAM
-   signal hr_bram_address         : std_logic_vector(11 downto 0);
-   signal hr_bram_data            : std_logic_vector(15 downto 0);
-   signal hr_bram_lo_wren         : std_logic;
-   signal hr_bram_hi_wren         : std_logic;
+   signal   hr_bram_address : std_logic_vector(11 downto 0);
+   signal   hr_bram_data    : std_logic_vector(15 downto 0);
+   signal   hr_bram_lo_wren : std_logic;
+   signal   hr_bram_hi_wren : std_logic;
 
    -- Connect to CORE
-   signal hr_bank_lo              : std_logic_vector( 6 downto 0);
-   signal hr_bank_hi              : std_logic_vector( 6 downto 0);
-   signal hr_bank_wait            : std_logic;
-   signal hr_cache_addr_lo        : std_logic_vector(C_CACHE_SIZE-1 downto 0);
-   signal hr_cache_addr_hi        : std_logic_vector(C_CACHE_SIZE-1 downto 0);
-   signal hr_loading              : std_logic;
-   signal hr_id                   : std_logic_vector(15 downto 0);
-   signal hr_exrom                : std_logic_vector( 7 downto 0);
-   signal hr_game                 : std_logic_vector( 7 downto 0);
-   signal hr_size                 : std_logic_vector(22 downto 0);
-   signal hr_bank_laddr           : std_logic_vector(15 downto 0);
-   signal hr_bank_size            : std_logic_vector(15 downto 0);
-   signal hr_bank_num             : std_logic_vector(15 downto 0);
-   signal hr_bank_raddr           : std_logic_vector(24 downto 0);
-   signal hr_bank_wr              : std_logic;
+   signal   hr_bank_lo       : std_logic_vector( 6 downto 0);
+   signal   hr_bank_hi       : std_logic_vector( 6 downto 0);
+   signal   hr_bank_wait     : std_logic;
+   signal   hr_cache_addr_lo : std_logic_vector(C_CACHE_SIZE - 1 downto 0);
+   signal   hr_cache_addr_hi : std_logic_vector(C_CACHE_SIZE - 1 downto 0);
+   signal   hr_loading       : std_logic;
+   signal   hr_id            : std_logic_vector(15 downto 0);
+   signal   hr_exrom         : std_logic_vector( 7 downto 0);
+   signal   hr_game          : std_logic_vector( 7 downto 0);
+   signal   hr_size          : std_logic_vector(22 downto 0);
+   signal   hr_bank_laddr    : std_logic_vector(15 downto 0);
+   signal   hr_bank_size     : std_logic_vector(15 downto 0);
+   signal   hr_bank_num      : std_logic_vector(15 downto 0);
+   signal   hr_bank_raddr    : std_logic_vector(24 downto 0);
+   signal   hr_bank_wr       : std_logic;
 
-   signal main_resp_status        : std_logic_vector( 3 downto 0);
-   signal main_resp_status_d      : std_logic_vector( 3 downto 0);
-   signal main_reset_core         : std_logic_vector(65 downto 0);
-   signal main_cache_addr_lo      : std_logic_vector(C_CACHE_SIZE-1 downto 0);
-   signal main_cache_addr_hi      : std_logic_vector(C_CACHE_SIZE-1 downto 0);
+   signal   main_resp_status   : std_logic_vector( 3 downto 0);
+   signal   main_resp_status_d : std_logic_vector( 3 downto 0);
+   signal   main_reset_core    : std_logic_vector(65 downto 0);
+   signal   main_cache_addr_lo : std_logic_vector(C_CACHE_SIZE - 1 downto 0);
+   signal   main_cache_addr_hi : std_logic_vector(C_CACHE_SIZE - 1 downto 0);
 
 begin
 
@@ -148,7 +148,7 @@ begin
    -- Handle QNICE interface (control and status)
    ---------------------------------------------------
 
-   i_sw_cartridge_csr : entity work.sw_cartridge_csr
+   sw_cartridge_csr_inst : entity work.sw_cartridge_csr
       generic map (
          G_BASE_ADDRESS => G_BASE_ADDRESS
       )
@@ -175,14 +175,14 @@ begin
          qnice_avm_readdata_i      => qnice_avm_readdata,
          qnice_avm_readdatavalid_i => qnice_avm_readdatavalid,
          qnice_avm_waitrequest_i   => qnice_avm_waitrequest
-      ); -- i_sw_cartridge_csr
+      ); -- sw_cartridge_csr_inst
 
 
    --------------------------------------------
    -- Clock Domain Crossing: QNICE -> HyperRAM
    --------------------------------------------
 
-   i_cdc_qnice2hr : entity work.cdc_stable
+   cdc_qnice2hr_inst : entity work.cdc_stable
       generic map (
          G_REGISTER_SRC => true,
          G_DATA_SIZE    => 24
@@ -194,9 +194,9 @@ begin
          dst_clk_i                => hr_clk_i,
          dst_data_o(22 downto  0) => hr_req_length,
          dst_data_o(23)           => hr_req_valid
-      ); -- i_cdc_qnice2hr
+      ); -- cdc_qnice2hr_inst
 
-   avm_fifo_qnice : entity work.avm_fifo
+   avm_fifo_qnice_inst : entity work.avm_fifo
       generic map (
          G_WR_DEPTH     => 16,
          G_RD_DEPTH     => 16,
@@ -227,14 +227,14 @@ begin
          m_avm_burstcount_o    => hr_qnice_burstcount,
          m_avm_readdata_i      => hr_qnice_readdata,
          m_avm_readdatavalid_i => hr_qnice_readdatavalid
-      ); -- avm_fifo_qnice
+      ); -- avm_fifo_qnice_inst
 
 
    --------------------------------------------
    -- Clock Domain Crossing: CORE -> HyperRAM
    --------------------------------------------
 
-   i_cdc_main2hr : entity work.cdc_stable
+   cdc_main2hr_inst : entity work.cdc_stable
       generic map (
          G_DATA_SIZE => 14
       )
@@ -245,7 +245,7 @@ begin
          dst_clk_i                => hr_clk_i,
          dst_data_o( 6 downto  0) => hr_bank_lo,
          dst_data_o(13 downto  7) => hr_bank_hi
-      ); -- i_cdc_main2hr
+      ); -- idc_main2hr_inst
 
 
    -------------------------------------------------------------
@@ -253,7 +253,7 @@ begin
    -- This module runs entirely within the HyperRAM clock domain.
    -------------------------------------------------------------
 
-   i_crt_loader : entity work.crt_loader
+   crt_loader_inst : entity work.crt_loader
       generic map (
          G_CACHE_SIZE => C_CACHE_SIZE
       )
@@ -296,14 +296,14 @@ begin
          bram_lo_q_i         => (others => '0'),
          bram_hi_wren_o      => hr_bram_hi_wren,
          bram_hi_q_i         => (others => '0')
-      ); -- i_crt_loader
+      ); -- crt_loader_inst
 
 
    --------------------------------------------
    -- Arbiter for HypeRAM access
    --------------------------------------------
 
-   i_avm_arbit : entity work.avm_arbit
+   avm_arbit_inst : entity work.avm_arbit
       generic map (
          G_PREFER_SWAP  => false,
          G_ADDRESS_SIZE => 32,
@@ -339,14 +339,14 @@ begin
          m_avm_readdata_i       => hr_readdata_i,
          m_avm_readdatavalid_i  => hr_readdatavalid_i,
          m_avm_waitrequest_i    => hr_waitrequest_i
-      ); -- i_avm_arbit
+      ); -- avm_arbit_inst
 
 
    --------------------------------------------
    -- Clock Domain Crossing: HyperRAM -> QNICE
    --------------------------------------------
 
-   i_cdc_hr2qnice : entity work.cdc_stable
+   cdc_hr2qnice_inst : entity work.cdc_stable
       generic map (
          G_DATA_SIZE => 31
       )
@@ -359,61 +359,61 @@ begin
          dst_data_o( 3 downto 0) => qnice_resp_status,
          dst_data_o( 7 downto 4) => qnice_resp_error,
          dst_data_o(30 downto 8) => qnice_resp_address
-      ); -- i_cdc_hr2qnice
+      ); -- cdc_hr2qnice_inst
 
 
    --------------------------------------------
    -- Clock Domain Crossing: HyperRAM -> CORE
    --------------------------------------------
 
-   i_cdc_slow : entity work.cdc_slow
-     generic map (
-       G_DATA_SIZE    => 73,
-       G_REGISTER_SRC => false
-     )
-     port map (
-       src_clk_i                => hr_clk_i,
-       src_rst_i                => hr_rst_i,
-       src_valid_i              => hr_bank_wr,
-       src_data_i(15 downto  0) => hr_bank_laddr,
-       src_data_i(31 downto 16) => hr_bank_size,
-       src_data_i(47 downto 32) => hr_bank_num,
-       src_data_i(72 downto 48) => hr_bank_raddr,
-       dst_clk_i                => main_clk_i,
-       dst_valid_o              => main_bank_wr_o,
-       dst_data_o(15 downto  0) => main_bank_laddr_o,
-       dst_data_o(31 downto 16) => main_bank_size_o,
-       dst_data_o(47 downto 32) => main_bank_num_o,
-       dst_data_o(72 downto 48) => main_bank_raddr_o
-     ); -- i_cdc_slow
+   cdc_slow_inst : entity work.cdc_slow
+      generic map (
+         G_DATA_SIZE    => 73,
+         G_REGISTER_SRC => false
+      )
+      port map (
+         src_clk_i                => hr_clk_i,
+         src_rst_i                => hr_rst_i,
+         src_valid_i              => hr_bank_wr,
+         src_data_i(15 downto  0) => hr_bank_laddr,
+         src_data_i(31 downto 16) => hr_bank_size,
+         src_data_i(47 downto 32) => hr_bank_num,
+         src_data_i(72 downto 48) => hr_bank_raddr,
+         dst_clk_i                => main_clk_i,
+         dst_valid_o              => main_bank_wr_o,
+         dst_data_o(15 downto  0) => main_bank_laddr_o,
+         dst_data_o(31 downto 16) => main_bank_size_o,
+         dst_data_o(47 downto 32) => main_bank_num_o,
+         dst_data_o(72 downto 48) => main_bank_raddr_o
+      ); -- cdc_slow_inst
 
-   i_cdc_stable : entity work.cdc_stable
-     generic map (
-       G_DATA_SIZE    => 57+2*C_CACHE_SIZE,
-       G_REGISTER_SRC => false
-     )
-     port map (
-       src_clk_i                => hr_clk_i,
-       src_data_i(15 downto  0) => hr_id,
-       src_data_i(23 downto 16) => hr_exrom,
-       src_data_i(31 downto 24) => hr_game,
-       src_data_i(54 downto 32) => hr_size,
-       src_data_i(55)           => hr_loading,
-       src_data_i(56)           => hr_bank_wait,
-       src_data_i(56+C_CACHE_SIZE   downto 57)              => hr_cache_addr_lo,
-       src_data_i(56+2*C_CACHE_SIZE downto 57+C_CACHE_SIZE) => hr_cache_addr_hi,
-       dst_clk_i                => main_clk_i,
-       dst_data_o(15 downto  0) => main_id_o,
-       dst_data_o(23 downto 16) => main_exrom_o,
-       dst_data_o(31 downto 24) => main_game_o,
-       dst_data_o(54 downto 32) => main_size_o,
-       dst_data_o(55)           => main_loading_o,
-       dst_data_o(56)           => main_bank_wait_o,
-       dst_data_o(56+C_CACHE_SIZE   downto 57)              => main_cache_addr_lo,
-       dst_data_o(56+2*C_CACHE_SIZE downto 57+C_CACHE_SIZE) => main_cache_addr_hi
-     ); -- i_cdc_stable
+   cdc_stable_inst : entity work.cdc_stable
+      generic map (
+         G_DATA_SIZE    => 57 + 2 * C_CACHE_SIZE,
+         G_REGISTER_SRC => false
+      )
+      port map (
+         src_clk_i                                                  => hr_clk_i,
+         src_data_i(15 downto  0)                                   => hr_id,
+         src_data_i(23 downto 16)                                   => hr_exrom,
+         src_data_i(31 downto 24)                                   => hr_game,
+         src_data_i(54 downto 32)                                   => hr_size,
+         src_data_i(55)                                             => hr_loading,
+         src_data_i(56)                                             => hr_bank_wait,
+         src_data_i(56 + C_CACHE_SIZE   downto 57)                  => hr_cache_addr_lo,
+         src_data_i(56 + 2 * C_CACHE_SIZE downto 57 + C_CACHE_SIZE) => hr_cache_addr_hi,
+         dst_clk_i                                                  => main_clk_i,
+         dst_data_o(15 downto  0)                                   => main_id_o,
+         dst_data_o(23 downto 16)                                   => main_exrom_o,
+         dst_data_o(31 downto 24)                                   => main_game_o,
+         dst_data_o(54 downto 32)                                   => main_size_o,
+         dst_data_o(55)                                             => main_loading_o,
+         dst_data_o(56)                                             => main_bank_wait_o,
+         dst_data_o(56 + C_CACHE_SIZE   downto 57)                  => main_cache_addr_lo,
+         dst_data_o(56 + 2 * C_CACHE_SIZE downto 57 + C_CACHE_SIZE) => main_cache_addr_hi
+      ); -- cdc_stable_inst
 
-   i_cdc_hr2main : entity work.cdc_stable
+   cdc_hr2main_inst : entity work.cdc_stable
       generic map (
          G_DATA_SIZE => 4
       )
@@ -422,14 +422,14 @@ begin
          src_data_i(3 downto 0) => hr_resp_status,
          dst_clk_i              => main_clk_i,
          dst_data_o(3 downto 0) => main_resp_status
-      ); -- i_cdc_hr2main
+      ); -- cdc_hr2main_inst
 
 
    ---------------------------------------------------
    -- Reset core when CRT file is successfully parsed
    ---------------------------------------------------
 
-   process (main_clk_i)
+   reset_core_proc : process (main_clk_i)
       constant C_STAT_READY : std_logic_vector(3 downto 0) := "0010"; -- Successfully parsed CRT file
    begin
       if rising_edge(main_clk_i) then
@@ -450,97 +450,97 @@ begin
             main_reset_core <= (others => '1');
          end if;
       end if;
-   end process;
+   end process reset_core_proc;
 
 
    -------------------------------------------------------------
    -- Instantiate bank cache memory
    -------------------------------------------------------------
 
-   crt_lo_ram : entity work.tdp_ram
+   crt_lo_ram_inst : entity work.tdp_ram
       generic map (
          ADDR_WIDTH => 12 + C_CACHE_SIZE,         -- 4 kW = 8 kB
          DATA_WIDTH => 16
       )
       port map (
          -- C64 MiSTer core
-         clock_a    => main_clk_i,
-         address_a  => main_cache_addr_lo & main_ram_addr_i(12 downto 1),
-         data_a     => (others => '0'),
-         wren_a     => '0',
-         q_a        => main_lo_ram_data_o,
+         clock_a   => main_clk_i,
+         address_a => main_cache_addr_lo & main_ram_addr_i(12 downto 1),
+         data_a    => (others => '0'),
+         wren_a    => '0',
+         q_a       => main_lo_ram_data_o,
 
-         clock_b    => hr_clk_i,
-         address_b  => hr_cache_addr_lo & hr_bram_address,
-         data_b     => hr_bram_data,
-         wren_b     => hr_bram_lo_wren,
-         q_b        => open
-      ); -- crt_lo_ram
+         clock_b   => hr_clk_i,
+         address_b => hr_cache_addr_lo & hr_bram_address,
+         data_b    => hr_bram_data,
+         wren_b    => hr_bram_lo_wren,
+         q_b       => open
+      ); -- crt_lo_ram_inst
 
-   crt_hi_ram : entity work.tdp_ram
+   crt_hi_ram_inst : entity work.tdp_ram
       generic map (
          ADDR_WIDTH => 12 + C_CACHE_SIZE,         -- 4 kW = 8 kB
          DATA_WIDTH => 16
       )
       port map (
          -- C64 MiSTer core
-         clock_a    => main_clk_i,
-         address_a  => main_cache_addr_hi & main_ram_addr_i(12 downto 1),
-         data_a     => (others => '0'),
-         wren_a     => '0',
-         q_a        => main_hi_ram_data_o,
+         clock_a   => main_clk_i,
+         address_a => main_cache_addr_hi & main_ram_addr_i(12 downto 1),
+         data_a    => (others => '0'),
+         wren_a    => '0',
+         q_a       => main_hi_ram_data_o,
 
-         clock_b    => hr_clk_i,
-         address_b  => hr_cache_addr_hi & hr_bram_address,
-         data_b     => hr_bram_data,
-         wren_b     => hr_bram_hi_wren,
-         q_b        => open
-      ); -- crt_lo_ram
+         clock_b   => hr_clk_i,
+         address_b => hr_cache_addr_hi & hr_bram_address,
+         data_b    => hr_bram_data,
+         wren_b    => hr_bram_hi_wren,
+         q_b       => open
+      ); -- crt_lo_ram_inst
 
 
    -------------------------------------------------------------
    -- Instantiate I/O memory
    -------------------------------------------------------------
 
-   ioe_ram : entity work.tdp_ram
+   ioe_ram_inst : entity work.tdp_ram
       generic map (
          ADDR_WIDTH => 8,         -- 256 bytes
          DATA_WIDTH => 8
       )
       port map (
          -- C64 MiSTer core
-         clock_a    => main_clk_i,
-         address_a  => main_ram_addr_i(7 downto 0),
-         data_a     => main_ram_data_i,
-         wren_a     => main_ioe_we_i,
-         q_a        => main_ioe_ram_data_o,
+         clock_a   => main_clk_i,
+         address_a => main_ram_addr_i(7 downto 0),
+         data_a    => main_ram_data_i,
+         wren_a    => main_ioe_we_i,
+         q_a       => main_ioe_ram_data_o,
 
-         clock_b    => '0',
-         address_b  => (others => '0'),
-         data_b     => (others => '0'),
-         wren_b     => '0',
-         q_b        => open
-      ); -- ioe_ram
+         clock_b   => '0',
+         address_b => (others => '0'),
+         data_b    => (others => '0'),
+         wren_b    => '0',
+         q_b       => open
+      ); -- ioe_ram_inst
 
-   iof_ram : entity work.tdp_ram
+   iof_ram_inst : entity work.tdp_ram
       generic map (
          ADDR_WIDTH => 8,         -- 256 bytes
          DATA_WIDTH => 8
       )
       port map (
          -- C64 MiSTer core
-         clock_a    => main_clk_i,
-         address_a  => main_ram_addr_i(7 downto 0),
-         data_a     => main_ram_data_i,
-         wren_a     => main_iof_we_i,
-         q_a        => main_iof_ram_data_o,
+         clock_a   => main_clk_i,
+         address_a => main_ram_addr_i(7 downto 0),
+         data_a    => main_ram_data_i,
+         wren_a    => main_iof_we_i,
+         q_a       => main_iof_ram_data_o,
 
-         clock_b    => '0',
-         address_b  => (others => '0'),
-         data_b     => (others => '0'),
-         wren_b     => '0',
-         q_b        => open
-      ); -- iof_ram
+         clock_b   => '0',
+         address_b => (others => '0'),
+         data_b    => (others => '0'),
+         wren_b    => '0',
+         q_b       => open
+      ); -- iof_ram_inst
 
 end architecture synthesis;
 
