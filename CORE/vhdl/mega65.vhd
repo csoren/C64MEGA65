@@ -67,7 +67,7 @@ entity mega65_core is
       qnice_dev_wait_o         : out   std_logic;
 
       --------------------------------------------------------------------------------------------------------
-      -- HyperRAM Clock Domain
+      -- External Memory Clock Domain
       --------------------------------------------------------------------------------------------------------
 
       mem_clk_i                : in    std_logic;
@@ -418,7 +418,7 @@ begin
    video_rst_o <= main_rst_o;
 
    ---------------------------------------------------------------------------------------------
-   -- mem_clk (HyperRAM clock)
+   -- mem_clk (Memory clock)
    ---------------------------------------------------------------------------------------------
 
    -- Switch between two clock rates for the CORE, corresponding to frame rates that
@@ -879,7 +879,7 @@ begin
 
    -- For now: Let's use a simple BRAM (using only 1 port will make a BRAM) for buffering
    -- the disks that we are mounting. This will work for D64 only.
-   -- @TODO: Switch to HyperRAM at a later stage
+   -- @TODO: Switch to external memory at a later stage
    mount_buf_ram_inst : entity work.dualport_2clk_ram
       generic map (
          ADDR_WIDTH   => 18,
@@ -921,8 +921,8 @@ begin
    -- Dual Clocks
    ---------------------------------------------------------------------------------------------
 
-   -- Clock Domain Crossing: CORE -> HyperRAM
-   cdc_main2hr_inst : entity work.cdc_stable
+   -- Clock Domain Crossing: CORE -> External Memory
+   cdc_main2mem_inst : entity work.cdc_stable
       generic map (
          G_DATA_SIZE => 3
       )
@@ -933,7 +933,7 @@ begin
          dst_clk_i              => mem_clk_i,
          dst_data_o(1 downto 0) => mem_c64_exp_port_mode,
          dst_data_o(2)          => mem_hdmi_ff
-      ); -- cdc_main2hr_inst
+      ); -- cdc_main2mem_inst
 
    -- Clock Domain Crossing: CORE -> QNICE
    cdc_main2qnice_inst : component xpm_cdc_array_single
@@ -1026,17 +1026,17 @@ begin
          main_hi_ram_data_o  => main_crt_hi_ram_data,
          main_ioe_ram_data_o => main_crt_ioe_ram_data,
          main_iof_ram_data_o => main_crt_iof_ram_data,
-         hr_clk_i            => mem_clk_i,
-         hr_rst_i            => mem_rst_i,
-         hr_write_o          => mem_crt_write,
-         hr_read_o           => mem_crt_read,
-         hr_address_o        => mem_crt_address,
-         hr_writedata_o      => mem_crt_writedata,
-         hr_byteenable_o     => mem_crt_byteenable,
-         hr_burstcount_o     => mem_crt_burstcount,
-         hr_readdata_i       => mem_crt_readdata,
-         hr_readdatavalid_i  => mem_crt_readdatavalid,
-         hr_waitrequest_i    => mem_crt_waitrequest
+         mem_clk_i           => mem_clk_i,
+         mem_rst_i           => mem_rst_i,
+         mem_write_o         => mem_crt_write,
+         mem_read_o          => mem_crt_read,
+         mem_address_o       => mem_crt_address,
+         mem_writedata_o     => mem_crt_writedata,
+         mem_byteenable_o    => mem_crt_byteenable,
+         mem_burstcount_o    => mem_crt_burstcount,
+         mem_readdata_i      => mem_crt_readdata,
+         mem_readdatavalid_i => mem_crt_readdatavalid,
+         mem_waitrequest_i   => mem_crt_waitrequest
       ); -- sw_cartridge_wrapper_inst
 
    main2mem_avm_fifo_inst : entity work.avm_fifo
