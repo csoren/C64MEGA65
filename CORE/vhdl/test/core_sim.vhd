@@ -72,8 +72,8 @@ begin
                            main_lo_ram_data_i( 7 downto 0) when main_ioe  = '1' and main_ram_addr_o(0) = '0' and main_ioe_wr_ena = '0' else
                            main_lo_ram_data_i(15 downto 8) when main_iof  = '1' and main_ram_addr_o(0) = '1' and main_iof_wr_ena = '0' else
                            main_lo_ram_data_i( 7 downto 0) when main_iof  = '1' and main_ram_addr_o(0) = '0' and main_iof_wr_ena = '0' else
-                           main_ioe_ram_data_i             when main_ioe  = '1' and main_ioe_wr_ena = '1'     else
-                           main_iof_ram_data_i             when main_iof  = '1' and main_iof_wr_ena = '1'     else
+                           main_ioe_ram_data_i             when main_ioe  = '1' and main_ioe_wr_ena = '1'    else
+                           main_iof_ram_data_i             when main_iof  = '1' and main_iof_wr_ena = '1'    else
                            main_rom_readdata               when main_ram_addr_o(15 downto 13) = "101"        else
                            main_rom_readdata               when main_ram_addr_o(15 downto 13) = "111"        else
                            main_io_dxxx                    when main_ram_addr_o(15 downto 12) = "1101"       else
