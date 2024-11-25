@@ -37,6 +37,7 @@ entity cartridge is
       -- To C64
       ioe_wr_ena_o   : out std_logic; -- 1: $DExx contains RAM, 0: $DExx read mirrors $9Exx
       iof_wr_ena_o   : out std_logic; -- 1: $DFxx contains RAM, 0: $DFxx read mirrors $9Fxx
+      roml_we_o      : out std_logic;
       io_rom_o       : out std_logic;
       io_ext_o       : out std_logic;
       io_data_o      : out std_logic_vector(7 downto 0);
@@ -57,7 +58,6 @@ architecture synthesis of cartridge is
    signal saved_d6     : std_logic;
    signal ioe_ena      : std_logic;
    signal iof_ena      : std_logic;
-   signal roml_we      : std_logic; -- TBD
 
    signal old_freeze   : std_logic := '0';
    signal old_nmiack   : std_logic := '0';
@@ -66,6 +66,14 @@ architecture synthesis of cartridge is
    signal freeze_crt   : std_logic;
 
 begin
+
+   debug_proc : process (bank_lo_o, bank_hi_o, exrom_o, game_o)
+   begin
+      report "bank_lo_o=" & to_hstring(bank_lo_o) &
+           ", bank_hi_o=" & to_hstring(bank_hi_o) &
+           ", exrom_o=" & to_string(exrom_o) &
+           ", game_o=" & to_string(game_o);
+   end process debug_proc;
 
    freeze_req <= not old_freeze and freeze_key_i;
    freeze_ack <= nmi_o and not old_nmiack and nmi_ack_i;
@@ -101,6 +109,7 @@ begin
             saved_d6     <= '0';
             ioe_wr_ena_o <= '0';
             iof_wr_ena_o <= '0';
+            roml_we_o    <= '0';
          end if;
 
          case to_integer(unsigned(cart_id_i)) is
@@ -123,7 +132,7 @@ begin
                   game_o       <= '1';
                   iof_ena      <= '0';
                   iof_wr_ena_o <= '0';
-                  roml_we      <= '0';
+                  roml_we_o    <= '0';
                   allow_freeze <= '1';
                else
                   if ioe_i = '1' and wr_en_i = '1' then
@@ -136,7 +145,7 @@ begin
                         game_o       <= not wr_data_i(0);
                         exrom_o      <= wr_data_i(1);
                         iof_wr_ena_o <= wr_data_i(5);
-                        roml_we      <= wr_data_i(5);
+                        roml_we_o    <= wr_data_i(5);
                         if wr_data_i(5) then
                            bank_lo_o <= (others => '0');
                         end if;
@@ -147,7 +156,7 @@ begin
                   cart_disable <= '0';
                   exrom_o      <= '1';
                   game_o       <= '0';
-                  roml_we      <= '0';
+                  roml_we_o    <= '0';
                   bank_lo_o    <= (others => '0');
                   bank_hi_o    <= (others => '0');
                   iof_wr_ena_o <= '0';
@@ -337,6 +346,7 @@ begin
             saved_d6     <= '0';
             ioe_wr_ena_o <= '0';
             iof_wr_ena_o <= '0';
+            roml_we_o    <= '0';
          end if;
       end if;
    end process;

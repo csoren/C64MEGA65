@@ -209,11 +209,9 @@ entity main is
       crt_bank_wait_i        : in    std_logic;
       crt_lo_ram_data_i      : in    std_logic_vector(15 downto 0);
       crt_hi_ram_data_i      : in    std_logic_vector(15 downto 0);
-      crt_ioe_ram_data_i     : in    std_logic_vector( 7 downto 0);
-      crt_iof_ram_data_i     : in    std_logic_vector( 7 downto 0);
+      crt_io_ram_data_i      : in    std_logic_vector( 7 downto 0);
       crt_addr_bus_o         : out   unsigned(15 downto 0);
-      crt_ioe_we_o           : out   std_logic;
-      crt_iof_we_o           : out   std_logic;
+      crt_io_we_o            : out   std_logic;
       crt_bank_lo_o          : out   std_logic_vector( 6 downto 0);
       crt_bank_hi_o          : out   std_logic_vector( 6 downto 0);
 
@@ -425,6 +423,7 @@ architecture synthesis of main is
    signal   crt_nmi        : std_logic;
    signal   crt_ioe_wr_ena : std_logic;
    signal   crt_iof_wr_ena : std_logic;
+   signal   crt_roml_we    : std_logic;
 
    -- RAM Expansion Unit
    signal   sim_ext_cycle : std_logic;
@@ -597,16 +596,17 @@ begin
 
       -- Access the simulated cartridge
       elsif c64_exp_port_mode_i = C_EXP_PORT_SIMCRT and (cart_roml_n = '0' or cart_romh_n = '0' or core_ioe = '1' or core_iof = '1') then
-         c64_ram_data <= unsigned(crt_lo_ram_data_i(15 downto 8)) when cart_roml_n = '0' and crt_addr_bus_o(0) = '1' else
-                         unsigned(crt_lo_ram_data_i( 7 downto 0)) when cart_roml_n = '0' and crt_addr_bus_o(0) = '0' else
+         c64_ram_data <= unsigned(crt_lo_ram_data_i(15 downto 8)) when cart_roml_n = '0' and crt_roml_we = '0' and crt_addr_bus_o(0) = '1' else
+                         unsigned(crt_lo_ram_data_i( 7 downto 0)) when cart_roml_n = '0' and crt_roml_we = '0' and crt_addr_bus_o(0) = '0' else
+                         unsigned(crt_io_ram_data_i)              when cart_roml_n = '0' and crt_roml_we = '1' else
                          unsigned(crt_hi_ram_data_i(15 downto 8)) when cart_romh_n = '0' and crt_addr_bus_o(0) = '1' else
                          unsigned(crt_hi_ram_data_i( 7 downto 0)) when cart_romh_n = '0' and crt_addr_bus_o(0) = '0' else
                          unsigned(crt_lo_ram_data_i(15 downto 8)) when core_ioe = '1'    and crt_addr_bus_o(0) = '1' and  crt_ioe_wr_ena = '0' else
                          unsigned(crt_lo_ram_data_i( 7 downto 0)) when core_ioe = '1'    and crt_addr_bus_o(0) = '0' and  crt_ioe_wr_ena = '0' else
                          unsigned(crt_lo_ram_data_i(15 downto 8)) when core_iof = '1'    and crt_addr_bus_o(0) = '1' and  crt_iof_wr_ena = '0' else
                          unsigned(crt_lo_ram_data_i( 7 downto 0)) when core_iof = '1'    and crt_addr_bus_o(0) = '0' and  crt_iof_wr_ena = '0' else
-                         unsigned(crt_ioe_ram_data_i) when core_ioe = '1'    and crt_ioe_wr_ena = '1' else
-                         unsigned(crt_iof_ram_data_i) when core_iof = '1'    and crt_iof_wr_ena = '1' else
+                         unsigned(crt_io_ram_data_i)              when core_ioe = '1'    and crt_ioe_wr_ena = '1' else
+                         unsigned(crt_io_ram_data_i)              when core_iof = '1'    and crt_iof_wr_ena = '1' else
                          X"EE";
 
       -- Standard access to the C64's RAM
@@ -1077,6 +1077,7 @@ begin
          bank_hi_o      => crt_bank_hi_o,
          ioe_wr_ena_o   => crt_ioe_wr_ena,
          iof_wr_ena_o   => crt_iof_wr_ena,
+         roml_we_o      => crt_roml_we,
          io_rom_o       => crt_io_rom,
          io_ext_o       => crt_io_ext,
          io_data_o      => crt_io_data,
@@ -1088,8 +1089,7 @@ begin
          nmi_ack_i      => core_nmi_ack
       ); -- cartridge_inst
 
-   crt_ioe_we_o    <= core_ioe and c64_ram_we;
-   crt_iof_we_o    <= core_iof and c64_ram_we;
+   crt_io_we_o    <= (core_ioe or core_iof or (core_roml and crt_roml_we)) and c64_ram_we;
 
    --------------------------------------------------------------------------------------------------
    -- Generate video output for the M2M framework
