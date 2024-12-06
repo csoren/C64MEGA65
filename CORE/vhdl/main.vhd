@@ -382,9 +382,35 @@ architecture synthesis of main is
    signal   core_io_data         : unsigned(7 downto 0);
    signal   core_dotclk          : std_logic;
    signal   core_phi2            : std_logic;
-   signal   core_phi2_delay      : std_logic;
    signal   core_phi2_prev       : std_logic;
    signal   cartridge_bank_raddr : std_logic_vector(24 downto 0);
+
+   signal   cart_en              : std_logic;                    -- Enable port, active high
+   signal   cart_phi2            : std_logic;
+   signal   cart_dotclock        : std_logic;
+   signal   cart_reset_oe        : std_logic;
+   signal   cart_reset           : std_logic;
+   signal   cart_game_oe         : std_logic;
+   signal   cart_game            : std_logic;
+   signal   cart_exrom_oe        : std_logic;
+   signal   cart_exrom           : std_logic;
+   signal   cart_nmi_oe          : std_logic;
+   signal   cart_nmi             : std_logic;
+   signal   cart_irq_oe          : std_logic;
+   signal   cart_irq             : std_logic;
+   signal   cart_roml_oe         : std_logic;
+   signal   cart_roml            : std_logic;
+   signal   cart_romh_oe         : std_logic;
+   signal   cart_romh            : std_logic;
+   signal   cart_ctrl_oe         : std_logic;
+   signal   cart_ba              : std_logic;
+   signal   cart_rw              : std_logic;
+   signal   cart_io1             : std_logic;
+   signal   cart_io2             : std_logic;
+   signal   cart_addr_oe         : std_logic;
+   signal   cart_a               : unsigned(15 downto 0);
+   signal   cart_data_oe         : std_logic;
+   signal   cart_d               : unsigned( 7 downto 0);
 
    -- Hardware Expansion Port (aka Cartridge Port)
    signal   cart_roml_n    : std_logic;
@@ -760,11 +786,36 @@ begin
    --    * Simulateed cartridge using data from .crt file
    --------------------------------------------------------------------------------------------------
 
-   -- Delay cartridge phi2 with one clock cycle (circa 30 ns).
+   -- Delay all cartridge output signals with one clock cycle (circa 30 ns).
    core_phi2_delay_proc : process (clk_main_i)
    begin
       if rising_edge(clk_main_i) then
-         core_phi2_delay <= core_phi2;
+         cart_en_o        <= cart_en;
+         cart_phi2_o      <= cart_phi2;
+         cart_dotclock_o  <= cart_dotclock;
+         cart_reset_oe_o  <= cart_reset_oe;
+         cart_reset_o     <= cart_reset;
+         cart_game_oe_o   <= cart_game_oe;
+         cart_game_o      <= cart_game;
+         cart_exrom_oe_o  <= cart_exrom_oe;
+         cart_exrom_o     <= cart_exrom;
+         cart_nmi_oe_o    <= cart_nmi_oe;
+         cart_nmi_o       <= cart_nmi;
+         cart_irq_oe_o    <= cart_irq_oe;
+         cart_irq_o       <= cart_irq;
+         cart_roml_oe_o   <= cart_roml_oe;
+         cart_roml_o      <= cart_roml;
+         cart_romh_oe_o   <= cart_romh_oe;
+         cart_romh_o      <= cart_romh;
+         cart_ctrl_oe_o   <= cart_ctrl_oe;
+         cart_ba_o        <= cart_ba;
+         cart_rw_o        <= cart_rw;
+         cart_io1_o       <= cart_io1;
+         cart_io2_o       <= cart_io2;
+         cart_addr_oe_o   <= cart_addr_oe;
+         cart_a_o         <= cart_a;
+         cart_data_oe_o   <= cart_data_oe;
+         cart_d_o         <= cart_d;
       end if;
    end process core_phi2_delay_proc;
 
@@ -776,26 +827,26 @@ begin
 
       -- Tristate all expansion port drivers that we can directly control
       -- @TODO: As soon as we support modules that can act as busmaster, we need to become more flexible here
-      cart_ctrl_oe_o  <= '0';
-      cart_addr_oe_o  <= '0';
-      cart_data_oe_o  <= '0';
+      cart_ctrl_oe  <= '0';
+      cart_addr_oe  <= '0';
+      cart_data_oe  <= '0';
 
       -- Due to a bug in the R5/R6 boards, the cartridge port needs ALWAYS to be enabled,
       -- otherwise joystick port B is not working correctly
-      cart_en_o       <= '1';
+      cart_en       <= '1';
 
       -- For the time being, we are treating GAME, EXROM, NMI and IRQ as READ-ONLY on all board revisions at all times
       -- @TODO: As soon as we support more sophisticted modules, we need to become more flexible here, too
-      cart_game_oe_o  <= '0';
-      cart_exrom_oe_o <= '0';
-      cart_nmi_oe_o   <= '0';
-      cart_irq_oe_o   <= '0';
+      cart_game_oe  <= '0';
+      cart_exrom_oe <= '0';
+      cart_nmi_oe   <= '0';
+      cart_irq_oe   <= '0';
 
       -- For the time being, we are treating ROML and ROMH as WRITE-ONLY at all times, as soon as c64_exp_port_mode_i = C_EXP_PORT_HARDWARE,
       -- so the "zero" here is just the deactivated output driver as long as the core is in a non-hardware cartridge mode
       -- and it will be switched to OUTPUT (WRITE-ONLY) in the code that follows below
-      cart_roml_oe_o  <= '0';
-      cart_romh_oe_o  <= '0';
+      cart_roml_oe  <= '0';
+      cart_romh_oe  <= '0';
 
       -- Bi-directional reset handling:
       -- The "zero" here is (similar to above) just the deactivated output in non-hardware cartridge mode.
@@ -806,24 +857,24 @@ begin
       -- But on R5/R6 and newer boards, we will be able to sense the reset from the cartridge and therefore we will
       -- not need i_cartridge_heuristics and handle_cartridge_triggered_resets. Instead, cartridges like the EF3
       -- and the KFF "are just working" on these newer boards.
-      cart_reset_oe_o <= '0';
+      cart_reset_oe <= '0';
 
       -- Default values for all signals
-      cart_phi2_o     <= '0';
-      cart_reset_o    <= '1';
-      cart_dotclock_o <= '0';
-      cart_game_o     <= '1';
-      cart_exrom_o    <= '1';
-      cart_nmi_o      <= '1';
-      cart_irq_o      <= '1';
-      cart_roml_o     <= '0';
-      cart_romh_o     <= '0';
-      cart_ba_o       <= '0';
-      cart_rw_o       <= '0';
-      cart_io1_o      <= '0';
-      cart_io2_o      <= '0';
-      cart_a_o        <= (others => '0');
-      cart_d_o        <= (others => '0');
+      cart_phi2     <= '0';
+      cart_reset    <= '1';
+      cart_dotclock <= '0';
+      cart_game     <= '1';
+      cart_exrom    <= '1';
+      cart_nmi      <= '1';
+      cart_irq      <= '1';
+      cart_roml     <= '0';
+      cart_romh     <= '0';
+      cart_ba       <= '0';
+      cart_rw       <= '0';
+      cart_io1      <= '0';
+      cart_io2      <= '0';
+      cart_a        <= (others => '0');
+      cart_d        <= (others => '0');
 
       cart_nmi_n      <= '1';
       cart_irq_n      <= '1';
@@ -841,9 +892,9 @@ begin
       -- Mode = Use hardware slot
       if c64_exp_port_mode_i = C_EXP_PORT_HARDWARE then
          -- Hardcoded to WRITE-ONLY (OUTPUT) for the time being
-         cart_ctrl_oe_o  <= '1';
-         cart_roml_oe_o  <= '1';
-         cart_romh_oe_o  <= '1';
+         cart_ctrl_oe  <= '1';
+         cart_roml_oe  <= '1';
+         cart_romh_oe  <= '1';
 
          -- Bi-directional RESET handling:
          -- Default is: READ (aka sense reset from the cartridge). We are switching this to WRITE
@@ -852,22 +903,22 @@ begin
          -- We also need to ensure that we are not transmitting any reset that comes from the cartridge
          -- itself, because in such a case the cartridge wants to reset the C64 but does not want to be reset by the C64,
          -- which is why we use reset_core_int_n instead of reset_core_n.
-         cart_reset_o    <= reset_core_int_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
-         cart_reset_oe_o <= not cart_reset_o;
+         cart_reset    <= reset_core_int_n when cart_reset_counter = 0 and cart_res_flckr_ign = 0 else '1';
+         cart_reset_oe <= not cart_reset_o;
 
          -- Connect physical output lines to the core's various output signals
-         cart_roml_o     <= cart_roml_n;
-         cart_romh_o     <= cart_romh_n;
-         cart_io1_o      <= cart_io1_n;
-         cart_io2_o      <= cart_io2_n;
-         cart_rw_o       <= not c64_ram_we;
-         cart_phi2_o     <= core_phi2_delay; -- Delayed 30 ns.
-         cart_dotclock_o <= core_dotclk;
+         cart_roml     <= cart_roml_n;
+         cart_romh     <= cart_romh_n;
+         cart_io1      <= cart_io1_n;
+         cart_io2      <= cart_io2_n;
+         cart_rw       <= not c64_ram_we;
+         cart_phi2     <= core_phi2;
+         cart_dotclock <= core_dotclk;
 
          -- @TODO: When implementing this, we need to perform more research. It seems that just using
          -- the C64 cores's "cpuHasBus" signal leads to less compatibility than more. For example it
          -- seemed, that the Kung Fu Flash is not working at all any more.
-         cart_ba_o       <= '1';
+         cart_ba       <= '1';
 
          cart_nmi_n      <= cart_nmi_i;
          cart_irq_n      <= cart_irq_i;
@@ -877,27 +928,27 @@ begin
 
          -- @TODO: As soon as we want to support DMA-enabled cartridges,
          -- we need to treat the address bus as a bi-directional port
-         cart_addr_oe_o  <= '1';
+         cart_addr_oe  <= '1';
          if core_umax_romh = '0' then
-            cart_a_o <= c64_ram_addr_o;
+            cart_a <= c64_ram_addr_o;
          -- Ultimax mode and VIC accesses the bus
          else
             -- According to "The PLA Dissected", the address lines A12 to A15 of the C64 address bus are pulled up by
             -- RP4 whenever the VIC-II has the bus, so they are %1111 usually.
-            cart_a_o <= "11" & c64_ram_addr_o(13 downto 0);
+            cart_a <= "11" & c64_ram_addr_o(13 downto 0);
          end if;
 
          -- Switch the data lines bi-directionally so that the CPU can also
          -- write to the cartridge, e.g. for bank switching
          if c64_ram_we = '0' and (cart_roml_n = '0' or cart_romh_n = '0' or cart_io1_n = '0' or cart_io2_n = '0') then
-            cart_data_oe_o <= '0';                                                                                     -- input
+            cart_data_oe <= '0';                                                                                     -- input
             data_from_cart <= cart_d_i;
          else
-            cart_data_oe_o <= '1';                                                                                     -- output
+            cart_data_oe <= '1';                                                                                     -- output
             if c64_ram_we = '0' then
-               cart_d_o <= c64_ram_data_i;
+               cart_d <= c64_ram_data_i;
             else
-               cart_d_o <= c64_ram_data_o;
+               cart_d <= c64_ram_data_o;
             end if;
          end if;
       end if;
