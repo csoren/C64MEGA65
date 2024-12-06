@@ -382,6 +382,7 @@ architecture synthesis of main is
    signal   core_io_data         : unsigned(7 downto 0);
    signal   core_dotclk          : std_logic;
    signal   core_phi2            : std_logic;
+   signal   core_phi2_delay      : std_logic;
    signal   core_phi2_prev       : std_logic;
    signal   cartridge_bank_raddr : std_logic_vector(24 downto 0);
 
@@ -759,6 +760,14 @@ begin
    --    * Simulateed cartridge using data from .crt file
    --------------------------------------------------------------------------------------------------
 
+   -- Delay cartridge phi2 with one clock cycle (circa 30 ns).
+   core_phi2_delay_proc : process (clk_main_i)
+   begin
+      if rising_edge(clk_main_i) then
+         core_phi2_delay <= core_phi2;
+      end if;
+   end process core_phi2_delay_proc;
+
    handle_hardware_expansion_proc : process (all)
    begin
       -- C64 Expansion Port (aka Cartridge Port) control lines
@@ -852,7 +861,7 @@ begin
          cart_io1_o      <= cart_io1_n;
          cart_io2_o      <= cart_io2_n;
          cart_rw_o       <= not c64_ram_we;
-         cart_phi2_o     <= core_phi2;
+         cart_phi2_o     <= core_phi2_delay; -- Delayed 30 ns.
          cart_dotclock_o <= core_dotclk;
 
          -- @TODO: When implementing this, we need to perform more research. It seems that just using
