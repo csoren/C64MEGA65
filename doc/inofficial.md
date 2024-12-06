@@ -5,6 +5,12 @@ builds that were not there in older builds. By finding the last known-to-work
 build, we have a better chance to hunt down problems. The name of the build
 can be checked in the "About & Help" menu of the core.
 
+## Version 5.3
+
+| Name          | Date     | Commit  | Comment
+|---------------|----------|---------|--------------------------------------
+| WIP-V5.3-A1   | 06/12/24 | 03960c66 | Attempt to fix issue #143: TeensyROM is not booting its menu
+
 ## Version 5.2
 
 | Name          | Date     | Commit  | Comment
