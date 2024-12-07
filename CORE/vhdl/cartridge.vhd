@@ -193,6 +193,20 @@ begin
                   iof_ena    <= '1';
                end if;
 
+            when 4 =>
+               -- Simons BASIC
+               -- One low 8k bank, one upper 8k bank which is enabled or disabled
+               -- by reading or writing the IO area respectively
+               if ioe_i = '1' then
+                  game_o <= not wr_en_i;
+               end if;
+               if cart_loading_i = '1' then
+                  game_o    <= '0';
+                  exrom_o   <= '0';
+                  bank_lo_o <= (others => '0');
+                  bank_hi_o <= (others => '0');
+               end if;
+               
             when 5 =>
                -- Ocean Type 1 - (game=0, exrom=0, 128k,256k or 512k in 8k banks)
                -- BANK is written to lower 6 bits of $DE00 - bit 8 is always set
