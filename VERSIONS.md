@@ -1,3 +1,27 @@
+WIP Version 5.2 - MONTH DAY, YEAR
+=================================
+
+This is a maintenance release with the main purpose of stabilizing the HDMI
+output by fixing the "Jail Bars" problem that mainly happened on R6 boards and
+occasionally also on R3 boards. Moreover it contains a few bug fixes and minor
+enhancements.
+
+WIP List of things that have been already done for V5.2:
+
+## New Features
+
+* Simulated cartridges (`*.crt`) are now also supporting COMAL 80 and
+  Simons BASIC
+  (GitHub Pull Requests https://github.com/MJoergen/C64MEGA65/pull/168 and)
+   https://github.com/MJoergen/C64MEGA65/pull/169
+
+## Bugfixes
+
+* Fixed the "Jail Bars" HDMI problem aka vertical bars over HDMI. The root
+  cause was a problem with our HyperRAM controller.
+  (Fixed GitHub issues https://github.com/MJoergen/C64MEGA65/issues/145 and
+   https://github.com/MJoergen/C64MEGA65/issues/166)
+
 Version 5.1 - June 28, 2024
 ===========================
 
