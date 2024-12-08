@@ -43,12 +43,10 @@ entity sw_cartridge_wrapper is
       main_bank_wait_o    : out   std_logic;
       main_ram_addr_i     : in    std_logic_vector(15 downto 0);
       main_ram_data_i     : in    std_logic_vector( 7 downto 0);
-      main_ioe_we_i       : in    std_logic;
-      main_iof_we_i       : in    std_logic;
+      main_io_we_i        : in    std_logic;
       main_lo_ram_data_o  : out   std_logic_vector(15 downto 0);
       main_hi_ram_data_o  : out   std_logic_vector(15 downto 0);
-      main_ioe_ram_data_o : out   std_logic_vector( 7 downto 0);
-      main_iof_ram_data_o : out   std_logic_vector( 7 downto 0);
+      main_io_ram_data_o  : out   std_logic_vector( 7 downto 0);
 
       mem_clk_i           : in    std_logic;
       mem_rst_i           : in    std_logic;
@@ -502,45 +500,25 @@ begin
    -- Instantiate I/O memory
    -------------------------------------------------------------
 
-   ioe_ram_inst : entity work.tdp_ram
+   io_ram_inst : entity work.tdp_ram
       generic map (
-         ADDR_WIDTH => 8,         -- 256 bytes
+         ADDR_WIDTH => 13,         -- 8k bytes
          DATA_WIDTH => 8
       )
       port map (
          -- C64 MiSTer core
          clock_a   => main_clk_i,
-         address_a => main_ram_addr_i(7 downto 0),
+         address_a => main_ram_addr_i(12 downto 0),
          data_a    => main_ram_data_i,
-         wren_a    => main_ioe_we_i,
-         q_a       => main_ioe_ram_data_o,
+         wren_a    => main_io_we_i,
+         q_a       => main_io_ram_data_o,
 
          clock_b   => '0',
          address_b => (others => '0'),
          data_b    => (others => '0'),
          wren_b    => '0',
          q_b       => open
-      ); -- ioe_ram_inst
-
-   iof_ram_inst : entity work.tdp_ram
-      generic map (
-         ADDR_WIDTH => 8,         -- 256 bytes
-         DATA_WIDTH => 8
-      )
-      port map (
-         -- C64 MiSTer core
-         clock_a   => main_clk_i,
-         address_a => main_ram_addr_i(7 downto 0),
-         data_a    => main_ram_data_i,
-         wren_a    => main_iof_we_i,
-         q_a       => main_iof_ram_data_o,
-
-         clock_b   => '0',
-         address_b => (others => '0'),
-         data_b    => (others => '0'),
-         wren_b    => '0',
-         q_b       => open
-      ); -- iof_ram_inst
+      ); -- io_ram_inst
 
 end architecture synthesis;
 

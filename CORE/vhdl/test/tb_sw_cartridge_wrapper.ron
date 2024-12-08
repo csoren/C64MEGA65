@@ -1,0 +1,1456 @@
+(
+    show_hierarchy: None,
+    show_menu: None,
+    show_ticks: None,
+    show_toolbar: None,
+    show_tooltip: None,
+    show_overview: None,
+    show_statusbar: None,
+    align_names_right: None,
+    show_variable_indices: None,
+    show_variable_direction: None,
+    show_empty_scopes: None,
+    show_parameters_in_scopes: None,
+    waves: Some((
+        source: File("tb_sw_cartridge_wrapper.ghw"),
+        format: Ghw,
+        active_scope: Some(WaveScope((
+            strs: [
+                "tb_sw_cartridge_wrapper",
+                "i_sw_cartridge_wrapper",
+            ],
+        ))),
+        displayed_items_order: [
+            (25),
+            (1),
+            (2),
+            (3),
+            (4),
+            (5),
+            (6),
+            (7),
+            (8),
+            (9),
+            (10),
+            (11),
+            (12),
+            (13),
+            (14),
+            (15),
+            (16),
+            (17),
+            (18),
+            (77),
+            (21),
+            (22),
+            (78),
+            (27),
+            (26),
+            (28),
+            (29),
+            (30),
+            (31),
+            (32),
+            (33),
+            (34),
+            (35),
+            (36),
+            (37),
+            (38),
+            (39),
+            (40),
+            (41),
+            (42),
+            (43),
+            (44),
+            (45),
+            (46),
+            (47),
+            (48),
+            (49),
+            (50),
+            (51),
+            (52),
+            (53),
+            (54),
+            (55),
+            (56),
+            (57),
+            (58),
+            (59),
+            (60),
+            (61),
+            (62),
+            (63),
+            (64),
+            (65),
+            (66),
+            (67),
+            (68),
+            (69),
+            (70),
+            (71),
+            (72),
+            (73),
+            (74),
+            (75),
+            (76),
+        ],
+        displayed_items: {
+            (6): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_exrom_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_exrom_o [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (9): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_laddr_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_laddr_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (32): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_exrom_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_exrom_i [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (4): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_loading_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_loading_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (16): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_wait_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_wait_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (21): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_lo_ram_data_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_lo_ram_data_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (72): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "hiram",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "hiram",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (11): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_num_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_num_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (43): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_data_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_data_o [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (66): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_exrom",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_exrom",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (8): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_size_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_size_o [22:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (17): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_ram_addr_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_addr_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (13): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_wr_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_wr_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (76): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioport_dir",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioport_dir [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (54): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_roml",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_roml",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (39): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_lo_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_lo_o [6:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (42): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_addr_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_addr_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (35): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_size_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_size_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (50): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_running_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_running_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (22): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_hi_ram_data_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_hi_ram_data_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (52): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_wr_data_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_wr_data_i [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (61): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_rom_readdata",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_rom_readdata [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (30): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_loading_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_loading_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (70): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_basic_rom",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_basic_rom",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (10): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_size_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_size_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (29): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_reset_core_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_reset_core_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (59): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_iof_wr_ena",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_iof_wr_ena",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (57): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_iof",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_iof",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (40): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_hi_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_hi_o [6:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (62): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_readdata",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_readdata [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (18): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_ram_data_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_data_i [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (33): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_game_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_game_i [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (77): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_io_we_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_io_we_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (74): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioport_in",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioport_in [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (45): Placeholder((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_iof_we_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_iof_we_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (31): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_id_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_id_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (25): Divider((
+                color: None,
+                background_color: None,
+                name: Some("sw_cartridge_wrapper"),
+            )),
+            (3): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_reset_core_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_reset_core_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (56): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioe",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioe",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (64): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_wr_en",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_wr_en",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (46): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_lo_ram_data_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_lo_ram_data_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (34): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_laddr_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_laddr_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (28): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_rst_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…i_core_sim.main_rst_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (36): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_num_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_num_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (37): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_raddr_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_raddr_i [24:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (44): Placeholder((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioe_we_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioe_we_o",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (5): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_id_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_id_o [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (2): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_rst_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…i_sw_cartridge_wrapper.main_rst_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (58): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioe_wr_ena",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioe_wr_ena",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (78): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_io_ram_data_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_io_ram_data_o [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (12): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_raddr_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_raddr_o [24:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (47): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_hi_ram_data_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_hi_ram_data_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (49): Placeholder((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_iof_ram_data_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_iof_ram_data_i [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (69): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_kernal_rom",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_kernal_rom",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (38): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_wr_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_wr_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (53): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_wr_en_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_wr_en_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (55): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_romh",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_romh",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (48): Placeholder((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioe_ram_data_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioe_ram_data_i [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (68): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ce",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ce",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (63): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_io_dxxx",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_io_dxxx [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (67): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_game",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_game",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (1): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_clk_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…i_sw_cartridge_wrapper.main_clk_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (75): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ioport_out",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ioport_out [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (60): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_data_to_c64",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_data_to_c64 [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (41): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_bank_wait_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_wait_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (26): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_clk_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "…i_core_sim.main_clk_i",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (7): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_game_o",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_game_o [7:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (65): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_io_rom",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_io_rom",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (73): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "charen",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "charen",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (14): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_lo_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_lo_i [6:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (15): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_sw_cartridge_wrapper",
+                        ],
+                    ),
+                    name: "main_bank_hi_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_bank_hi_i [6:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (71): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "loram",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "loram",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (51): Variable((
+                variable_ref: (
+                    path: (
+                        strs: [
+                            "tb_sw_cartridge_wrapper",
+                            "i_core_sim",
+                        ],
+                    ),
+                    name: "main_ram_wr_addr_i",
+                ),
+                color: None,
+                background_color: None,
+                display_name: "main_ram_wr_addr_i [15:0]",
+                display_name_type: Unique,
+                manual_name: None,
+                format: None,
+                field_formats: [],
+            )),
+            (27): Divider((
+                color: None,
+                background_color: None,
+                name: Some("core_sim"),
+            )),
+        },
+        display_item_ref_counter: 78,
+        viewports: [
+            (
+                curr_left: (0.0),
+                curr_right: (1.0),
+                target_left: (0.0),
+                target_right: (1.0),
+                move_start_left: (0.0),
+                move_start_right: (1.0),
+                move_duration: None,
+                move_strategy: Instant,
+            ),
+        ],
+        cursor: Some((1, [
+            2472746278,
+            20,
+        ])),
+        markers: {},
+        focused_item: Some((22)),
+        focused_transaction: (None, None),
+        selected_items: [],
+        default_variable_name_type: Unique,
+        scroll_offset: 0.78129005,
+        display_variable_indices: true,
+        graphics: {},
+    )),
+    drag_started: true,
+    drag_source_idx: Some((76)),
+    drag_target_idx: Some((14)),
+    previous_waves: None,
+    count: None,
+    blacklisted_translators: [],
+    show_about: false,
+    show_keys: false,
+    show_gestures: false,
+    show_quick_start: false,
+    show_license: false,
+    show_performance: false,
+    show_logs: false,
+    show_cursor_window: false,
+    wanted_timeunit: MicroSeconds,
+    time_string_format: None,
+    show_url_entry: false,
+    variable_name_filter_focused: false,
+    variable_name_filter_type: Fuzzy,
+    variable_name_filter_case_insensitive: true,
+    rename_target: None,
+    sidepanel_width: Some(300.0),
+    ui_zoom_factor: None,
+)

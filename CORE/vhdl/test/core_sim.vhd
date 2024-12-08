@@ -32,13 +32,15 @@ entity core_sim is
       main_bank_wait_i    : in  std_logic;
       main_ram_addr_o     : out std_logic_vector(15 downto 0);
       main_ram_data_o     : out std_logic_vector( 7 downto 0);
-      main_ioe_we_o       : out std_logic;
-      main_iof_we_o       : out std_logic;
+      main_io_we_o        : out std_logic;
       main_lo_ram_data_i  : in  std_logic_vector(15 downto 0);
       main_hi_ram_data_i  : in  std_logic_vector(15 downto 0);
-      main_ioe_ram_data_i : in  std_logic_vector( 7 downto 0);
-      main_iof_ram_data_i : in  std_logic_vector( 7 downto 0);
-      main_running_o      : out std_logic := '1'
+      main_io_ram_data_i  : in  std_logic_vector( 7 downto 0);
+      main_running_o      : out std_logic := '1';
+      main_ram_wr_addr_i  : in  std_logic_vector(15 downto 0);
+      main_ram_wr_data_i  : in  std_logic_vector( 7 downto 0);
+      main_ram_wr_en_i    : in  std_logic;
+      main_freeze_i       : in  std_logic
    );
 end entity core_sim;
 
@@ -52,6 +54,7 @@ architecture simulation of core_sim is
    signal main_iof             : std_logic;
    signal main_ioe_wr_ena      : std_logic;
    signal main_iof_wr_ena      : std_logic;
+   signal main_roml_we         : std_logic;
    signal main_ram_data_to_c64 : std_logic_vector(7 downto 0);
    signal main_rom_readdata    : std_logic_vector(7 downto 0);
    signal main_ram_readdata    : std_logic_vector(7 downto 0);
@@ -61,60 +64,107 @@ architecture simulation of core_sim is
    signal main_exrom           : std_logic;
    signal main_game            : std_logic;
    signal main_ce              : std_logic := '0';
+   signal main_nmi             : std_logic;
+   signal main_nmi_ack         : std_logic;
+
+   signal main_ram_addr : std_logic_vector(15 downto 0);
+   signal main_ram_data : std_logic_vector( 7 downto 0);
+   signal main_ram_we   : std_logic;
+
+   signal main_kernal_rom : std_logic;
+   signal main_basic_rom  : std_logic;
+   signal loram  : std_logic;
+   signal hiram  : std_logic;
+   signal charen : std_logic;
+
+   signal main_ioport_in  : std_logic_vector(7 downto 0);
+   signal main_ioport_out : std_logic_vector(7 downto 0);
+   signal main_ioport_dir : std_logic_vector(7 downto 0);
+   signal main_raster     : std_logic_vector(7 downto 0) := X"00";
 
 begin
 
-   main_ram_data_to_c64 <= main_lo_ram_data_i(15 downto 8) when main_roml = '1' and main_ram_addr_o(0) = '1' else
-                           main_lo_ram_data_i( 7 downto 0) when main_roml = '1' and main_ram_addr_o(0) = '0' else
+   main_ram_data_to_c64 <= main_lo_ram_data_i(15 downto 8) when main_roml = '1' and main_roml_we = '0' and main_ram_addr_o(0) = '1' else
+                           main_lo_ram_data_i( 7 downto 0) when main_roml = '1' and main_roml_we = '0' and main_ram_addr_o(0) = '0' else
+                           main_io_ram_data_i              when main_roml = '1' and main_roml_we = '1' else
                            main_hi_ram_data_i(15 downto 8) when main_romh = '1' and main_ram_addr_o(0) = '1' else
                            main_hi_ram_data_i( 7 downto 0) when main_romh = '1' and main_ram_addr_o(0) = '0' else
                            main_lo_ram_data_i(15 downto 8) when main_ioe  = '1' and main_ram_addr_o(0) = '1' and main_ioe_wr_ena = '0' else
                            main_lo_ram_data_i( 7 downto 0) when main_ioe  = '1' and main_ram_addr_o(0) = '0' and main_ioe_wr_ena = '0' else
                            main_lo_ram_data_i(15 downto 8) when main_iof  = '1' and main_ram_addr_o(0) = '1' and main_iof_wr_ena = '0' else
                            main_lo_ram_data_i( 7 downto 0) when main_iof  = '1' and main_ram_addr_o(0) = '0' and main_iof_wr_ena = '0' else
-                           main_ioe_ram_data_i             when main_ioe  = '1' and main_ioe_wr_ena = '1'     else
-                           main_iof_ram_data_i             when main_iof  = '1' and main_iof_wr_ena = '1'     else
-                           main_rom_readdata               when main_ram_addr_o(15 downto 13) = "101"        else
-                           main_rom_readdata               when main_ram_addr_o(15 downto 13) = "111"        else
+                           main_io_ram_data_i              when main_ioe  = '1' and main_ioe_wr_ena = '1'    else
+                           main_io_ram_data_i              when main_iof  = '1' and main_iof_wr_ena = '1'    else
+                           main_rom_readdata               when main_basic_rom = '1'                         else
+                           main_rom_readdata               when main_kernal_rom = '1'                        else
                            main_io_dxxx                    when main_ram_addr_o(15 downto 12) = "1101"       else
                            main_ram_readdata;
 
-   main_io_dxxx <= X"FF" when main_ram_addr_o(11 downto 0) = X"C01" else
-                   X"00";
+   loram  <= main_ioport_in(0);
+   hiram  <= main_ioport_in(1);
+   charen <= main_ioport_in(2);
+
+   -- Simplified PLA.
+   -- Logic inspired by https://www.c64-wiki.com/wiki/Bank_Switching
+
+   -- CART ROM LO
+   main_roml <= '1' when main_ram_addr_o(15 downto 13) = "100" and main_exrom = '1' and main_game = '0'             else
+                '1' when main_ram_addr_o(15 downto 13) = "100" and main_exrom = '0' and hiram = '1' and loram = '1' else
+                '0';
+
+   -- CART ROM HI
+   main_romh <= '1' when main_ram_addr_o(15 downto 13) = "101" and main_exrom = '0' and main_game = '0' and hiram = '1' else
+                '1' when main_ram_addr_o(15 downto 13) = "111" and main_exrom = '1' and main_game = '0'                 else
+                '0';
+
+   main_basic_rom  <= '1' when main_ram_addr_o(15 downto 13) = "101" and main_game = '1' and hiram = '1' and loram = '1' else
+                      '0';
+   main_kernal_rom <= '1' when main_ram_addr_o(15 downto 13) = "111" and main_exrom = '1' and main_game = '1' and hiram = '1' else
+                      '1' when main_ram_addr_o(15 downto 13) = "111" and main_exrom = '0' and hiram = '1'                     else
+                      '0';
 
    main_ioe        <= '1' when main_ram_addr_o(15 downto 8) = X"DE" else '0';
    main_iof        <= '1' when main_ram_addr_o(15 downto 8) = X"DF" else '0';
-   main_ioe_we_o   <= main_ioe and main_wr_en;
-   main_iof_we_o   <= main_iof and main_wr_en;
 
-   -- Simplified PLA
-   main_roml <= '1' when main_ram_addr_o(15 downto 13) = "100"      -- 0x8000 - 0x9FFF
-                     and main_exrom = '0'
-           else '0';
-   main_romh <= '1' when main_ram_addr_o(15 downto 13) = "101"      -- 0xA000 - 0xBFFF
-                     and main_exrom = '0'
-                     and main_game = '0'
-           else '1' when main_ram_addr_o(15 downto 13) = "111"      -- 0xE000 - 0xFFFF
-                     and main_exrom = '1'
-                     and main_game = '0'
-           else '0';
+   main_io_dxxx <= X"FF" when main_ram_addr_o(11 downto 0) = X"C01" else
+                   main_raster when main_ram_addr_o(11 downto 0) = X"012" else
+                   X"00";
+
+   main_io_we_o    <= (main_ioe or main_iof or (main_roml and main_roml_we)) and main_wr_en;
 
    main_ce <= not main_ce when rising_edge(main_clk_i);
 
+   p_raster : process
+   begin
+      main_raster <= std_logic_vector(unsigned(main_raster) + 1);
+      wait for 10 us;
+   end process p_raster;
+
    i_cpu_65c02 : entity work.cpu_65c02
+      generic map (
+         G_ENABLE_IOPORT => true,
+         G_VARIANT       => "6502",
+         G_VERBOSE       => 2
+      )
       port map (
-         clk_i     => main_clk_i,
-         rst_i     => main_rst_i or main_reset_core_i,
-         ce_i      => main_ce and not main_bank_wait_i,
-         nmi_i     => '0',
-         irq_i     => '0',
-         addr_o    => main_ram_addr_o,
-         wr_en_o   => main_wr_en,
-         wr_data_o => main_ram_data_o,
-         rd_en_o   => open,
-         rd_data_i => main_ram_data_to_c64,
-         debug_o   => open
+         clk_i        => main_clk_i,
+         rst_i        => main_rst_i or main_reset_core_i,
+         ce_i         => main_ce and not main_bank_wait_i and not main_ram_wr_en_i,
+         nmi_i        => main_nmi,
+         nmi_ack_o    => main_nmi_ack,
+         irq_i        => '0',
+         addr_o       => main_ram_addr_o,
+         wr_en_o      => main_wr_en,
+         wr_data_o    => main_ram_data_o,
+         rd_en_o      => open,
+         rd_data_i    => main_ram_data_to_c64,
+         ioport_in_i  => main_ioport_in,
+         ioport_out_o => main_ioport_out,
+         ioport_dir_o => main_ioport_dir,
+         debug_o      => open
       ); -- i_cpu_65c02
+
+   main_ioport_in <= (main_ioport_out and main_ioport_dir) or (X"3F" and not main_ioport_dir);
 
    i_cartridge : entity work.cartridge
       port map (
@@ -129,6 +179,7 @@ begin
          iof_i          => main_iof,
          ioe_wr_ena_o   => main_ioe_wr_ena,
          iof_wr_ena_o   => main_iof_wr_ena,
+         roml_we_o      => main_roml_we,
          wr_en_i        => main_wr_en,
          wr_data_i      => main_ram_data_o,
          addr_i         => main_ram_addr_o,
@@ -137,9 +188,10 @@ begin
          io_rom_o       => main_io_rom,
          exrom_o        => main_exrom,
          game_o         => main_game,
-         freeze_key_i   => '0',
+         freeze_key_i   => main_freeze_i,
          mod_key_i      => '0',
-         nmi_ack_i      => '0'
+         nmi_o          => main_nmi,
+         nmi_ack_i      => main_nmi_ack
       ); -- i_cartridge
 
    i_avm_rom : entity work.avm_rom
@@ -171,16 +223,22 @@ begin
       port map (
          clk_i               => not main_clk_i,
          rst_i               => main_rst_i or main_reset_core_i,
-         avm_write_i         => main_wr_en,
-         avm_read_i          => not main_wr_en,
-         avm_address_i       => main_ram_addr_o,
-         avm_writedata_i     => main_ram_data_o,
+         avm_write_i         => main_ram_we,
+         avm_read_i          => not main_ram_we,
+         avm_address_i       => main_ram_addr,
+         avm_writedata_i     => main_ram_data,
          avm_byteenable_i    => (others => '1'),
          avm_burstcount_i    => X"01",
          avm_readdata_o      => main_ram_readdata,
          avm_readdatavalid_o => open,
          avm_waitrequest_o   => open
       ); -- i_avm_memory
+
+
+
+   main_ram_addr <= main_ram_wr_addr_i when main_ram_wr_en_i = '1' else main_ram_addr_o;
+   main_ram_data <= main_ram_wr_data_i when main_ram_wr_en_i = '1' else main_ram_data_o;
+   main_ram_we   <= main_ram_wr_en_i   when main_ram_wr_en_i = '1' else main_wr_en;
 
 end architecture simulation;
 

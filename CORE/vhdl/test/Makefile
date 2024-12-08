@@ -12,7 +12,7 @@ SRC += ../../../M2M/vhdl/memory/avm_memory.vhd
 SRC += ../../../M2M/vhdl/cdc_slow.vhd
 SRC += ../../../M2M/vhdl/cdc_stable.vhd
 SRC += ../../../M2M/vhdl/qnice_csr.vhd
-SRC += ../../../M2M/vhdl/qnice2hyperram.vhd
+SRC += ../../../M2M/vhdl/qnice2avalon.vhd
 SRC += ../../../M2M/vhdl/tdp_ram.vhd
 
 SRC += ../../../../65c02/src/datapath/alu.vhd
@@ -28,7 +28,8 @@ SRC += ../../../../65c02/src/datapath/xr.vhd
 SRC += ../../../../65c02/src/datapath/yr.vhd
 SRC += ../../../../65c02/src/datapath/zp.vhd
 SRC += ../../../../65c02/src/control/control.vhd
-SRC += ../../../../65c02/src/control/microcode.vhd
+SRC += ../../../../65c02/src/control/microcode_65c02.vhd
+SRC += ../../../../65c02/src/control/microcode_6502.vhd
 SRC += ../../../../65c02/src/cpu_65c02.vhd
 
 SRC += qnice_sim.vhd
@@ -36,8 +37,15 @@ SRC += core_sim.vhd
 
 #CRT_FILE = Super_Mario_Bros_64_v1.2_-_Zeropaige.crt
 #CRT_FILE = Final_Cartridge_III,_The_\(USA,_Europe\)_\(May_88\)_\(Program\).crt
-CRT_FILE = Wormhole_GMod2.crt
-CRT_DIR  = $(HOME)/Documents/MEGA65/MEGA65-SD/c64/
+#CRT_FILE = Wormhole_GMod2.crt
+#CRT_FILE = Wonderboy_MagicDesk.crt
+#CRT_FILE = Wonderboy_1987Activision.crt
+CRT_FILE = Action_Replay_V6.0_6.0_1989_PAL.crt
+CRT_DIR  := $(HOME)/Documents/FPGA/MEGA65/MEGA65-SD/c64
+CRT_DIR  := $(CRT_DIR)/games/A/action_replay_v6_0/Action_Replay
+
+OUT_FILE = $(HOME)/$(CRT_FILE).txt
+STOP_TIME = 25ms
 
 
 #DUT ?= crt_parser
@@ -58,7 +66,8 @@ sim: $(SRC) xpm-obj08.cf
 	xxd -r -p $(ROM_FILE).hex $(ROM_FILE).bin
 	ghdl -i --std=08 --work=work $(SRC)
 	ghdl -m --std=08 -fexplicit $(TB)
-	ghdl -r --std=08 $(TB) $(GENERIC) --assert-level=error --wave=$(WAVE) --max-stack-alloc=2097151 --stop-time=3000us | tee output.txt
+	ghdl -r --std=08 $(TB) $(GENERIC) --assert-level=error --wave=$(WAVE) --max-stack-alloc=2097151 \
+		--stop-time=$(STOP_TIME) | tee $(OUT_FILE)
 
 xpm-obj08.cf:
 	ghdl -a --work=xpm --std=08 ${XPM_TOP_DIR}/src/xpm/xpm_VCOMP.vhd
