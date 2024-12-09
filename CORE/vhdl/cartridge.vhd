@@ -314,6 +314,19 @@ begin
                   bank_hi_o    <= (others => '0');
                end if;
 
+            when 22 =>
+               -- Waterloo Structured BASIC (game=1, exrom=0, two 8k banks)
+               if ioe_i = '1' then
+                  bank_lo_o <= "000000" & addr_i(1);
+                  exrom_o   <= addr_i(0);
+               end if;
+               if cart_loading_i = '1' then
+                  game_o       <= '1';
+                  exrom_o      <= '0';
+                  bank_lo_o    <= (others => '0');
+                  bank_hi_o    <= (others => '0');
+               end if;
+
             when 32 =>
                -- EASYFLASH - 1mb 128x8k/64x16k, XBank format(33) looks the same
                -- upd: original Easyflash(32) boots in ultimax mode.
