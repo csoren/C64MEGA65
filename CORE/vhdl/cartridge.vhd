@@ -364,6 +364,19 @@ begin
                   bank_lo_o <= (others => '0');
                end if;
 
+            when 68 =>
+               -- BIS-Plus (game=1, exrom=0, one 8k bank)
+               -- Any access to $DExx sets exrom, requiring reset to enable
+               if ioe_i = '1' then
+                  exrom_o <= '1';
+               end if;
+               if cart_loading_i = '1' then
+                  game_o       <= '1';
+                  exrom_o      <= '0';
+                  bank_lo_o    <= (others => '0');
+                  bank_hi_o    <= (others => '0');
+               end if;
+
             when others =>
                null;
          end case;
